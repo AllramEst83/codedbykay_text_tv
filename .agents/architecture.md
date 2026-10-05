@@ -8,7 +8,7 @@ Keep the file list below in step with `lib/` as it changes.
 
 ```
 lib/
-  main.dart                  # runApp + wiring: IoHttpFetcher -> TextTv -> LiveTextTvRepository -> TextTvApp
+  main.dart                  # runApp + wiring: IoHttpFetcher -> TextTv -> LiveTextTvRepository, PrefsSessionStore -> saved session -> TextTvApp
   app.dart                   # TextTvApp: MaterialApp, theme, edge-to-edge black system bars
   messages.dart              # user-facing strings
   model/                     # pure Dart (values and parsers): no platform, no I/O
@@ -17,6 +17,7 @@ lib/
     text_tv_html.dart        # parseTextTvHtml: a page's HTML as styled rows (null if not the shape expected, so the plain text is the fallback)
     tv_mosaic.dart           # tvPictureFor(hash): texttv.nu's block-graphics GIFs rebuilt and looked up by CRC-32 (no downloads)
     tv_layout.dart           # tvIsBar / tvTextMargins / tvGutters: the black gutter each side of a page that gives its TEXT equal margins
+    text_tv_session.dart     # TextTvSession (page, part, history <= 50): what a cold start returns to; tolerant encode/decode
     text_tv_headlines.dart   # textTvHeadlines(page): the headline lines of a page (no title, bare numbers or navigation); not used by the UI yet
   services/
     http_fetcher.dart        # HttpFetcher: GET a URL, return the body
@@ -25,6 +26,7 @@ lib/
     text_tv.dart             # TextTv: the texttv.nu client; page(n) -> TextTvPage? (null = not in broadcast), throws NetworkException
     text_tv_repository.dart  # TextTvRepository: page(n, {fresh}) -> TextTvResult, never throws
     live_text_tv_repository.dart # in-memory cache over TextTv: 5 min, 40 pages
+    session_store.dart       # SessionStore (load/save, never throws) and PrefsSessionStore on shared_preferences
   ui/
     theme.dart               # TvColors, TvMetrics, kPixelFontFamily, textTvTheme(): the chrome's colours and metrics, the only place they are defined
     text_tv_screen.dart      # TextTvScreen: state (page, part, history, number pad, request counter) and the layout of the screen
@@ -37,7 +39,7 @@ test/                        # mirrors lib/; fakes/ holds FakeHttpFetcher and Fa
 
 Rules:
 - `model/` imports nothing from `services/` or `ui/` (and no `dart:io`, no Flutter).
-- `ui/` reaches the network only through `TextTvRepository`. Tests inject a fake; nothing in `lib/` constructs a repository except `main.dart`.
+- `ui/` reaches the network only through `TextTvRepository` and storage only through callbacks wired in `main.dart`. Tests inject a fake; nothing in `lib/` constructs a repository except `main.dart`.
 - Expected failures are values (`TextTvResult`), not exceptions; `NetworkException` stays inside `services/`.
 - The page's colours are the fixed teletext palette in `tv_row.dart` and are not themeable; the chrome's colours are in `ui/theme.dart` and nowhere else.
 
@@ -94,6 +96,7 @@ The tests pin most of this; change the spec and the tests together.
 - The viewer is the home screen: no close button, and `PopScope(canPop: history empty and no keypad)` makes back step through the pages read and then leave the app.
 - One `textTvColumns` constant in `model/` is the grid width everywhere (client, parser, UI).
 - Release signing reads `android/key.properties` (untracked) and falls back to the debug key when it is absent, so CI and fresh clones build; see [android.md](android.md).
+- Remember where you were: `TextTvScreen` takes its starting `TextTvSession` and reports every move through `onSessionChanged`; it knows nothing about storage. `main.dart` loads the session before `runApp` and saves it fire-and-forget. A saved part the page no longer has is clamped when the page arrives; a stored page outside 100-899 or unreadable JSON means the front page. Dependency added: `shared_preferences` (Flutter team package, one JSON string under the key `session`).
 - The improvement backlog is in [improvements.md](improvements.md).
 
 ### Viewer design

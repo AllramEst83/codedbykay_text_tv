@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
+import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
@@ -6,32 +7,36 @@ import 'package:codedbykay_text_tv/ui/text_tv_page_area.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
 import 'package:flutter/material.dart';
 
-/// The Text TV viewer, the app's only screen: [start]'s page under a title
-/// bar, with previous/next page, a number pad, shortcuts to the pages people
+/// The Text TV viewer, the app's only screen: the page in [initial] under a
+/// title bar, with previous/next page, a number pad, shortcuts to the pages people
 /// read, tappable page links, and swipes between the parts of a page. The
 /// system back button steps back through the pages read, then leaves the app.
+/// [onSessionChanged] hears where the reader is after every move, so a later
+/// run can start there.
 class TextTvScreen extends StatefulWidget {
   const TextTvScreen({
     super.key,
     required this.repository,
-    this.start = textTvFirstPage,
+    this.initial = const TextTvSession(),
+    this.onSessionChanged,
   });
 
   final TextTvRepository repository;
-  final int start;
+  final TextTvSession initial;
+  final ValueChanged<TextTvSession>? onSessionChanged;
 
   @override
   State<TextTvScreen> createState() => _TextTvScreenState();
 }
 
 class _TextTvScreenState extends State<TextTvScreen> {
-  late int _number = widget.start;
-  int _part = 0;
+  late int _number = widget.initial.page;
+  late int _part = widget.initial.part;
   TextTvResult? _result;
   bool _loading = true;
 
   // The pages left behind, most recent last: what back returns to.
-  final List<int> _history = <int>[];
+  late final List<int> _history = List<int>.of(widget.initial.history);
 
   bool _keypad = false;
   String _typed = '';
@@ -43,18 +48,24 @@ class _TextTvScreenState extends State<TextTvScreen> {
   @override
   void initState() {
     super.initState();
-    _load(_number);
+    _load(_number, part: _part);
   }
 
-  Future<void> _load(int number, {bool fresh = false}) async {
+  /// Tells the listener where the reader is now.
+  void _report() => widget.onSessionChanged?.call(
+    TextTvSession(page: _number, part: _part, history: List<int>.of(_history)),
+  );
+
+  Future<void> _load(int number, {bool fresh = false, int part = 0}) async {
     final int request = ++_request;
     setState(() {
       _number = number;
-      _part = 0;
+      _part = part;
       _loading = true;
       _keypad = false;
       _typed = '';
     });
+    _report();
     final TextTvResult result = await widget.repository.page(
       number,
       fresh: fresh,
@@ -63,14 +74,22 @@ class _TextTvScreenState extends State<TextTvScreen> {
     setState(() {
       _loading = false;
       _result = result;
+      // A part remembered from an earlier run may no longer exist.
+      _part = result is TextTvShown
+          ? _part.clamp(0, result.page.parts.length - 1)
+          : 0;
     });
+    _report();
   }
 
   /// Goes to [number], remembering the page it leaves so back can return.
   void _open(int number) {
     if (number < textTvFirstPage || number > textTvLastPage) return;
     if (number == _number && !_loading && _result is TextTvShown) return;
-    if (number != _number) _history.add(_number);
+    if (number != _number) {
+      if (_history.length >= TextTvSession.maxHistory) _history.removeAt(0);
+      _history.add(_number);
+    }
     _load(number);
   }
 
@@ -109,6 +128,7 @@ class _TextTvScreenState extends State<TextTvScreen> {
   void _setPart(int part) {
     if (part < 0 || part >= _parts) return;
     setState(() => _part = part);
+    _report();
   }
 
   // A swipe left reads on (the next part, or past the last, the next page); a

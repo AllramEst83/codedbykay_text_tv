@@ -2,7 +2,7 @@
 
 - Application id and namespace: `com.codedbykay.texttv` (`android/app/build.gradle.kts`, `MainActivity.kt` package). Label "Text TV" in `AndroidManifest.xml`. Do not change the id after publishing.
 - Permissions: `INTERNET` only (main manifest; the debug/profile manifests also declare it for tooling). Cleartext traffic is off (`usesCleartextTraffic="false"`): texttv.nu is HTTPS. Add nothing else without a recorded reason in `architecture.md`.
-- No Kotlin beyond the stock `MainActivity` and no platform channels. If one is ever added, wrap it behind a Dart interface in `services/` and fake it in tests.
+- No Kotlin beyond the stock `MainActivity` and no platform channels of our own (`shared_preferences` brings its own plugin code). If one is ever added, wrap it behind a Dart interface in `services/` and fake it in tests.
 - The window is black from the first frame (`LaunchTheme`/`NormalTheme` in `res/values*/styles.xml`, `launch_background.xml`) because every page is black; the system bars are edge-to-edge, black, with light icons (`textTvSystemUi` in `app.dart`). `enableOnBackInvokedCallback` is on so the predictive back gesture reaches `PopScope`.
 - **Release signing**: `android/app/build.gradle.kts` reads `android/key.properties` (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`). That file and any `*.jks`/`*.keystore` are git-ignored (`android/.gitignore`); never commit them. Without it a release build falls back to the debug key (fine for CI and local sideloading, not for distribution). Create the keystore once and back it up outside the repo: losing it means a new application id for updates.
 - Version: `version:` in `pubspec.yaml` (`name+build`); bump the build number for every APK handed out.

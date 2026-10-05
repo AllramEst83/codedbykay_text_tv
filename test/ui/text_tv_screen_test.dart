@@ -1,6 +1,7 @@
 import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
+import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/model/tv_layout.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_screen.dart';
@@ -39,11 +40,17 @@ Future<void> _open(
   WidgetTester tester,
   FakeTextTvRepository repository, {
   int start = 100,
+  TextTvSession? session,
+  ValueChanged<TextTvSession>? onSessionChanged,
 }) async {
   await tester.pumpWidget(
     MaterialApp(
       theme: textTvTheme(),
-      home: TextTvScreen(repository: repository, start: start),
+      home: TextTvScreen(
+        repository: repository,
+        initial: session ?? TextTvSession(page: start),
+        onSessionChanged: onSessionChanged,
+      ),
     ),
   );
   await tester.pumpAndSettle();
@@ -571,6 +578,109 @@ void main() {
       await tester.tap(find.byKey(textTvNextKey));
       await tester.pumpAndSettle();
       expect(repository.requests.last, (556, false));
+    });
+  });
+
+  group('remembering where you were', () {
+    testWidgets('opens on the saved page, part and history', (
+      WidgetTester tester,
+    ) async {
+      final FakeTextTvRepository repository = _repository(<int>[377]);
+      repository.pages[377] = _page(
+        377,
+        parts: <List<String>>[
+          <String>['one'],
+          <String>['two'],
+        ],
+      );
+      await _open(
+        tester,
+        repository,
+        session: const TextTvSession(
+          page: 377,
+          part: 1,
+          history: <int>[100, 300],
+        ),
+      );
+
+      expect(repository.requests, <(int, bool)>[(377, false)]);
+      expect(_number('377'), findsOneWidget);
+      expect(find.text('${Messages.part} 2/2'), findsOneWidget);
+
+      // Back goes through the restored history.
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(_number('300'), findsOneWidget);
+    });
+
+    testWidgets(
+      'a saved part the page no longer has is brought back in range',
+      (WidgetTester tester) async {
+        await _open(
+          tester,
+          _repository(),
+          session: const TextTvSession(page: 101, part: 4),
+        );
+
+        expect(_number('101'), findsOneWidget);
+        expect(find.textContaining(Messages.part), findsNothing);
+      },
+    );
+
+    testWidgets('reports every move: page, history and part', (
+      WidgetTester tester,
+    ) async {
+      final FakeTextTvRepository repository = _repository();
+      repository.pages[300] = _page(
+        300,
+        parts: <List<String>>[
+          <String>['one'],
+          <String>['two'],
+        ],
+      );
+      final List<TextTvSession> heard = <TextTvSession>[];
+      await _open(tester, repository, onSessionChanged: heard.add);
+      expect(heard.last, const TextTvSession());
+
+      await tester.tap(find.byKey(textTvChipKey(300)));
+      await tester.pumpAndSettle();
+      expect(heard.last, const TextTvSession(page: 300, history: <int>[100]));
+
+      await tester.tap(find.byKey(textTvPartNextKey));
+      await tester.pumpAndSettle();
+      expect(
+        heard.last,
+        const TextTvSession(page: 300, part: 1, history: <int>[100]),
+      );
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(heard.last, const TextTvSession());
+    });
+
+    testWidgets('keeps only the most recent pages of history', (
+      WidgetTester tester,
+    ) async {
+      final FakeTextTvRepository repository = FakeTextTvRepository(
+        <int, TextTvPage>{for (int n = 100; n <= 899; n++) n: _page(n)},
+      );
+      final List<TextTvSession> heard = <TextTvSession>[];
+      await _open(
+        tester,
+        repository,
+        session: TextTvSession(
+          history: <int>[
+            for (int n = 0; n < TextTvSession.maxHistory; n++) 200,
+          ],
+        ),
+        onSessionChanged: heard.add,
+      );
+
+      await tester.tap(find.byKey(textTvChipKey(300)));
+      await tester.pumpAndSettle();
+
+      expect(heard.last.history, hasLength(TextTvSession.maxHistory));
+      expect(heard.last.history.last, 100);
     });
   });
 
