@@ -25,6 +25,45 @@ List<List<StyledRun>> _fixture(String name) {
 }
 
 void main() {
+  group('tvIsFrame', () {
+    test('a colour bar is part of the frame', () {
+      final List<StyledRun> bar = <StyledRun>[
+        StyledRun(''.padRight(40), bg: TvColor.blue),
+      ];
+
+      expect(tvIsFrame(bar, columns: textTvColumns), isTrue);
+    });
+
+    test('so is a row of block graphics on black, with no bar in it', () {
+      final List<StyledRun> logoRow = <StyledRun>[
+        StyledRun(''.padRight(3)),
+        StyledRun(''.padRight(4), mosaic: const <int>[3, 3, 3, 3]),
+        StyledRun(''.padRight(33)),
+      ];
+
+      expect(tvIsBar(logoRow, columns: textTvColumns), isFalse);
+      expect(tvIsFrame(logoRow, columns: textTvColumns), isTrue);
+    });
+
+    test('a row of text is not', () {
+      expect(tvIsFrame(_row('Hej'), columns: textTvColumns), isFalse);
+    });
+
+    test('the bottom row of the big lettering on page 101 is', () {
+      final List<List<StyledRun>> rows = _fixture('texttv_101.json');
+
+      // Rows 1 to 4 are the lettering: three on blue, the last on black.
+      for (int i = 1; i <= 4; i++) {
+        expect(
+          tvIsFrame(rows[i], columns: textTvColumns),
+          isTrue,
+          reason: '$i',
+        );
+      }
+      expect(tvIsBar(rows[4], columns: textTvColumns), isFalse);
+    });
+  });
+
   group('tvIsBar', () {
     test('a coloured background under the whole width is a bar', () {
       final List<StyledRun> bar = <StyledRun>[

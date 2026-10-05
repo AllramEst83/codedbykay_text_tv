@@ -208,7 +208,7 @@ class TvGrid extends StatelessWidget {
               style: style,
               // The text is centred by what it says; a bar, which runs the width
               // of the page, by its edges, so it has the same margin both sides.
-              gutterLeft: tvIsBar(row, columns: textTvColumns)
+              gutterLeft: tvIsFrame(row, columns: textTvColumns)
                   ? tvGutterCells ~/ 2
                   : gutters.left,
               rowHeight: rowHeight,

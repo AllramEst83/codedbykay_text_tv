@@ -114,4 +114,24 @@ void main() {
       matchesGoldenFile('goldens/page_377_bedstead.png'),
     );
   });
+
+  testWidgets('page 101, a logo made of block graphics', (
+    WidgetTester tester,
+  ) async {
+    await _draw(tester, _page(101));
+
+    await expectLater(
+      find.byType(MaterialApp),
+      matchesGoldenFile('goldens/page_101.png'),
+    );
+  });
+
+  testWidgets('page 400, weather', (WidgetTester tester) async {
+    await _draw(tester, _page(400));
+
+    await expectLater(
+      find.byType(MaterialApp),
+      matchesGoldenFile('goldens/page_400.png'),
+    );
+  });
 }

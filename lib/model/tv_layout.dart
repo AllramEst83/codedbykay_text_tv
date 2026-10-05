@@ -16,6 +16,15 @@ bool tvIsBar(List<StyledRun> row, {required int columns}) {
   return coloured >= columns * 0.9;
 }
 
+/// Whether [row] is part of the page's frame rather than of its text: a colour
+/// bar ([tvIsBar]) or a row of block graphics, like the bottom row of the big
+/// lettering under a title, which hangs below its blue banner on black and so
+/// is not a bar itself. Frame rows are placed by the same fixed gutter, so the
+/// rows of one logo line up.
+bool tvIsFrame(List<StyledRun> row, {required int columns}) =>
+    tvIsBar(row, columns: columns) ||
+    row.any((StyledRun run) => run.mosaic != null);
+
 /// The blank margin, in cells, a Text TV page leaves to the left and to the
 /// right of its text: the least room any of its longer rows leaves on each
 /// side. Text TV pages are not laid out symmetrically (headlines are indented
@@ -31,7 +40,7 @@ bool tvIsBar(List<StyledRun> row, {required int columns}) {
   int? left;
   int? right;
   for (final List<StyledRun> row in rows.skip(1)) {
-    if (tvIsBar(row, columns: columns)) continue;
+    if (tvIsFrame(row, columns: columns)) continue;
     final String text = plainText(row);
     final String trimmed = text.trim();
     if (trimmed.runes.length < _minInk) continue;
