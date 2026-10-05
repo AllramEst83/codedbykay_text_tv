@@ -86,3 +86,8 @@ const Key textTvAlertsKey = ValueKey<String>('text-tv-alerts');
 const Key textTvAlertPageKey = ValueKey<String>('text-tv-alert-page');
 const Key textTvAlertsNoteKey = ValueKey<String>('text-tv-alerts-note');
 const Key textTvOpenSettingsKey = ValueKey<String>('text-tv-open-settings');
+const Key textTvBreadcrumbsKey = ValueKey<String>('text-tv-breadcrumbs');
+const Key textTvBreadcrumbsSwitchKey = ValueKey<String>(
+  'text-tv-breadcrumbs-switch',
+);
+Key textTvCrumbKey(int page) => ValueKey<String>('text-tv-crumb-$page');

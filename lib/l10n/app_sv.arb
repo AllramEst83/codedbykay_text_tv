@@ -52,6 +52,9 @@
   "removeFavourite": "Ta bort som favorit",
   "favouritesCount": "{count} AV {max} SPARADE",
 
+  "breadcrumbsOn": "BRÖDSMULOR OVAN SIDAN",
+  "crumbHome": "HEM",
+  "crumbsLabel": "Vägen till den här sidan",
   "quickEntry": "SIFFROR OCH FÄRGKNAPPAR ALLTID SYNLIGA",
   "autoRefresh": "AUTOMATISK UPPDATERING",
   "prefetch": "LÄS IN I FÖRVÄG: NÄSTA OCH LÄNKADE SIDOR",

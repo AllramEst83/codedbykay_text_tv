@@ -162,6 +162,15 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get breadcrumbsOn => 'BRÖDSMULOR OVAN SIDAN';
+
+  @override
+  String get crumbHome => 'HEM';
+
+  @override
+  String get crumbsLabel => 'Vägen till den här sidan';
+
+  @override
   String get quickEntry => 'SIFFROR OCH FÄRGKNAPPAR ALLTID SYNLIGA';
 
   @override

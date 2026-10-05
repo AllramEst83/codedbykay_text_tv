@@ -58,6 +58,9 @@
     "placeholders": {"count": {"type": "int"}, "max": {"type": "int"}}
   },
 
+  "breadcrumbsOn": "PATH TO THE PAGE ABOVE IT",
+  "crumbHome": "HOME",
+  "crumbsLabel": "Path to this page",
   "quickEntry": "ALWAYS-ON NUMBER PAD AND COLOUR KEYS",
   "autoRefresh": "AUTO REFRESH",
   "prefetch": "READ AHEAD: NEXT AND LINKED PAGES",

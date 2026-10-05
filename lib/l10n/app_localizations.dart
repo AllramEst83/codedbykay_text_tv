@@ -386,6 +386,24 @@ abstract class AppLocalizations {
   /// **'{count} OF {max} SAVED'**
   String favouritesCount(int count, int max);
 
+  /// No description provided for @breadcrumbsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'PATH TO THE PAGE ABOVE IT'**
+  String get breadcrumbsOn;
+
+  /// No description provided for @crumbHome.
+  ///
+  /// In en, this message translates to:
+  /// **'HOME'**
+  String get crumbHome;
+
+  /// No description provided for @crumbsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Path to this page'**
+  String get crumbsLabel;
+
   /// No description provided for @quickEntry.
   ///
   /// In en, this message translates to:

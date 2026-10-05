@@ -162,6 +162,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get breadcrumbsOn => 'PATH TO THE PAGE ABOVE IT';
+
+  @override
+  String get crumbHome => 'HOME';
+
+  @override
+  String get crumbsLabel => 'Path to this page';
+
+  @override
   String get quickEntry => 'ALWAYS-ON NUMBER PAD AND COLOUR KEYS';
 
   @override

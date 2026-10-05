@@ -20,6 +20,7 @@ import 'package:codedbykay_text_tv/services/open_page_service.dart';
 import 'package:codedbykay_text_tv/services/share_service.dart';
 import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
+import 'package:codedbykay_text_tv/ui/breadcrumbs.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
 import 'package:codedbykay_text_tv/ui/page_snapshot.dart';
 import 'package:codedbykay_text_tv/ui/page_turn.dart';
@@ -524,6 +525,14 @@ class _TextTvScreenState extends State<TextTvScreen>
 
   int get _parts => _page?.parts.length ?? 1;
 
+  /// The way down to the page on show, when the setting is on, the page is
+  /// here and the site said it (a path of one step says nothing).
+  List<Crumb>? get _crumbs {
+    if (!_controls.breadcrumbs || _loading) return null;
+    final List<Crumb>? crumbs = _page?.breadcrumbs;
+    return crumbs != null && crumbs.length >= 2 ? crumbs : null;
+  }
+
   void _setPart(int part) {
     if (part < 0 || part >= _parts) return;
     setState(() => _part = part);
@@ -735,6 +744,8 @@ class _TextTvScreenState extends State<TextTvScreen>
             ),
             if (_reader.enabled)
               ReaderBar(settings: _reader, onChanged: _setReader),
+            if (_crumbs case final List<Crumb> crumbs)
+              TvBreadcrumbs(crumbs: crumbs, current: _number, onOpen: _open),
             Expanded(
               child: ColoredBox(
                 color: TvColors.black,

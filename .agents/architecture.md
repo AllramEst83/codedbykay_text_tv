@@ -39,6 +39,7 @@ lib/
     headline_watch.dart      # watchedHeadlines(page), breakingHeadline(previous, current) (the top headline, if new), WatchState (what the alerts last saw, per page)
     background_memory.dart   # BackgroundMemory: per watched page the site's change time, and which page the widget was given; lets a run ask `api/updated` before reading
     page_section.dart        # PageSection (the six built-in favourites' pages), sectionOf(page), legacyDefaultNames (the Swedish names older versions saved)
+    breadcrumbs.dart         # TvBreadcrumbs: the path to the page as a scrolling row of steps, tap one to go up
     page_semantics.dart      # PageSemantics: the page-level node (label, live region) around the rows
     page_share.dart          # pageText(page, part), pageLink(n), shareMessage: what copying and sharing send
     network_failure.dart     # NetworkFailure (offline/timeout/server/changed/other, .transient): why a request failed, for the wording and the retry

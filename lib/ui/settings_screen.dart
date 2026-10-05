@@ -286,6 +286,14 @@ class _SettingsScreenState extends State<SettingsScreen>
                         onChanged: (bool v) =>
                             _setControls(_controls.copyWith(quickEntry: v)),
                       ),
+                      const SizedBox(height: TvMetrics.margin),
+                      TvSwitchRow(
+                        switchKey: textTvBreadcrumbsSwitchKey,
+                        label: context.l10n.breadcrumbsOn,
+                        value: _controls.breadcrumbs,
+                        onChanged: (bool v) =>
+                            _setControls(_controls.copyWith(breadcrumbs: v)),
+                      ),
                     ],
                   ),
                   const SizedBox(height: TvMetrics.margin * 2),

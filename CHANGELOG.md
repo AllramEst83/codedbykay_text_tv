@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Breadcrumbs (I-24): a row above the page with the way down to it (`HOME > SPORT > RESULTATBÖRSEN > MÅLSERVICE`); tap a step to go back up. On to start with, and it can be switched off in settings > CONTROLS if you would rather have the line of height.
 - Lighter background checks (I-22): the widget and alert job now asks texttv.nu whether a page changed (`api/updated`, a few hundred bytes) and downloads it only if it did. It still reads at once when the widget has nothing yet or its page was changed, and when alerts have seen nothing of their page.
 - Share links name the version (I-25): SHARE LINK, SHARE TEXT and SHARE IMAGE now give the link that names the page as it is now (`texttv.nu/377/malservice-37397964`), so the receiver sees what you shared and not whatever the page says later. A page the site gave no such link for falls back to its live address.
 - Fixed: in a release build the alerts switch could not be turned on, and no alert could be shown. The release build had stripped the notification's small icon (it is only named at runtime), so the notification plugin could not start, and the permission check depended on it. The icon is now kept (`res/raw/keep.xml`), and the permission check no longer waits for the plugin to start.
