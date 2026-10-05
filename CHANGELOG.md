@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Search (I-9): a magnifier button opens a search over the pages saved on the phone; type a word (Swedish letters match with or without their marks) to list the pages that have it, or a page number to go straight there.
 - Network handling (I-8): a failure now says what kind it was (no connection, no answer in time, a server problem, a site that has changed); a failure that may pass is tried once more after a second, and a read-ahead that fails stays silent.
 - Icon shortcuts (I-7c): long-pressing the app icon lists your first four favourites and opens the one you choose; they follow your favourites as you change them.
 - Recent pages (I-7b): a clock chip at the start of the favourites row lists the last dozen pages you read (latest first, remembered between runs), with a CLEAR LIST button.

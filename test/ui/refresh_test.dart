@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
+import 'package:codedbykay_text_tv/model/page_search.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
@@ -111,6 +112,9 @@ class _SlowRepository implements TextTvRepository {
 
   @override
   Future<void> prefetch(int number) async {}
+
+  @override
+  Future<List<SearchHit>> search(String query) async => const <SearchHit>[];
 }
 
 void main() {

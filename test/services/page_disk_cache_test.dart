@@ -36,6 +36,19 @@ void main() {
       },
     );
 
+    test(
+      'numbers lists the pages kept, and nothing for a missing folder',
+      () async {
+        final FilePageDiskCache cache = FilePageDiskCache(directory);
+        expect(await cache.numbers(), isEmpty);
+
+        await cache.write(377, 'x', t0);
+        await cache.write(100, 'x', t0);
+
+        expect((await cache.numbers())..sort(), <int>[100, 377]);
+      },
+    );
+
     test('a later write replaces the earlier one', () async {
       final FilePageDiskCache cache = FilePageDiskCache(directory);
       await cache.write(100, 'old', t0);

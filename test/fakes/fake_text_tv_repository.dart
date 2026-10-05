@@ -1,3 +1,4 @@
+import 'package:codedbykay_text_tv/model/page_search.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 
@@ -45,5 +46,17 @@ class FakeTextTvRepository implements TextTvRepository {
   @override
   Future<void> prefetch(int number) async {
     prefetched.add(number);
+  }
+
+  /// Every query searched for, in order.
+  final List<String> searches = <String>[];
+
+  /// Pages [search] looks in; the pages served by default.
+  List<TextTvPage>? searchable;
+
+  @override
+  Future<List<SearchHit>> search(String query) async {
+    searches.add(query);
+    return searchPages(searchable ?? pages.values, query);
   }
 }

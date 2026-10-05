@@ -19,6 +19,12 @@ abstract final class Messages {
   static const String addFavourite = 'Add to favourites';
   static const String removeFavourite = 'Remove from favourites';
   static String favouritesCount(int n, int max) => '$n OF $max SAVED';
+  static const String search = 'Search';
+  static const String searchTitle = 'SEARCH';
+  static const String searchHint = 'WORD OR PAGE NUMBER';
+  static const String searchScope = 'FINDS WORDS ON PAGES YOU HAVE READ.';
+  static const String searchNothing = 'NO READ PAGE HAS THAT.';
+  static String searchGo(int page) => 'GO TO PAGE $page';
   static const String sectionControls = 'CONTROLS';
   static const String quickEntry = 'ALWAYS-ON NUMBER PAD AND COLOUR KEYS';
   static const String sectionRefresh = 'REFRESH';

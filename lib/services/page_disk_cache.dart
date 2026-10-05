@@ -14,6 +14,9 @@ abstract interface class PageDiskCache {
   Future<SavedPage?> read(int number);
   Future<void> write(int number, String body, DateTime at);
   Future<void> remove(int number);
+
+  /// The numbers of every page kept, in no particular order.
+  Future<List<int>> numbers();
 }
 
 /// [PageDiskCache] as one file per page in [directory], named `<number>.json`,
@@ -60,6 +63,19 @@ class FilePageDiskCache implements PageDiskCache {
       await _file(number).delete();
     } on Object {
       // Already gone, or cannot be: either way there is nothing to serve.
+    }
+  }
+
+  @override
+  Future<List<int>> numbers() async {
+    try {
+      return <int>[
+        for (final FileSystemEntity entity in directory.listSync())
+          if (entity is File && entity.path.endsWith('.json'))
+            ?int.tryParse(entity.uri.pathSegments.last.replaceAll('.json', '')),
+      ];
+    } on Object {
+      return const <int>[];
     }
   }
 

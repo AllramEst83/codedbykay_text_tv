@@ -52,3 +52,9 @@ const Key textTvQuickEntryKey = ValueKey<String>('text-tv-quick-entry');
 Key textTvFastextKey(int index) => ValueKey<String>('text-tv-fastext-$index');
 Key textTvDigitKey(int digit) => ValueKey<String>('text-tv-digit-$digit');
 Key textTvChipKey(int page) => ValueKey<String>('text-tv-chip-$page');
+const Key textTvSearchKey = ValueKey<String>('text-tv-search');
+const Key textTvSearchFieldKey = ValueKey<String>('text-tv-search-field');
+const Key textTvSearchGoKey = ValueKey<String>('text-tv-search-go');
+const Key textTvSearchEmptyKey = ValueKey<String>('text-tv-search-empty');
+Key textTvSearchHitKey(int page) =>
+    ValueKey<String>('text-tv-search-hit-$page');

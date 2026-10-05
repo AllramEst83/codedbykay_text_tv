@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:codedbykay_text_tv/model/network_failure.dart';
+import 'package:codedbykay_text_tv/model/page_search.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/services/live_text_tv_repository.dart';
 import 'package:codedbykay_text_tv/services/network_exception.dart';
@@ -248,6 +249,37 @@ void main() {
       );
     });
 
+    test(
+      'search finds words on pages read, from memory and from disk',
+      () async {
+        disk.saved[200] = SavedPage(_page(200, line: 'Skåne får snö'), now);
+        fetcher.route('/api/get/300', _page(300, line: 'Snö i Norrland'));
+        await saving.page(300);
+
+        final List<SearchHit> hits = await saving.search('snö');
+
+        expect(hits.map((SearchHit h) => h.page), <int>[200, 300]);
+      },
+    );
+
+    test(
+      'search sees the newer copy in memory, not the old one on disk',
+      () async {
+        fetcher.route('/api/get/300', _page(300, line: 'Ny rubrik'));
+        await saving.page(300);
+        disk.saved[300] = SavedPage(_page(300, line: 'Gammal rubrik'), now);
+
+        expect(await saving.search('gammal'), isEmpty);
+        expect(await saving.search('ny'), hasLength(1));
+      },
+    );
+
+    test('search never asks the site', () async {
+      await saving.search('anything');
+
+      expect(fetcher.requests, isEmpty);
+    });
+
     test('a page read is saved as the site sent it, with the time', () async {
       await saving.page(130);
 
@@ -365,4 +397,7 @@ class _MemoryDisk implements PageDiskCache {
 
   @override
   Future<void> remove(int number) async => saved.remove(number);
+
+  @override
+  Future<List<int>> numbers() async => saved.keys.toList();
 }

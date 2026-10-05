@@ -29,6 +29,7 @@ lib/
     reader_settings.dart     # ReaderSettings (enabled, ReaderTheme, size, lineSpacing, letterSpacing, margin, bold; every step an index into a table: readerTextSizes, readerLineHeights, readerLetterSpacings, readerMargins): how the reader looks; tolerant encode/decode; resetLayout
     saved_time.dart          # formatSavedAt: `14:32` for today, `3/10 14:32` otherwise
     text_tv_session.dart     # TextTvSession (page, part, history <= 50): what a cold start returns to; tolerant encode/decode
+    page_search.dart         # searchPages(pages, query) -> SearchHit(page, line, matches); foldForSearch (å/ä/ö); every word on one line, best 30
     network_failure.dart     # NetworkFailure (offline/timeout/server/changed/other, .transient): why a request failed, for the wording and the retry
     text_tv_headlines.dart   # textTvHeadlines(page): the headline lines of a page (no title, bare numbers or navigation); not used by the UI yet
   services/
@@ -52,6 +53,7 @@ lib/
     settings_screen.dart     # SettingsScreen: the page the gear button opens, as framed panels each under a blue header bar: CONTROLS (the quick-pad switch), FAVOURITES (count, RESET), REFRESH (auto-refresh step slider, read-ahead switch), CRT SCREEN (switch, live preview, three capped sliders, RESET)
     crt_screen.dart          # CrtScreen: draws its child through shaders/crt.frag (flutter_shaders AnimatedSampler) and routes touches through CrtHitMap
     crt_hit_map.dart         # CrtHitMap: a render object that remaps a touch through the CRT glass so a tap reaches what is shown
+    search_sheet.dart        # showSearchSheet: the search field, a go-to-page row and the hits; debounced, stale answers dropped
     page_turn.dart           # PageTurn: the 180 ms slide-and-fade a new page comes in with (from the side it was turned to); keyed per page, so the old page is already gone
     recent_pages_sheet.dart  # showRecentPages: bottom sheet listing the pages read last (not the one on show), each a tap away, with CLEAR LIST
     reader_view.dart         # ReaderView: the reader's page (ListView of blocks in the scheme's colours; its own loading/failed/not-broadcast messages)

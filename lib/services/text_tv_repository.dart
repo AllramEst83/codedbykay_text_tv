@@ -1,3 +1,4 @@
+import 'package:codedbykay_text_tv/model/page_search.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 
 /// Text TV pages for the viewer. Never throws: every
@@ -18,4 +19,9 @@ abstract interface class TextTvRepository {
   /// nothing: a read-ahead that fails is just a page that is read when asked
   /// for.
   Future<void> prefetch(int number);
+
+  /// The pages held (in memory or saved on disk) with every word of [query]
+  /// on a line, best first (see `searchPages`). Never asks the site: it only
+  /// finds what has been read.
+  Future<List<SearchHit>> search(String query);
 }

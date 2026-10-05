@@ -1,3 +1,4 @@
+import 'package:codedbykay_text_tv/model/page_search.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/services/network_exception.dart';
 import 'package:codedbykay_text_tv/services/page_disk_cache.dart';
@@ -106,6 +107,20 @@ class LiveTextTvRepository implements TextTvRepository {
     return saved == null
         ? null
         : TextTvShown(saved.page, readAt: saved.cachedAt);
+  }
+
+  @override
+  Future<List<SearchHit>> search(String query) async {
+    final Map<int, TextTvPage> pages = <int, TextTvPage>{};
+    for (final int number in await disk?.numbers() ?? const <int>[]) {
+      final TextTvShown? saved = await _saved(number);
+      if (saved != null) pages[number] = saved.page;
+    }
+    // What is in memory is newer than what is on disk.
+    for (final MapEntry<int, (TextTvPage, DateTime)> e in _kept.entries) {
+      pages[e.key] = e.value.$1;
+    }
+    return searchPages(pages.values, query);
   }
 
   /// The copy on disk, with when it was saved, or null if there is none or it

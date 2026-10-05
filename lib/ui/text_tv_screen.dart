@@ -18,6 +18,7 @@ import 'package:codedbykay_text_tv/ui/page_turn.dart';
 import 'package:codedbykay_text_tv/ui/reader_bar.dart';
 import 'package:codedbykay_text_tv/ui/reader_view.dart';
 import 'package:codedbykay_text_tv/ui/recent_pages_sheet.dart';
+import 'package:codedbykay_text_tv/ui/search_sheet.dart';
 import 'package:codedbykay_text_tv/ui/settings_screen.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
@@ -504,6 +505,10 @@ class _TextTvScreenState extends State<TextTvScreen>
       a.length == b.length &&
       Iterable<int>.generate(a.length).every((int i) => a[i] == b[i]);
 
+  void _openSearch() {
+    showSearchSheet(context, search: widget.repository.search, onOpen: _open);
+  }
+
   void _openRecents() {
     showRecentPages(
       context,
@@ -576,6 +581,7 @@ class _TextTvScreenState extends State<TextTvScreen>
               onReader: () =>
                   _setReader(_reader.copyWith(enabled: !_reader.enabled)),
               onSettings: _openSettings,
+              onSearch: _openSearch,
             ),
             if (_reader.enabled)
               ReaderBar(settings: _reader, onChanged: _setReader),

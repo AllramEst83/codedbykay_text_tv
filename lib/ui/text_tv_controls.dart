@@ -19,6 +19,7 @@ class TvTopBar extends StatelessWidget {
     required this.readerOn,
     required this.onReader,
     required this.onSettings,
+    required this.onSearch,
   });
 
   final VoidCallback? onRefresh;
@@ -30,6 +31,9 @@ class TvTopBar extends StatelessWidget {
   /// Opens the settings page.
   final VoidCallback onSettings;
 
+  /// Opens the search.
+  final VoidCallback onSearch;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -39,13 +43,27 @@ class TvTopBar extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-              child: Text(
-                Messages.title,
-                style: tvText(14, TvColors.white),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              // Four buttons leave a narrow phone little room: the title
+              // shrinks to fit rather than being cut off.
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  Messages.title,
+                  style: tvText(14, TvColors.white),
+                  maxLines: 1,
+                ),
               ),
             ),
+            const SizedBox(width: TvMetrics.gutter),
+            TvIconButton(
+              key: textTvSearchKey,
+              icon: (Color colour) =>
+                  Icon(Icons.search, color: colour, size: 26),
+              semanticLabel: Messages.search,
+              onTap: onSearch,
+            ),
+            const SizedBox(width: TvMetrics.gutter),
             TvIconButton(
               key: textTvReaderKey,
               icon: (Color colour) => GlassesIcon(colour: colour),
