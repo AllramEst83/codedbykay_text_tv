@@ -212,6 +212,60 @@ abstract class AppLocalizations {
   /// **'Preview of the teletext font'**
   String get pageFontPreview;
 
+  /// No description provided for @sectionBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'WIDGET AND ALERTS'**
+  String get sectionBackground;
+
+  /// No description provided for @widgetPage.
+  ///
+  /// In en, this message translates to:
+  /// **'WIDGET PAGE'**
+  String get widgetPage;
+
+  /// No description provided for @backgroundEvery.
+  ///
+  /// In en, this message translates to:
+  /// **'CHECK EVERY'**
+  String get backgroundEvery;
+
+  /// No description provided for @every30Min.
+  ///
+  /// In en, this message translates to:
+  /// **'30 MIN'**
+  String get every30Min;
+
+  /// No description provided for @every1Hour.
+  ///
+  /// In en, this message translates to:
+  /// **'1 H'**
+  String get every1Hour;
+
+  /// No description provided for @every3Hours.
+  ///
+  /// In en, this message translates to:
+  /// **'3 H'**
+  String get every3Hours;
+
+  /// No description provided for @pickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CHOOSE A PAGE'**
+  String get pickerTitle;
+
+  /// No description provided for @pickerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'STAR A PAGE TO FIND IT HERE.'**
+  String get pickerHint;
+
+  /// No description provided for @backgroundNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The widget is refreshed in the background at this interval, and only while it is on a home screen. Each check asks texttv.nu for one page.'**
+  String get backgroundNote;
+
   /// No description provided for @sectionControls.
   ///
   /// In en, this message translates to:

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:codedbykay_text_tv/app.dart';
+import 'package:codedbykay_text_tv/background.dart';
+import 'package:codedbykay_text_tv/model/background_settings.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/language_settings.dart';
@@ -10,12 +12,17 @@ import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
+import 'package:codedbykay_text_tv/services/background_coordinator.dart';
+import 'package:codedbykay_text_tv/services/background_refresher.dart';
+import 'package:codedbykay_text_tv/services/background_scheduler.dart';
+import 'package:codedbykay_text_tv/services/background_settings_store.dart';
 import 'package:codedbykay_text_tv/services/controls_settings_store.dart';
 import 'package:codedbykay_text_tv/services/crt_settings_store.dart';
 import 'package:codedbykay_text_tv/services/http_fetcher.dart';
 import 'package:codedbykay_text_tv/services/io_http_fetcher.dart';
 import 'package:codedbykay_text_tv/services/language_settings_store.dart';
 import 'package:codedbykay_text_tv/services/live_text_tv_repository.dart';
+import 'package:codedbykay_text_tv/services/open_page_service.dart';
 import 'package:codedbykay_text_tv/services/page_disk_cache.dart';
 import 'package:codedbykay_text_tv/services/page_font_settings_store.dart';
 import 'package:codedbykay_text_tv/services/reader_settings_store.dart';
@@ -25,9 +32,11 @@ import 'package:codedbykay_text_tv/services/session_store.dart';
 import 'package:codedbykay_text_tv/services/share_service.dart';
 import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv.dart';
+import 'package:codedbykay_text_tv/services/widget_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:workmanager/workmanager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +51,22 @@ Future<void> main() async {
   final CrtSettings crt = await crtStore.load();
   final RefreshSettingsStore refreshStore = PrefsRefreshSettingsStore();
   final RefreshSettings refresh = await refreshStore.load();
+  final BackgroundSettingsStore backgroundStore =
+      PrefsBackgroundSettingsStore();
+  BackgroundSettings background = await backgroundStore.load();
+  await Workmanager().initialize(backgroundDispatcher);
+  const WidgetPlatform widgetPlatform = HomeWidgetPlatform();
+  final OpenPageService openPages = OpenPageService();
+  await widgetPlatform.start(openPages.request);
+  final BackgroundCoordinator coordinator = BackgroundCoordinator(
+    scheduler: const WorkmanagerScheduler(),
+    widget: widgetPlatform,
+    refresher: BackgroundRefresher(
+      textTv: TextTv(fetcher: fetcher),
+      settings: backgroundStore,
+      widget: widgetPlatform,
+    ),
+  );
   final PageFontSettingsStore pageFontStore = PrefsPageFontSettingsStore();
   final PageFontSettings pageFont = await pageFontStore.load();
   final LanguageSettingsStore languageStore = PrefsLanguageSettingsStore();
@@ -52,6 +77,8 @@ Future<void> main() async {
   final SavedPages saved = await savedStore.load();
   final ShortcutService shortcuts = ShortcutService(QuickActionsShortcuts());
   await shortcuts.start();
+  // The first time in front is not a "coming back": start the job now.
+  unawaited(coordinator.appResumed(background));
   runApp(
     TextTvApp(
       repository: LiveTextTvRepository(
@@ -65,6 +92,14 @@ Future<void> main() async {
       onCrtChanged: (CrtSettings c) => unawaited(crtStore.save(c)),
       refresh: refresh,
       onRefreshChanged: (RefreshSettings r) => unawaited(refreshStore.save(r)),
+      background: background,
+      onBackgroundChanged: (BackgroundSettings b) {
+        background = b;
+        unawaited(backgroundStore.save(b));
+        unawaited(coordinator.apply(b));
+      },
+      openPages: openPages,
+      onResumed: () => unawaited(coordinator.appResumed(background)),
       pageFont: pageFont,
       onPageFontChanged: (PageFontSettings p) =>
           unawaited(pageFontStore.save(p)),

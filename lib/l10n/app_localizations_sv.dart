@@ -69,6 +69,34 @@ class AppLocalizationsSv extends AppLocalizations {
   String get pageFontPreview => 'Förhandsvisning av text-TV-typsnittet';
 
   @override
+  String get sectionBackground => 'WIDGET OCH AVISERINGAR';
+
+  @override
+  String get widgetPage => 'WIDGETENS SIDA';
+
+  @override
+  String get backgroundEvery => 'KOLLA VAR';
+
+  @override
+  String get every30Min => '30 MIN';
+
+  @override
+  String get every1Hour => '1 TIM';
+
+  @override
+  String get every3Hours => '3 TIM';
+
+  @override
+  String get pickerTitle => 'VÄLJ EN SIDA';
+
+  @override
+  String get pickerHint => 'STJÄRNMARKERA EN SIDA SÅ HITTAR DU DEN HÄR.';
+
+  @override
+  String get backgroundNote =>
+      'Widgeten uppdateras i bakgrunden med det här mellanrummet, och bara när den ligger på en startskärm. Varje koll hämtar en sida från texttv.nu.';
+
+  @override
   String get sectionControls => 'KNAPPAR';
 
   @override

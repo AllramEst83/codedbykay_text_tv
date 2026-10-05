@@ -62,6 +62,7 @@ void main() {
         'themeBeige',
         'fontSystem',
         'langSystem',
+        'every30Min',
         'pageFontPixel',
         'pageFontBedstead',
         'langSwedish',

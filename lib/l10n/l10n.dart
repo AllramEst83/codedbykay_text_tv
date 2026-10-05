@@ -48,6 +48,12 @@ extension AppWording on AppLocalizations {
     PageFont.bedstead => pageFontBedstead,
   };
 
+  String intervalName(int step) => switch (step) {
+    0 => every30Min,
+    1 => every1Hour,
+    _ => every3Hours,
+  };
+
   String languageName(AppLanguage language) => switch (language) {
     AppLanguage.system => langSystem,
     AppLanguage.swedish => langSwedish,

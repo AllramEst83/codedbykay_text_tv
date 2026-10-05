@@ -69,6 +69,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pageFontPreview => 'Preview of the teletext font';
 
   @override
+  String get sectionBackground => 'WIDGET AND ALERTS';
+
+  @override
+  String get widgetPage => 'WIDGET PAGE';
+
+  @override
+  String get backgroundEvery => 'CHECK EVERY';
+
+  @override
+  String get every30Min => '30 MIN';
+
+  @override
+  String get every1Hour => '1 H';
+
+  @override
+  String get every3Hours => '3 H';
+
+  @override
+  String get pickerTitle => 'CHOOSE A PAGE';
+
+  @override
+  String get pickerHint => 'STAR A PAGE TO FIND IT HERE.';
+
+  @override
+  String get backgroundNote =>
+      'The widget is refreshed in the background at this interval, and only while it is on a home screen. Each check asks texttv.nu for one page.';
+
+  @override
   String get sectionControls => 'CONTROLS';
 
   @override

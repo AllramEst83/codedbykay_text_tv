@@ -54,7 +54,7 @@ Things built because they were wanted, not because they were planned. They are d
 
 ## Tier 3 (later, only if wanted)
 
-- [ ] **I-18. Home-screen widget** with the headlines of a chosen page.
+- [x] **I-18. Home-screen widget** with the headlines of a chosen page. Done: `TextTvWidgetProvider` (Kotlin, on the `home_widget` plugin; layout/xml/strings in en + sv) shows the page number, up to 8 headlines and the time read; a tap opens the app on the page via `texttv://page/N`. One WorkManager periodic job (30 min / 1 h / 3 h, needs a connection) refreshes it, only while a widget is on a home screen (`BackgroundCoordinator`), and the app refreshes it when it comes to the front. Settings > WIDGET AND ALERTS picks the page (from favourites and recents) and the interval. Build-verified only: not run on a device (no emulator was attached), so check adding the widget, its look, the refresh and the tap on the phone.
 - [ ] **I-19. Breaking-news notification** for page 100 or a chosen page. Needs background polling and a notification permission; weigh battery and the API's limits before building.
 - [ ] **I-20. Dark/amoled/colour-blind options**: teletext is always black, but offer a high-contrast palette and a no-flash mode.
 - [ ] **I-21. Other teletext sources** (the same viewer over another country's service) once the client is behind a small interface; the repository interface already allows it.

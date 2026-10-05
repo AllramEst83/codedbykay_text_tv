@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:codedbykay_text_tv/l10n/l10n.dart';
+import 'package:codedbykay_text_tv/model/background_settings.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/fastext.dart';
@@ -14,6 +15,7 @@ import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/saved_time.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
+import 'package:codedbykay_text_tv/services/open_page_service.dart';
 import 'package:codedbykay_text_tv/services/share_service.dart';
 import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
@@ -57,6 +59,10 @@ class TextTvScreen extends StatefulWidget {
     this.onCrtChanged,
     this.refresh = const RefreshSettings(),
     this.onRefreshChanged,
+    this.background = BackgroundSettings.defaults,
+    this.onBackgroundChanged,
+    this.openPages,
+    this.onResumed,
     this.pageFont = PageFontSettings.defaults,
     this.onPageFontChanged,
     this.language = LanguageSettings.defaults,
@@ -95,6 +101,16 @@ class TextTvScreen extends StatefulWidget {
   final ControlsSettings controls;
   final ValueChanged<ControlsSettings>? onControlsChanged;
 
+  /// What the app does in the background (the widget).
+  final BackgroundSettings background;
+  final ValueChanged<BackgroundSettings>? onBackgroundChanged;
+
+  /// Pages that something outside asks to be opened (a tap on the widget).
+  final OpenPageService? openPages;
+
+  /// Called when the app comes back to the front.
+  final VoidCallback? onResumed;
+
   /// The typeface of the teletext page.
   final PageFontSettings pageFont;
   final ValueChanged<PageFontSettings>? onPageFontChanged;
@@ -131,7 +147,9 @@ class _TextTvScreenState extends State<TextTvScreen>
   late CrtSettings _crtSettings = widget.crt;
   late RefreshSettings _refresh = widget.refresh;
   late ControlsSettings _controls = widget.controls;
+  late BackgroundSettings _background = widget.background;
   late PageFontSettings _pageFont = widget.pageFont;
+  StreamSubscription<int>? _openPagesSubscription;
   late SavedPages _saved = widget.saved;
   TextTvResult? _result;
   bool _loading = true;
@@ -177,6 +195,7 @@ class _TextTvScreenState extends State<TextTvScreen>
     if (shortcuts != null) {
       _shortcutSubscription = shortcuts.opened.listen(_open);
     }
+    _openPagesSubscription = widget.openPages?.requests.listen(_open);
   }
 
   // The language the icon shortcuts were last titled in.
@@ -253,6 +272,7 @@ class _TextTvScreenState extends State<TextTvScreen>
       return;
     }
     _startAuto();
+    widget.onResumed?.call();
     final DateTime? at = _readAt;
     if (_canRefreshQuietly &&
         at != null &&
@@ -334,6 +354,12 @@ class _TextTvScreenState extends State<TextTvScreen>
       ? CrtScreen(settings: _crtSettings, child: page)
       : page;
 
+  void _setBackground(BackgroundSettings background) {
+    if (background == _background) return;
+    setState(() => _background = background);
+    widget.onBackgroundChanged?.call(background);
+  }
+
   void _setPageFont(PageFontSettings pageFont) {
     if (pageFont == _pageFont) return;
     setState(() => _pageFont = pageFont);
@@ -349,6 +375,9 @@ class _TextTvScreenState extends State<TextTvScreen>
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) => SettingsScreen(
+          background: _background,
+          onBackgroundChanged: _setBackground,
+          recents: _saved.recents,
           pageFont: _pageFont,
           onPageFontChanged: _setPageFont,
           language: widget.language,
@@ -672,6 +701,7 @@ class _TextTvScreenState extends State<TextTvScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     unawaited(_shortcutSubscription?.cancel());
+    unawaited(_openPagesSubscription?.cancel());
     _autoTimer?.cancel();
     _readAheadTimer?.cancel();
     _typedTimer?.cancel();

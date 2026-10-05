@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title">TEXT-TV</string>
+    <string name="widget_description">Rubrikerna från en text-tv-sida på startskärmen.</string>
+    <string name="widget_empty">Öppna Text TV en gång så läses sidan in.</string>
+</resources>

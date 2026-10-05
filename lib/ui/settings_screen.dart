@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/l10n/l10n.dart';
+import 'package:codedbykay_text_tv/model/background_settings.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/language_settings.dart';
@@ -9,6 +10,7 @@ import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
 import 'package:codedbykay_text_tv/ui/formats.dart';
+import 'package:codedbykay_text_tv/ui/page_picker_sheet.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
@@ -23,6 +25,9 @@ import 'package:flutter/material.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
     super.key,
+    required this.background,
+    required this.onBackgroundChanged,
+    required this.recents,
     required this.pageFont,
     required this.onPageFontChanged,
     required this.language,
@@ -36,6 +41,13 @@ class SettingsScreen extends StatefulWidget {
     required this.saved,
     required this.onSavedChanged,
   });
+
+  /// What the app does in the background, and the listener for it.
+  final BackgroundSettings background;
+  final ValueChanged<BackgroundSettings> onBackgroundChanged;
+
+  /// The pages read lately, for the page pickers.
+  final List<int> recents;
 
   /// The typeface of the teletext page, and the listener for it.
   final PageFontSettings pageFont;
@@ -65,6 +77,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  late BackgroundSettings _background = widget.background;
   late PageFontSettings _pageFont = widget.pageFont;
   late LanguageSettings _language = widget.language;
   late CrtSettings _crt = widget.crt;
@@ -75,6 +88,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (saved == _saved) return;
     setState(() => _saved = saved);
     widget.onSavedChanged(saved);
+  }
+
+  void _setBackground(BackgroundSettings background) {
+    if (background == _background) return;
+    setState(() => _background = background);
+    widget.onBackgroundChanged(background);
   }
 
   void _setPageFont(PageFontSettings pageFont) {
@@ -238,6 +257,77 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         value: _refresh.prefetch,
                         onChanged: (bool v) =>
                             _setRefresh(_refresh.copyWith(prefetch: v)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: TvMetrics.margin * 2),
+                  _SettingsGroup(
+                    id: 'background',
+                    title: context.l10n.sectionBackground,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              context.l10n.widgetPage,
+                              style: tvText(12, TvColors.white),
+                            ),
+                          ),
+                          TvButton(
+                            key: textTvWidgetPageKey,
+                            label: context.l10n.chipLabel(
+                              Favourite(_background.widgetPage),
+                            ),
+                            onTap: () => showPagePicker(
+                              context,
+                              title: context.l10n.pickerTitle,
+                              selected: _background.widgetPage,
+                              favourites: _saved.favourites,
+                              recents: widget.recents,
+                              onPick: (int page) => _setBackground(
+                                _background.copyWith(widgetPage: page),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: TvMetrics.margin),
+                      Text(
+                        context.l10n.backgroundEvery,
+                        style: tvText(12, TvColors.white),
+                      ),
+                      const SizedBox(height: TvMetrics.gutter),
+                      Row(
+                        children: <Widget>[
+                          for (
+                            int step = 0;
+                            step < backgroundIntervals.length;
+                            step++
+                          )
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  right: step == backgroundIntervals.length - 1
+                                      ? 0
+                                      : TvMetrics.gutter,
+                                ),
+                                child: TvChoice(
+                                  choiceKey: textTvIntervalKey(step),
+                                  label: context.l10n.intervalName(step),
+                                  selected: _background.interval == step,
+                                  onTap: () => _setBackground(
+                                    _background.copyWith(interval: step),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: TvMetrics.margin),
+                      Text(
+                        context.l10n.backgroundNote,
+                        key: textTvBackgroundNoteKey,
+                        style: readerTextStyle(13, TvColors.white),
                       ),
                     ],
                   ),

@@ -9,6 +9,7 @@ Keep the file list below in step with `lib/` as it changes.
 ```
 lib/
   main.dart                  # runApp + wiring: IoHttpFetcher -> TextTv -> LiveTextTvRepository, PrefsSessionStore -> saved session, FilePageDiskCache (app cache folder) -> TextTvApp
+  background.dart            # backgroundDispatcher: the job's entry point (own isolate, no screen), builds a BackgroundRefresher and runs it
   app.dart                   # TextTvApp: MaterialApp, theme, edge-to-edge black system bars
   l10n/                      # app_en.arb (template) + app_sv.arb -> generated app_localizations*.dart (checked in; `flutter gen-l10n` or any `flutter pub get`/build regenerates, config in l10n.yaml); l10n.dart: `context.l10n` (English when no delegates are above, so a bare widget test works) and AppWording (failure, themeName, autoRefreshValue, sectionName, chipLabel, shortcutTitle)
   model/                     # pure Dart (values and parsers): no platform, no I/O
@@ -32,6 +33,9 @@ lib/
     page_search.dart         # searchPages(pages, query) -> SearchHit(page, line, matches); foldForSearch (å/ä/ö); every word on one line, best 30
     language_settings.dart   # AppLanguage (system/swedish/english, .locale), LanguageSettings (tolerant decode), resolveLocale(device): sv -> sv, anything else -> en
     page_font_settings.dart  # PageFont (pixel, bedstead), PageFontSettings (tolerant decode); the face's style, row height and whether glyphs stretch are `pageTextStyle`/`pageRowCells`/`pageStretchesGlyphs` in ui/theme.dart
+    background_settings.dart # BackgroundSettings (widgetPage, interval index into backgroundIntervals 30m/1h/3h), tolerant decode
+    widget_content.dart      # WidgetContent.of(page, now): page, up to 8 headlines, `HH:mm`
+    launch_link.dart         # launchLinkFor(page) / pageOfLaunchLink(uri): `texttv://page/N`, what the widget opens the app with
     page_section.dart        # PageSection (the six built-in favourites' pages), sectionOf(page), legacyDefaultNames (the Swedish names older versions saved)
     page_semantics.dart      # PageSemantics: the page-level node (label, live region) around the rows
     page_share.dart          # pageText(page, part), pageLink(n), shareMessage: what copying and sharing send
@@ -48,6 +52,12 @@ lib/
     crt_settings_store.dart  # CrtSettingsStore (load/save, never throws) and PrefsCrtSettingsStore on shared_preferences (key `crt`)
     share_service.dart       # SharePlatform (shareText) over share_plus (SharePlusPlatform); never throws
     language_settings_store.dart # PrefsLanguageSettingsStore (key `language`)
+    widget_platform.dart     # WidgetPlatform (start, publish, hasWidgets) over home_widget (HomeWidgetPlatform); keys must match TextTvWidgetProvider.kt
+    background_scheduler.dart # BackgroundScheduler over workmanager: one periodic job `texttv-background-refresh`, needs a connection
+    background_refresher.dart # BackgroundRefresher.run(): read the widget's page, publish; never throws; used by the job and by the app
+    background_coordinator.dart # starts/stops the job (only while a widget exists), refreshes at once on resume (not within 5 min)
+    open_page_service.dart   # OpenPageService: pages asked for from outside (widget tap), buffered for the viewer
+    background_settings_store.dart # PrefsBackgroundSettingsStore (key `background`; reload()s because the job runs in another isolate)
     shortcut_service.dart    # ShortcutPlatform (start/set: the thin plugin side), QuickActionsShortcuts (quick_actions), ShortcutService (keeps the icon's shortcuts in step with the favourites; `opened` stream of pages chosen from them; never throws)
     saved_pages_store.dart   # SavedPagesStore (load/save, never throws) and PrefsSavedPagesStore on shared_preferences (key `pages`)
     controls_settings_store.dart # ControlsSettingsStore (load/save, never throws) and PrefsControlsSettingsStore on shared_preferences (key `controls`)

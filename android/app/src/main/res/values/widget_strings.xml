@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title">TEXT TV</string>
+    <string name="widget_description">The headlines of a Text TV page on your home screen.</string>
+    <string name="widget_empty">Open Text TV once to load the page.</string>
+</resources>

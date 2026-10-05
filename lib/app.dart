@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/l10n/l10n.dart';
+import 'package:codedbykay_text_tv/model/background_settings.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/language_settings.dart';
@@ -7,6 +8,7 @@ import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
+import 'package:codedbykay_text_tv/services/open_page_service.dart';
 import 'package:codedbykay_text_tv/services/share_service.dart';
 import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
@@ -38,6 +40,10 @@ class TextTvApp extends StatefulWidget {
     this.onCrtChanged,
     this.refresh = const RefreshSettings(),
     this.onRefreshChanged,
+    this.background = BackgroundSettings.defaults,
+    this.onBackgroundChanged,
+    this.openPages,
+    this.onResumed,
     this.pageFont = PageFontSettings.defaults,
     this.onPageFontChanged,
     this.language = LanguageSettings.defaults,
@@ -67,6 +73,16 @@ class TextTvApp extends StatefulWidget {
   /// Whether the page refreshes by itself, as of the last run.
   final RefreshSettings refresh;
   final ValueChanged<RefreshSettings>? onRefreshChanged;
+
+  /// What the app does in the background, as of the last run.
+  final BackgroundSettings background;
+  final ValueChanged<BackgroundSettings>? onBackgroundChanged;
+
+  /// Pages asked for from outside the app (a tap on the widget).
+  final OpenPageService? openPages;
+
+  /// Called when the app comes back to the front.
+  final VoidCallback? onResumed;
 
   /// The typeface of the teletext page, as of the last run.
   final PageFontSettings pageFont;
@@ -135,6 +151,10 @@ class _TextTvAppState extends State<TextTvApp> {
           onSavedChanged: widget.onSavedChanged,
           shortcuts: widget.shortcuts,
           share: widget.share,
+          background: widget.background,
+          onBackgroundChanged: widget.onBackgroundChanged,
+          openPages: widget.openPages,
+          onResumed: widget.onResumed,
           pageFont: widget.pageFont,
           onPageFontChanged: widget.onPageFontChanged,
           language: _language,
