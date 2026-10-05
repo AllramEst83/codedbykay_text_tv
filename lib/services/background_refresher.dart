@@ -26,6 +26,7 @@ class BackgroundRefresher {
     required this.widget,
     this.alerts,
     this.watch,
+    this.memory,
     this.clock = _systemNow,
     this.pause = const Duration(seconds: 1),
   });
@@ -38,6 +39,11 @@ class BackgroundRefresher {
   /// without them there are no alerts.
   final AlertPlatform? alerts;
   final WatchStateStore? watch;
+
+  /// What was last seen of each page, so a run can ask the site whether a page
+  /// changed (a few hundred bytes) before reading it. Without it every run
+  /// reads every page.
+  final BackgroundMemoryStore? memory;
   final DateTime Function() clock;
 
   /// Between the two pages of a run.
@@ -56,9 +62,18 @@ class BackgroundRefresher {
 
       if (widgetNeeded) {
         widgetNumber = current.widgetPage;
-        widgetPage = await _read(widgetNumber);
+        // A widget that has not been given this page yet needs it whatever the
+        // site says (it was just added, or its page was changed).
+        final bool needed = (await memory?.load())?.widgetShown != widgetNumber;
+        widgetPage = await _read(widgetNumber, force: needed);
         if (widgetPage != null) {
           await widget.publish(WidgetContent.of(widgetPage, clock()));
+          final BackgroundMemoryStore? store = memory;
+          if (store != null) {
+            await store.save(
+              (await store.load()).withWidgetShown(widgetNumber),
+            );
+          }
         }
       }
       if (alertsNeeded) {
@@ -70,7 +85,10 @@ class BackgroundRefresher {
           page = widgetPage;
         } else {
           if (widgetNumber != null) await Future<void>.delayed(pause);
-          page = await _read(number);
+          // Alerts that have seen nothing of this page yet need it too: the
+          // first look is what later ones are compared with.
+          final bool unseen = (await watch!.load()).forPage(number).isEmpty;
+          page = await _read(number, force: unseen);
         }
         if (page != null) await _watch(page, announce: alert);
       }
@@ -79,9 +97,27 @@ class BackgroundRefresher {
     }
   }
 
-  Future<TextTvPage?> _read(int number) async {
+  /// The page, or null when it did not change since the last read (asked of the
+  /// site first, unless [force]) or could not be read. A page read is
+  /// remembered with the time the site gave for it.
+  Future<TextTvPage?> _read(int number, {bool force = false}) async {
+    final BackgroundMemoryStore? store = memory;
     try {
-      return await textTv.page(number);
+      if (store != null && !force) {
+        final int? since = (await store.load()).updated[number];
+        if (since != null) {
+          if (!await textTv.hasUpdate(number, since)) return null;
+          // Two requests to one site in a row: a breath between them.
+          await Future<void>.delayed(pause ~/ 4);
+        }
+      }
+      final TextTvPage? page = await textTv.page(number);
+      if (page != null && store != null) {
+        final int stamp =
+            page.updatedUnix ?? clock().millisecondsSinceEpoch ~/ 1000;
+        await store.save((await store.load()).withUpdated(number, stamp));
+      }
+      return page;
     } on NetworkException {
       return null;
     }

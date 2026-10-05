@@ -32,6 +32,25 @@ class TextTv {
     return _fetcher.get(url);
   }
 
+  /// Whether the site has a newer version of [number] than the one changed at
+  /// [sinceUnix] (the time its answer gave, `TextTvPage.updatedUnix`). One small
+  /// request, a few hundred bytes, in place of reading the page. Throws
+  /// [NetworkException] when the site cannot be reached or answers with
+  /// something unexpected.
+  Future<bool> hasUpdate(int number, int sinceUnix) async {
+    final url = Uri.https('texttv.nu', '/api/updated/$number/$sinceUnix', {
+      'app': _app,
+    });
+    final Object? json;
+    try {
+      json = jsonDecode(await _fetcher.get(url));
+    } on FormatException {
+      throw _unexpected;
+    }
+    if (json is! Map || json['update_available'] is! bool) throw _unexpected;
+    return json['update_available'] as bool;
+  }
+
   /// Reads an answer from [fetchBody]: the page, or null when it is not in
   /// broadcast. Throws [NetworkException] when it is not what the site sends.
   TextTvPage? parse(int number, String body) {

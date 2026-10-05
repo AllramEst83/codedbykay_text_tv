@@ -19,6 +19,7 @@ void backgroundDispatcher() {
       widget: const HomeWidgetPlatform(),
       alerts: LocalNotificationsAlerts(),
       watch: PrefsWatchStateStore(),
+      memory: PrefsBackgroundMemoryStore(),
     ).run();
     return true;
   });

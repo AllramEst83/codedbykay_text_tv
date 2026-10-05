@@ -70,6 +70,7 @@ Future<void> main() async {
       widget: widgetPlatform,
       alerts: alertPlatform,
       watch: PrefsWatchStateStore(),
+      memory: PrefsBackgroundMemoryStore(),
     ),
   );
   final PageFontSettingsStore pageFontStore = PrefsPageFontSettingsStore();
