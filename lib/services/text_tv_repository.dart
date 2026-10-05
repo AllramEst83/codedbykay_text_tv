@@ -12,4 +12,10 @@ abstract interface class TextTvRepository {
   /// however old, or null. Quick: it never asks the site, so a viewer can show
   /// it while [page] reads the current one.
   Future<TextTvShown?> cached(int number);
+
+  /// Reads [number] ahead of being asked for, so the page is at hand when it
+  /// is. Does nothing for a page already held fresh. Never throws and says
+  /// nothing: a read-ahead that fails is just a page that is read when asked
+  /// for.
+  Future<void> prefetch(int number);
 }

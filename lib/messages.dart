@@ -13,6 +13,7 @@ abstract final class Messages {
   static const String sectionRefresh = 'REFRESH';
   static const String sectionCrt = 'CRT SCREEN';
   static const String autoRefresh = 'AUTO REFRESH';
+  static const String prefetch = 'READ AHEAD: NEXT AND LINKED PAGES';
   static String autoRefreshValue(Duration? every) => every == null
       ? 'OFF'
       : every.inSeconds < 120

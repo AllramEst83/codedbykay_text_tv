@@ -107,6 +107,9 @@ class _SlowRepository implements TextTvRepository {
 
   @override
   Future<TextTvShown?> cached(int number) async => null;
+
+  @override
+  Future<void> prefetch(int number) async {}
 }
 
 void main() {

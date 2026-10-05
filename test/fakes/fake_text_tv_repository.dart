@@ -19,6 +19,9 @@ class FakeTextTvRepository implements TextTvRepository {
   /// Pages [cached] has at once, as a saved copy would; empty by default.
   final Map<int, TextTvPage> cachedCopies = <int, TextTvPage>{};
 
+  /// Every page read ahead, in order.
+  final List<int> prefetched = <int>[];
+
   /// Every `(number, fresh)` asked for, in order.
   final List<(int, bool)> requests = <(int, bool)>[];
 
@@ -37,5 +40,10 @@ class FakeTextTvRepository implements TextTvRepository {
   Future<TextTvShown?> cached(int number) async {
     final TextTvPage? page = cachedCopies[number];
     return page == null ? null : TextTvShown(page);
+  }
+
+  @override
+  Future<void> prefetch(int number) async {
+    prefetched.add(number);
   }
 }

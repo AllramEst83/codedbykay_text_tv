@@ -109,6 +109,63 @@ void main() {
     expect(fetcher.requests, hasLength(5));
   });
 
+  group('reading ahead', () {
+    test('reads the page, so a later request needs no network', () async {
+      await repository.prefetch(140);
+      expect(fetcher.requests, hasLength(1));
+
+      final TextTvResult result = await repository.page(140);
+
+      expect(result, isA<TextTvShown>());
+      expect(fetcher.requests, hasLength(1), reason: 'answered from memory');
+    });
+
+    test('does nothing for a page already held fresh', () async {
+      await repository.page(140);
+      fetcher.requests.clear();
+
+      await repository.prefetch(140);
+
+      expect(fetcher.requests, isEmpty);
+    });
+
+    test('reads again a page that has gone stale', () async {
+      await repository.page(140);
+      now = now.add(const Duration(minutes: 6));
+      fetcher.requests.clear();
+
+      await repository.prefetch(140);
+
+      expect(fetcher.requests, hasLength(1));
+    });
+
+    test('never throws when the site cannot be reached', () async {
+      fetcher.route('/api/get/', const NetworkException('no signal'));
+
+      await expectLater(repository.prefetch(140), completes);
+    });
+
+    test(
+      'a failed read-ahead leaves the page to be read when asked for',
+      () async {
+        fetcher.route('/api/get/', const NetworkException('no signal'));
+        await repository.prefetch(140);
+        fetcher.route('/api/get/', (Uri url) => _page(140));
+
+        final TextTvResult result = await repository.page(140);
+
+        expect(result, isA<TextTvShown>());
+      },
+    );
+
+    test('a page not in broadcast is no trouble', () async {
+      fetcher.route('/api/get/', '[]');
+
+      await expectLater(repository.prefetch(140), completes);
+      expect(await repository.page(140), isA<TextTvNotBroadcast>());
+    });
+  });
+
   group('with a disk cache', () {
     late _MemoryDisk disk;
     late LiveTextTvRepository saving;

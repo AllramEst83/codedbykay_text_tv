@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 /// Keys so tests can find the parts.
 const Key textTvOfflineKey = ValueKey<String>('text-tv-offline');
 const Key textTvUpdatedKey = ValueKey<String>('text-tv-updated');
+const Key textTvPrefetchKey = ValueKey<String>('text-tv-prefetch');
 const Key textTvAutoRefreshKey = ValueKey<String>('text-tv-auto-refresh');
 Key textTvSettingsGroupKey(String id) =>
     ValueKey<String>('text-tv-settings-group-$id');

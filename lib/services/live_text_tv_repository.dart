@@ -69,6 +69,13 @@ class LiveTextTvRepository implements TextTvRepository {
   }
 
   @override
+  Future<void> prefetch(int number) async {
+    // page() answers a page held fresh from memory without asking the site, and
+    // keeps what it reads in memory and on disk like any other read.
+    await page(number);
+  }
+
+  @override
   Future<TextTvShown?> cached(int number) async {
     final (TextTvPage, DateTime)? kept = _kept[number];
     if (kept != null) return TextTvShown(kept.$1, readAt: kept.$2);

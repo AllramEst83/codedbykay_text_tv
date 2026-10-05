@@ -15,6 +15,7 @@ Personal project, built with Flutter.
 - Back steps through the pages you have read, then leaves the app.
 - Opens where you left off: the page, its part and the pages you came through.
 - Optional (settings > CONTROLS): an always-visible number pad (the box shows `1--` as you type) and coloured Fastext keys built from a page's bottom row of links. Off by default, which leaves the page the most height.
+- Paging feels instant: after a page arrives, the app quietly reads a few pages ahead (the next and previous page and the ones it links to), one at a time, and a new page slides in from the side you turned to. Reading ahead can be switched off in settings.
 - Pull the page down to read it again. It also refreshes itself when you come back to the app after a couple of minutes, and, if you turn it on in settings, every 30 seconds, minute or two minutes while you read. A dim line shows when it was last updated.
 - Pages read in the last five minutes are reused; REFRESH asks the site again. Failures say why and offer TRY AGAIN.
 - Works offline for pages you have read: they are saved on the phone, shown at once, refreshed behind, and marked "OFFLINE. SAVED 14:32" when the site cannot be reached.

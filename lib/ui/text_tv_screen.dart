@@ -4,6 +4,7 @@ import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/fastext.dart';
+import 'package:codedbykay_text_tv/model/prefetch.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_time.dart';
@@ -11,6 +12,7 @@ import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
+import 'package:codedbykay_text_tv/ui/page_turn.dart';
 import 'package:codedbykay_text_tv/ui/reader_bar.dart';
 import 'package:codedbykay_text_tv/ui/reader_view.dart';
 import 'package:codedbykay_text_tv/ui/settings_screen.dart';
@@ -112,12 +114,48 @@ class _TextTvScreenState extends State<TextTvScreen>
   bool _refreshing = false;
   Timer? _autoTimer;
 
+  // Pages read ahead of being asked for: a short queue, worked through one page
+  // at a time with a pause between, and dropped the moment the reader moves.
+  final List<int> _readAhead = <int>[];
+  Timer? _readAheadTimer;
+  static const Duration _readAheadWait = Duration(milliseconds: 700);
+  static const Duration _readAheadGap = Duration(milliseconds: 400);
+
+  // Which way the last page turn went: 1 to a later page, -1 to an earlier one.
+  int _turn = 0;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _load(_number, part: _part);
     _startAuto();
+  }
+
+  /// Sets up reading ahead for the page just read, when the settings say so.
+  /// Only a page read from the site counts: an old saved copy shown because
+  /// the site could not be reached says the site is not answering.
+  void _scheduleReadAhead(TextTvShown shown) {
+    _stopReadAhead();
+    if (!_refresh.prefetch || shown.cachedAt != null) return;
+    _readAhead.addAll(prefetchTargets(shown.page, _part));
+    if (_readAhead.isNotEmpty) {
+      _readAheadTimer = Timer(_readAheadWait, _readNextAhead);
+    }
+  }
+
+  void _stopReadAhead() {
+    _readAheadTimer?.cancel();
+    _readAhead.clear();
+  }
+
+  Future<void> _readNextAhead() async {
+    if (!mounted || _readAhead.isEmpty) return;
+    final int number = _readAhead.removeAt(0);
+    await widget.repository.prefetch(number);
+    if (mounted && _readAhead.isNotEmpty) {
+      _readAheadTimer = Timer(_readAheadGap, _readNextAhead);
+    }
   }
 
   /// Whether the page on show may be read again without being asked: it is
@@ -143,6 +181,7 @@ class _TextTvScreenState extends State<TextTvScreen>
     if (state != AppLifecycleState.resumed) {
       // Nothing is read while the app is out of sight.
       _autoTimer?.cancel();
+      _stopReadAhead();
       return;
     }
     _startAuto();
@@ -198,7 +237,8 @@ class _TextTvScreenState extends State<TextTvScreen>
     _show(result);
   }
 
-  void _show(TextTvResult result) {
+  void _show(TextTvResult result, {bool readAhead = false}) {
+    if (readAhead && result is TextTvShown) _scheduleReadAhead(result);
     setState(() {
       _loading = false;
       _result = result;
@@ -213,6 +253,7 @@ class _TextTvScreenState extends State<TextTvScreen>
   void _setRefresh(RefreshSettings refresh) {
     setState(() => _refresh = refresh);
     _startAuto();
+    if (!refresh.prefetch) _stopReadAhead();
     widget.onRefreshChanged?.call(refresh);
   }
 
@@ -252,6 +293,8 @@ class _TextTvScreenState extends State<TextTvScreen>
 
   Future<void> _load(int number, {bool fresh = false, int part = 0}) async {
     final int request = ++_request;
+    _stopReadAhead();
+    _turn = number == _number ? 0 : (number > _number ? 1 : -1);
     setState(() {
       _number = number;
       _part = part;
@@ -282,7 +325,7 @@ class _TextTvScreenState extends State<TextTvScreen>
     }
     final TextTvResult result = await reading;
     if (!mounted || request != _request) return;
-    _show(result);
+    _show(result, readAhead: true);
   }
 
   /// Goes to [number], remembering the page it leaves so back can return.
@@ -448,6 +491,7 @@ class _TextTvScreenState extends State<TextTvScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _autoTimer?.cancel();
+    _readAheadTimer?.cancel();
     _typedTimer?.cancel();
     super.dispose();
   }
@@ -482,31 +526,37 @@ class _TextTvScreenState extends State<TextTvScreen>
                         behavior: HitTestBehavior.opaque,
                         onHorizontalDragEnd: (DragEndDetails d) =>
                             _swiped(d.primaryVelocity ?? 0),
-                        child: _reader.enabled
-                            ? ReaderView(
-                                number: _number,
-                                part: _part,
-                                loading: _loading,
-                                result: _result,
-                                settings: _reader,
-                                onLink: _open,
-                                onRetry: () => _load(_number, fresh: true),
-                                onPull: _pullRefresh,
-                              )
-                            : _crt(
-                                TvPageArea(
+                        // A new page comes in with a short slide from the side it
+                        // was turned to (a new key for each page number).
+                        child: PageTurn(
+                          key: ValueKey<int>(_number),
+                          direction: _turn,
+                          child: _reader.enabled
+                              ? ReaderView(
                                   number: _number,
                                   part: _part,
                                   loading: _loading,
                                   result: _result,
-                                  onLink: (String command) {
-                                    final int? page = int.tryParse(command);
-                                    if (page != null) _open(page);
-                                  },
+                                  settings: _reader,
+                                  onLink: _open,
                                   onRetry: () => _load(_number, fresh: true),
                                   onPull: _pullRefresh,
+                                )
+                              : _crt(
+                                  TvPageArea(
+                                    number: _number,
+                                    part: _part,
+                                    loading: _loading,
+                                    result: _result,
+                                    onLink: (String command) {
+                                      final int? page = int.tryParse(command);
+                                      if (page != null) _open(page);
+                                    },
+                                    onRetry: () => _load(_number, fresh: true),
+                                    onPull: _pullRefresh,
+                                  ),
                                 ),
-                              ),
+                        ),
                       ),
                     ),
                     if (_savedAt case final DateTime savedAt)

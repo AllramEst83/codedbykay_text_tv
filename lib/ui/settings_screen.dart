@@ -131,6 +131,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onChanged: (double v) =>
                             _setRefresh(_refresh.copyWith(auto: v.round())),
                       ),
+                      const SizedBox(height: TvMetrics.margin),
+                      TvSwitchRow(
+                        switchKey: textTvPrefetchKey,
+                        label: Messages.prefetch,
+                        value: _refresh.prefetch,
+                        onChanged: (bool v) =>
+                            _setRefresh(_refresh.copyWith(prefetch: v)),
+                      ),
                     ],
                   ),
                   const SizedBox(height: TvMetrics.margin * 2),

@@ -73,5 +73,44 @@ void main() {
     test('copyWith changes the step', () {
       expect(const RefreshSettings().copyWith(auto: 3).auto, 3);
     });
+
+    test('reads ahead by default', () {
+      expect(const RefreshSettings().prefetch, isTrue);
+    });
+
+    test('the read-ahead switch survives a round trip, both ways', () {
+      for (final bool on in <bool>[true, false]) {
+        final RefreshSettings s = RefreshSettings(auto: 2, prefetch: on);
+
+        expect(RefreshSettings.decode(s.encode()), s);
+      }
+    });
+
+    test('a saved setting from before read-ahead existed reads ahead', () {
+      expect(
+        RefreshSettings.decode('{"auto": 2}'),
+        const RefreshSettings(auto: 2),
+      );
+    });
+
+    test('a read-ahead value that is not a yes or no means yes', () {
+      for (final String bad in <String>['1', '"no"', 'null', '[]']) {
+        expect(
+          RefreshSettings.decode('{"prefetch": $bad}').prefetch,
+          isTrue,
+          reason: bad,
+        );
+      }
+    });
+
+    test('copyWith changes one without the other', () {
+      const RefreshSettings s = RefreshSettings(auto: 3);
+
+      expect(
+        s.copyWith(prefetch: false),
+        const RefreshSettings(auto: 3, prefetch: false),
+      );
+      expect(s.copyWith(auto: 1).prefetch, isTrue);
+    });
   });
 }
