@@ -65,3 +65,5 @@ const Key textTvShareLinkKey = ValueKey<String>('text-tv-share-link');
 const Key textTvShareImageKey = ValueKey<String>('text-tv-share-image');
 Key textTvReaderFontKey(ReaderFont font) =>
     ValueKey<String>('text-tv-reader-font-${font.name}');
+const Key textTvAboutCreditKey = ValueKey<String>('text-tv-about-credit');
+const Key textTvAboutPrivacyKey = ValueKey<String>('text-tv-about-privacy');

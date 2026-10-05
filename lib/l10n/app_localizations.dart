@@ -164,6 +164,24 @@ abstract class AppLocalizations {
   /// **'REFRESH'**
   String get sectionRefresh;
 
+  /// No description provided for @sectionAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'ABOUT'**
+  String get sectionAbout;
+
+  /// No description provided for @aboutCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'The pages are SVT Text, which belongs to Sveriges Television. They reach this app through texttv.nu, which is run by someone other than this app\'s maker. This app is not made, approved or supported by SVT or texttv.nu.'**
+  String get aboutCredit;
+
+  /// No description provided for @aboutPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'No account, no ads, no tracking. The only thing this app sends is the number of the page you ask for, to texttv.nu. The pages you have read, your favourites and your settings stay on this phone.'**
+  String get aboutPrivacy;
+
   /// No description provided for @sectionCrt.
   ///
   /// In en, this message translates to:

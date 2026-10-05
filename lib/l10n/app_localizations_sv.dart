@@ -43,6 +43,17 @@ class AppLocalizationsSv extends AppLocalizations {
   String get sectionRefresh => 'UPPDATERING';
 
   @override
+  String get sectionAbout => 'OM APPEN';
+
+  @override
+  String get aboutCredit =>
+      'Sidorna är SVT Text, som tillhör Sveriges Television. De hämtas via texttv.nu, som drivs av någon annan än den som har gjort den här appen. Appen är inte gjord, godkänd eller stödd av SVT eller texttv.nu.';
+
+  @override
+  String get aboutPrivacy =>
+      'Inget konto, inga annonser, ingen spårning. Det enda appen skickar är numret på sidan du vill läsa, till texttv.nu. Sidor du har läst, dina favoriter och dina inställningar sparas bara på den här telefonen.';
+
+  @override
   String get sectionCrt => 'CRT-SKÄRM';
 
   @override

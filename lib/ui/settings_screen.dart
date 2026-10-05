@@ -234,6 +234,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: TvMetrics.margin * 2),
+                  _SettingsGroup(
+                    id: 'about',
+                    title: context.l10n.sectionAbout,
+                    children: <Widget>[
+                      Text(
+                        context.l10n.aboutCredit,
+                        key: textTvAboutCreditKey,
+                        style: readerTextStyle(13, TvColors.white),
+                      ),
+                      const SizedBox(height: TvMetrics.margin),
+                      Text(
+                        context.l10n.aboutPrivacy,
+                        key: textTvAboutPrivacyKey,
+                        style: readerTextStyle(13, TvColors.white),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

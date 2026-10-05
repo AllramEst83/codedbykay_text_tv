@@ -53,7 +53,7 @@ lib/
   ui/
     theme.dart               # TvColors, TvMetrics, kPixelFontFamily, textTvTheme(): the chrome's colours and metrics, the only place they are defined
     text_tv_screen.dart      # TextTvScreen: state (page, part, history, typed digits and their timer, request counter) and the layout of the screen
-    settings_screen.dart     # SettingsScreen: the page the gear button opens, as framed panels each under a blue header bar: CONTROLS (the quick-pad switch), FAVOURITES (count, RESET), REFRESH (auto-refresh step slider, read-ahead switch), CRT SCREEN (switch, live preview, three capped sliders, RESET)
+    settings_screen.dart     # SettingsScreen: the page the gear button opens, as framed panels each under a blue header bar: CONTROLS (the quick-pad switch), FAVOURITES (count, RESET), REFRESH (auto-refresh step slider, read-ahead switch), CRT SCREEN (switch, live preview, three capped sliders, RESET), ABOUT (credit and privacy text)
     crt_screen.dart          # CrtScreen: draws its child through shaders/crt.frag (flutter_shaders AnimatedSampler) and routes touches through CrtHitMap
     crt_hit_map.dart         # CrtHitMap: a render object that remaps a touch through the CRT glass so a tap reaches what is shown
     page_snapshot.dart       # capturePageImage(context, page, part): a PNG of the page as teletext, drawn off-screen in the overlay

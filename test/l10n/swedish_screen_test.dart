@@ -108,6 +108,9 @@ void main() {
     expect(find.text('FAVORITER'), findsOneWidget);
     expect(find.text('ÅTERSTÄLL FAVORITER'), findsOneWidget);
     expect(find.text('0 AV 24 SPARADE'), findsNothing);
+    await tester.scrollUntilVisible(find.byKey(textTvAboutPrivacyKey), 200);
+    expect(find.textContaining('Inget konto'), findsOneWidget);
+    expect(find.text('OM APPEN'), findsOneWidget);
     expect(find.text('6 AV 24 SPARADE'), findsOneWidget);
   });
 

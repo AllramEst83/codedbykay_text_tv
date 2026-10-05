@@ -16,6 +16,9 @@
   "sectionFavourites": "FAVOURITES",
   "sectionControls": "CONTROLS",
   "sectionRefresh": "REFRESH",
+  "sectionAbout": "ABOUT",
+  "aboutCredit": "The pages are SVT Text, which belongs to Sveriges Television. They reach this app through texttv.nu, which is run by someone other than this app's maker. This app is not made, approved or supported by SVT or texttv.nu.",
+  "aboutPrivacy": "No account, no ads, no tracking. The only thing this app sends is the number of the page you ask for, to texttv.nu. The pages you have read, your favourites and your settings stay on this phone.",
   "sectionCrt": "CRT SCREEN",
 
   "recentPages": "Recent pages",

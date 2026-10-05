@@ -332,6 +332,7 @@ void main() {
       'favourites',
       'refresh',
       'crt',
+      'about',
     ];
 
     testWidgets('are three panels, each with a named header bar', (
@@ -478,5 +479,6 @@ String _title(String id) => switch (id) {
   'controls' => en.sectionControls,
   'favourites' => en.sectionFavourites,
   'refresh' => en.sectionRefresh,
+  'about' => en.sectionAbout,
   _ => en.sectionCrt,
 };
