@@ -124,6 +124,33 @@ void main() {
     });
   });
 
+  group('the reader bar', () {
+    testWidgets('leaves a gap between its buttons and the page', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository());
+
+      final double buttonsBottom = tester
+          .getBottomLeft(find.byKey(textTvReaderLargerKey))
+          .dy;
+      final double pageTop = tester
+          .getTopLeft(find.byKey(textTvReaderViewKey))
+          .dy;
+
+      expect(pageTop - buttonsBottom, greaterThanOrEqualTo(TvMetrics.margin));
+    });
+
+    testWidgets('A- and A+ are the same square as the glasses button', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository());
+
+      final Size glasses = tester.getSize(find.byKey(textTvReaderKey));
+      expect(tester.getSize(find.byKey(textTvReaderSmallerKey)), glasses);
+      expect(tester.getSize(find.byKey(textTvReaderLargerKey)), glasses);
+    });
+  });
+
   group('reading', () {
     testWidgets('shows the page as text, headlines and all', (
       WidgetTester tester,

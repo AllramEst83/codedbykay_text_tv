@@ -16,36 +16,39 @@ class ReaderBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: TvMetrics.gutter),
-      child: Row(
-        children: <Widget>[
-          TvButton(
-            key: textTvReaderSmallerKey,
-            label: 'A-',
-            semanticLabel: Messages.smallerText,
-            onTap: settings.size > 0
-                ? () => onChanged(settings.copyWith(size: settings.size - 1))
-                : null,
-          ),
-          const SizedBox(width: TvMetrics.gutter),
-          TvButton(
-            key: textTvReaderLargerKey,
-            label: 'A+',
-            semanticLabel: Messages.largerText,
-            onTap: settings.size < readerTextSizes.length - 1
-                ? () => onChanged(settings.copyWith(size: settings.size + 1))
-                : null,
-          ),
-          const SizedBox(width: TvMetrics.margin),
-          for (final ReaderTheme theme in ReaderTheme.values)
-            _Swatch(
-              theme: theme,
-              selected: theme == settings.theme,
-              onTap: () => onChanged(settings.copyWith(theme: theme)),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: TvMetrics.margin),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: TvMetrics.gutter),
+        child: Row(
+          children: <Widget>[
+            TvIconButton(
+              key: textTvReaderSmallerKey,
+              icon: (Color colour) => Text('A-', style: tvText(12, colour)),
+              semanticLabel: Messages.smallerText,
+              onTap: settings.size > 0
+                  ? () => onChanged(settings.copyWith(size: settings.size - 1))
+                  : null,
             ),
-        ],
+            const SizedBox(width: TvMetrics.gutter),
+            TvIconButton(
+              key: textTvReaderLargerKey,
+              icon: (Color colour) => Text('A+', style: tvText(12, colour)),
+              semanticLabel: Messages.largerText,
+              onTap: settings.size < readerTextSizes.length - 1
+                  ? () => onChanged(settings.copyWith(size: settings.size + 1))
+                  : null,
+            ),
+            const SizedBox(width: TvMetrics.margin),
+            for (final ReaderTheme theme in ReaderTheme.values)
+              _Swatch(
+                theme: theme,
+                selected: theme == settings.theme,
+                onTap: () => onChanged(settings.copyWith(theme: theme)),
+              ),
+          ],
+        ),
       ),
     );
   }

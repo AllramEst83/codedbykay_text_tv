@@ -162,7 +162,8 @@ class TvButton extends StatelessWidget {
   }
 }
 
-/// A bordered button with an icon, lit when [selected].
+/// A bordered square button with an icon or a short label drawn by [icon], lit
+/// when [selected] and greyed when [onTap] is null.
 class TvIconButton extends StatelessWidget {
   const TvIconButton({
     super.key,
@@ -175,14 +176,19 @@ class TvIconButton extends StatelessWidget {
   /// Draws the icon in the colour the button is in just now.
   final Widget Function(Color colour) icon;
   final String semanticLabel;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool selected;
 
   @override
   Widget build(BuildContext context) {
-    final Color colour = selected ? TvColors.highlight : TvColors.white;
+    final Color colour = onTap == null
+        ? TvColors.dim
+        : selected
+        ? TvColors.highlight
+        : TvColors.white;
     return Semantics(
       button: true,
+      enabled: onTap != null,
       selected: selected,
       label: semanticLabel,
       excludeSemantics: true,
