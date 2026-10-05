@@ -689,6 +689,152 @@ void main() {
     });
   });
 
+  group('text size', () {
+    void phone(WidgetTester tester) {
+      tester.view
+        ..physicalSize = const Size(400, 900)
+        ..devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+    }
+
+    double rowWidth(WidgetTester tester) =>
+        tester.getSize(find.byType(TvRow).first).width;
+
+    bool enabled(WidgetTester tester, Key key) =>
+        tester
+            .widget<InkWell>(
+              find.descendant(
+                of: find.byKey(key),
+                matching: find.byType(InkWell),
+              ),
+            )
+            .onTap !=
+        null;
+
+    testWidgets(
+      'starts at the page fitted to the screen, and cannot go smaller',
+      (WidgetTester tester) async {
+        phone(tester);
+        await _open(tester, _repository());
+
+        expect(rowWidth(tester), closeTo(400 * 0.995, 1));
+        expect(enabled(tester, textTvSmallerKey), isFalse);
+        expect(enabled(tester, textTvLargerKey), isTrue);
+      },
+    );
+
+    testWidgets('A+ makes the page larger, A- brings it back', (
+      WidgetTester tester,
+    ) async {
+      phone(tester);
+      await _open(tester, _repository());
+      final double fitted = rowWidth(tester);
+
+      await tester.tap(find.byKey(textTvLargerKey));
+      await tester.pumpAndSettle();
+      expect(rowWidth(tester), closeTo(fitted * 1.25, 1));
+
+      await tester.tap(find.byKey(textTvLargerKey));
+      await tester.pumpAndSettle();
+      expect(rowWidth(tester), closeTo(fitted * 1.5, 1));
+
+      await tester.tap(find.byKey(textTvSmallerKey));
+      await tester.pumpAndSettle();
+      expect(rowWidth(tester), closeTo(fitted * 1.25, 1));
+    });
+
+    testWidgets('stops at the largest size', (WidgetTester tester) async {
+      phone(tester);
+      await _open(tester, _repository());
+      final double fitted = rowWidth(tester);
+
+      for (int i = 0; i < textTvZoomSteps.length - 1; i++) {
+        await tester.tap(find.byKey(textTvLargerKey));
+        await tester.pumpAndSettle();
+      }
+
+      expect(rowWidth(tester), closeTo(fitted * textTvZoomSteps.last, 2));
+      expect(enabled(tester, textTvLargerKey), isFalse);
+      expect(enabled(tester, textTvSmallerKey), isTrue);
+    });
+
+    testWidgets('a larger page pans sideways', (WidgetTester tester) async {
+      phone(tester);
+      await _open(tester, _repository());
+      await tester.tap(find.byKey(textTvLargerKey));
+      await tester.pumpAndSettle();
+      final double before = tester.getTopLeft(find.byType(TvRow).first).dx;
+
+      await tester.drag(find.byType(TvRow).first, const Offset(-100, 0));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.getTopLeft(find.byType(TvRow).first).dx,
+        lessThan(before - 50),
+      );
+    });
+
+    testWidgets('a page fitted to the screen does not pan', (
+      WidgetTester tester,
+    ) async {
+      phone(tester);
+      await _open(tester, _repository());
+      final double before = tester.getTopLeft(find.byType(TvRow).first).dx;
+
+      await tester.drag(find.byType(TvRow).first, const Offset(-100, 0));
+      await tester.pumpAndSettle();
+
+      expect(tester.getTopLeft(find.byType(TvRow).first).dx, before);
+    });
+
+    testWidgets('a link in a larger page still opens its page', (
+      WidgetTester tester,
+    ) async {
+      phone(tester);
+      final FakeTextTvRepository repository = _repository();
+      repository.pages[100] = _page(
+        100,
+        parts: <List<String>>[
+          <String>['101'.padRight(40)],
+        ],
+        styled: <List<List<StyledRun>>>[
+          <List<StyledRun>>[
+            <StyledRun>[
+              const StyledRun('101', underline: true, command: '101'),
+              StyledRun(''.padRight(37)),
+            ],
+          ],
+        ],
+      );
+      await _open(tester, repository);
+      await tester.tap(find.byKey(textTvLargerKey));
+      await tester.pumpAndSettle();
+
+      final Offset left = tester.getTopLeft(find.byType(TvRow).first);
+      await tester.tapAt(left + const Offset(30, 10));
+      await tester.pumpAndSettle();
+
+      expect(_number('101'), findsOneWidget);
+    });
+
+    testWidgets('is reported, and restored on the next run', (
+      WidgetTester tester,
+    ) async {
+      phone(tester);
+      final List<TextTvSession> heard = <TextTvSession>[];
+      await _open(tester, _repository(), onSessionChanged: heard.add);
+
+      await tester.tap(find.byKey(textTvLargerKey));
+      await tester.pumpAndSettle();
+      expect(heard.last.zoom, 1);
+
+      // A new run: the old screen goes, so the saved session is read afresh.
+      await tester.pumpWidget(const SizedBox());
+      await _open(tester, _repository(), session: const TextTvSession(zoom: 3));
+      expect(rowWidth(tester), closeTo(400 * 0.995 * 2, 2));
+    });
+  });
+
   group('saved copies', () {
     testWidgets('a saved copy shows at once while the page is read', (
       WidgetTester tester,

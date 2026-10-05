@@ -19,7 +19,12 @@ class TvPageArea extends StatelessWidget {
     required this.result,
     required this.onLink,
     required this.onRetry,
+    this.zoom = 1,
   });
+
+  /// How many times wider than the screen the page is drawn; above 1 it pans
+  /// sideways.
+  final double zoom;
 
   final int number;
   final int part;
@@ -31,6 +36,16 @@ class TvPageArea extends StatelessWidget {
   /// Black space above and below the page.
   static const double _airAbove = TvMetrics.margin;
 
+  /// [grid] as wide as [zoom] says, in a sideways scroll when that is wider
+  /// than the [viewport]; untouched at 1.
+  Widget _panned(Widget grid, double viewport) {
+    if (zoom <= 1) return grid;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SizedBox(width: viewport * zoom, child: grid),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -41,12 +56,16 @@ class TvPageArea extends StatelessWidget {
           content = TvMessage(lines: const <String>[Messages.loading]);
         } else {
           content = switch (shown) {
-            TextTvShown(:final TextTvPage page) => TvGrid(
-              page: page,
-              part: part,
-              onLink: onLink,
-              width: constraints.maxWidth,
-              height: constraints.maxHeight - 2 * _airAbove,
+            TextTvShown(:final TextTvPage page) => _panned(
+              TvGrid(
+                page: page,
+                part: part,
+                onLink: onLink,
+                width: constraints.maxWidth * zoom,
+                height: constraints.maxHeight - 2 * _airAbove,
+                zoom: zoom,
+              ),
+              constraints.maxWidth,
             ),
             TextTvNotBroadcast(:final int number) => TvMessage(
               lines: <String>[Messages.pageNotBroadcast(number)],
@@ -116,7 +135,12 @@ class TvGrid extends StatelessWidget {
     required this.onLink,
     required this.width,
     required this.height,
+    this.zoom = 1,
   });
+
+  /// The zoom [width] already includes; it lifts the limit on how large the
+  /// letters may grow beyond the font's own size.
+  final double zoom;
 
   final TextTvPage page;
   final int part;
@@ -159,7 +183,7 @@ class TvGrid extends StatelessWidget {
 
     // Spread the rows over the height there is: a headline row counts for two.
     // A screen too short for the natural row height scrolls instead.
-    final double cell = tvCellWidth(width);
+    final double cell = tvCellWidth(width, upscaleLimit: tvUpscaleLimit * zoom);
     final int units = rows.fold(
       0,
       (int sum, List<StyledRun> row) =>
@@ -184,6 +208,7 @@ class TvGrid extends StatelessWidget {
                 : gutters.left,
             rowHeight: rowHeight,
             onRun: onLink,
+            upscaleLimit: tvUpscaleLimit * zoom,
           ),
       ],
     );

@@ -27,9 +27,10 @@ double tvCellWidth(
   double width, {
   int columns = textTvColumns,
   double baseFontSize = 8,
+  double upscaleLimit = tvUpscaleLimit,
 }) => (width * 0.995 / (columns + tvGutterCells)).clamp(
   0.0,
-  baseFontSize * tvUpscaleLimit,
+  baseFontSize * upscaleLimit,
 );
 
 /// The teletext colours as drawn: a fixed palette, not the theme's, because a
@@ -89,6 +90,7 @@ class TvRow extends StatelessWidget {
     this.gutterLeft = tvGutterCells ~/ 2,
     this.rowHeight,
     this.onRun,
+    this.upscaleLimit = tvUpscaleLimit,
   });
 
   final List<StyledRun> runs;
@@ -109,6 +111,10 @@ class TvRow extends StatelessWidget {
   /// Runs the command of a tapped link. Links are not tappable without it.
   final ValueChanged<String>? onRun;
 
+  /// How many times larger than the style's font size the text may be drawn
+  /// to fill the width; raised when the page is deliberately zoomed.
+  final double upscaleLimit;
+
   @override
   Widget build(BuildContext context) {
     final base = style ?? DefaultTextStyle.of(context).style;
@@ -121,6 +127,7 @@ class TvRow extends StatelessWidget {
           scaler,
           constraints,
           columns + tvGutterCells,
+          upscaleLimit,
         );
         final font = base.copyWith(fontSize: fontSize);
         final cell = TextPainter(
@@ -189,6 +196,7 @@ double _fittingFontSize(
   TextScaler scaler,
   BoxConstraints constraints,
   int columns,
+  double upscaleLimit,
 ) {
   final size = base.fontSize ?? 14;
   if (!constraints.hasBoundedWidth) return size;
@@ -203,7 +211,7 @@ double _fittingFontSize(
   // A hair under, so rounding never pushes the last column past the edge.
   final scale = (constraints.maxWidth / needed * 0.995).clamp(
     0.0,
-    tvUpscaleLimit,
+    upscaleLimit,
   );
   return size * scale;
 }
