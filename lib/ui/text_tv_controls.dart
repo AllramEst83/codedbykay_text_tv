@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/ui/glasses_icon.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +19,18 @@ TextStyle tvText(double size, Color colour) =>
 
 /// The bar above the page: the name, and REFRESH.
 class TvTopBar extends StatelessWidget {
-  const TvTopBar({super.key, required this.onRefresh});
+  const TvTopBar({
+    super.key,
+    required this.onRefresh,
+    required this.readerOn,
+    required this.onReader,
+  });
 
   final VoidCallback? onRefresh;
+
+  /// Whether the page is shown as reader text, and the button that switches.
+  final bool readerOn;
+  final VoidCallback onReader;
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +41,21 @@ class TvTopBar extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-              child: Text(Messages.title, style: tvText(14, TvColors.white)),
+              child: Text(
+                Messages.title,
+                style: tvText(14, TvColors.white),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+            TvIconButton(
+              key: textTvReaderKey,
+              icon: (Color colour) => GlassesIcon(colour: colour),
+              selected: readerOn,
+              semanticLabel: readerOn ? Messages.readerOff : Messages.readerOn,
+              onTap: onReader,
+            ),
+            const SizedBox(width: TvMetrics.gutter),
             TvButton(
               key: textTvRefreshKey,
               label: Messages.refresh,
@@ -103,10 +126,18 @@ class TvPartBar extends StatelessWidget {
 
 /// A bordered text button in the viewer's flat look; a `null` [onTap] greys it.
 class TvButton extends StatelessWidget {
-  const TvButton({super.key, required this.label, required this.onTap});
+  const TvButton({
+    super.key,
+    required this.label,
+    required this.onTap,
+    this.semanticLabel,
+  });
 
   final String label;
   final VoidCallback? onTap;
+
+  /// What a screen reader says when the label is not words (`A+`).
+  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +152,50 @@ class TvButton extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: colour, width: TvMetrics.border),
         ),
-        child: Text(label, style: tvText(12, colour)),
+        child: Text(
+          label,
+          style: tvText(12, colour),
+          semanticsLabel: semanticLabel,
+        ),
+      ),
+    );
+  }
+}
+
+/// A bordered button with an icon, lit when [selected].
+class TvIconButton extends StatelessWidget {
+  const TvIconButton({
+    super.key,
+    required this.icon,
+    required this.semanticLabel,
+    required this.onTap,
+    this.selected = false,
+  });
+
+  /// Draws the icon in the colour the button is in just now.
+  final Widget Function(Color colour) icon;
+  final String semanticLabel;
+  final VoidCallback onTap;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color colour = selected ? TvColors.highlight : TvColors.white;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: semanticLabel,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            border: Border.all(color: colour, width: TvMetrics.border),
+          ),
+          child: icon(colour),
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Reader mode (I-3a): a glasses button shows the page as reflowed text with its own size (`A-`/`A+`) and five colour schemes; the choice is remembered.
 - The app is portrait-only.
 - Offline cache (I-1): pages read are saved on the phone and shown at once; when the site cannot be reached the saved copy is shown with "OFFLINE. SAVED 14:32".
 - Remembers where you were (I-2): the last page, part and history survive restarts.

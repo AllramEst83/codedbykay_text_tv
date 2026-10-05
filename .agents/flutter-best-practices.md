@@ -16,7 +16,7 @@ Toolchain: Flutter 3.47 / Dart ^3.13 (see `pubspec.yaml`). Dot shorthands
 - `const` constructors and `const` widgets wherever possible. Use `super.key`.
 - Keep `build` pure and cheap: no I/O, no allocations of controllers, no timers.
 - Rebuild the smallest subtree. State that changes frequently lives in its own tiny widget so the whole screen doesn't rebuild.
-- Chrome colours and metrics come from `ui/theme.dart` (`TvColors`, `TvMetrics`); the page's own colours from `tvColorOf`. No hard-coded colours scattered in widgets.
+- Chrome colours and metrics come from `ui/theme.dart` (`TvColors`, `TvMetrics`), the reader's from `readerPalette`; the page's own colours from `tvColorOf`. No hard-coded colours scattered in widgets.
 - Respect `MediaQuery` text scaling and safe areas/insets (keyboard, gesture bar). Never hard-code device sizes.
 - Prefer `LayoutBuilder`/flex layouts over fixed sizes.
 

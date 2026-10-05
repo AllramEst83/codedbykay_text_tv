@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_screen.dart';
@@ -23,6 +24,8 @@ class TextTvApp extends StatelessWidget {
     required this.repository,
     this.session = const TextTvSession(),
     this.onSessionChanged,
+    this.reader = const ReaderSettings(),
+    this.onReaderChanged,
   });
 
   final TextTvRepository repository;
@@ -30,6 +33,10 @@ class TextTvApp extends StatelessWidget {
   /// Where the reader left off, or the front page.
   final TextTvSession session;
   final ValueChanged<TextTvSession>? onSessionChanged;
+
+  /// How the reader was set up on the last run.
+  final ReaderSettings reader;
+  final ValueChanged<ReaderSettings>? onReaderChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +50,8 @@ class TextTvApp extends StatelessWidget {
           repository: repository,
           initial: session,
           onSessionChanged: onSessionChanged,
+          reader: reader,
+          onReaderChanged: onReaderChanged,
         ),
       ),
     );

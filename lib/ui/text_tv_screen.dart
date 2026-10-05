@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_time.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
+import 'package:codedbykay_text_tv/ui/reader_bar.dart';
+import 'package:codedbykay_text_tv/ui/reader_view.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_page_area.dart';
@@ -25,12 +28,19 @@ class TextTvScreen extends StatefulWidget {
     required this.repository,
     this.initial = const TextTvSession(),
     this.onSessionChanged,
+    this.reader = const ReaderSettings(),
+    this.onReaderChanged,
     this.clock = _systemNow,
   });
 
   final TextTvRepository repository;
   final TextTvSession initial;
   final ValueChanged<TextTvSession>? onSessionChanged;
+
+  /// Whether the page shows as reader text and how the reader looks, as of the
+  /// last run; [onReaderChanged] hears every change to it.
+  final ReaderSettings reader;
+  final ValueChanged<ReaderSettings>? onReaderChanged;
 
   /// Today's date, for saying when a saved copy is from.
   final DateTime Function() clock;
@@ -42,6 +52,7 @@ class TextTvScreen extends StatefulWidget {
 class _TextTvScreenState extends State<TextTvScreen> {
   late int _number = widget.initial.page;
   late int _part = widget.initial.part;
+  late ReaderSettings _reader = widget.reader;
   TextTvResult? _result;
   bool _loading = true;
 
@@ -59,6 +70,11 @@ class _TextTvScreenState extends State<TextTvScreen> {
   void initState() {
     super.initState();
     _load(_number, part: _part);
+  }
+
+  void _setReader(ReaderSettings reader) {
+    setState(() => _reader = reader);
+    widget.onReaderChanged?.call(reader);
   }
 
   /// Tells the listener where the reader is now.
@@ -212,7 +228,12 @@ class _TextTvScreenState extends State<TextTvScreen> {
           children: <Widget>[
             TvTopBar(
               onRefresh: _loading ? null : () => _load(_number, fresh: true),
+              readerOn: _reader.enabled,
+              onReader: () =>
+                  _setReader(_reader.copyWith(enabled: !_reader.enabled)),
             ),
+            if (_reader.enabled)
+              ReaderBar(settings: _reader, onChanged: _setReader),
             Expanded(
               child: ColoredBox(
                 color: TvColors.black,
@@ -223,17 +244,27 @@ class _TextTvScreenState extends State<TextTvScreen> {
                         behavior: HitTestBehavior.opaque,
                         onHorizontalDragEnd: (DragEndDetails d) =>
                             _swiped(d.primaryVelocity ?? 0),
-                        child: TvPageArea(
-                          number: _number,
-                          part: _part,
-                          loading: _loading,
-                          result: _result,
-                          onLink: (String command) {
-                            final int? page = int.tryParse(command);
-                            if (page != null) _open(page);
-                          },
-                          onRetry: () => _load(_number, fresh: true),
-                        ),
+                        child: _reader.enabled
+                            ? ReaderView(
+                                number: _number,
+                                part: _part,
+                                loading: _loading,
+                                result: _result,
+                                settings: _reader,
+                                onLink: _open,
+                                onRetry: () => _load(_number, fresh: true),
+                              )
+                            : TvPageArea(
+                                number: _number,
+                                part: _part,
+                                loading: _loading,
+                                result: _result,
+                                onLink: (String command) {
+                                  final int? page = int.tryParse(command);
+                                  if (page != null) _open(page);
+                                },
+                                onRetry: () => _load(_number, fresh: true),
+                              ),
                       ),
                     ),
                     if (_savedAt case final DateTime savedAt)

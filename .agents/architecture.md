@@ -17,6 +17,8 @@ lib/
     text_tv_html.dart        # parseTextTvHtml: a page's HTML as styled rows (null if not the shape expected, so the plain text is the fallback)
     tv_mosaic.dart           # tvPictureFor(hash): texttv.nu's block-graphics GIFs rebuilt and looked up by CRC-32 (no downloads)
     tv_layout.dart           # tvIsBar / tvTextMargins / tvGutters: the black gutter each side of a page that gives its TEXT equal margins
+    reader_content.dart      # buildReaderBlocks(page, part): a page's rows reflowed into ReaderCaption / Heading / Paragraph / Columns / Nav blocks (tall rows and bars are headings, wrapped lines join, page numbers become links)
+    reader_settings.dart     # ReaderSettings (enabled, ReaderTheme, size step), readerTextSizes: how the reader looks; tolerant encode/decode
     saved_time.dart          # formatSavedAt: `14:32` for today, `3/10 14:32` otherwise
     text_tv_session.dart     # TextTvSession (page, part, history <= 50): what a cold start returns to; tolerant encode/decode
     text_tv_headlines.dart   # textTvHeadlines(page): the headline lines of a page (no title, bare numbers or navigation); not used by the UI yet
@@ -28,12 +30,16 @@ lib/
     text_tv.dart             # TextTv: the texttv.nu client; fetchBody(n) + parse(n, body), page(n) = both; null = not in broadcast, throws NetworkException
     text_tv_repository.dart  # TextTvRepository: page(n, {fresh}) -> TextTvResult, never throws; cached(n) -> the copy already held, quickly
     live_text_tv_repository.dart # cache over TextTv: memory 5 min / 40 pages, plus the optional disk cache (offline fallback)
+    reader_settings_store.dart # ReaderSettingsStore (load/save, never throws) and PrefsReaderSettingsStore on shared_preferences
     session_store.dart       # SessionStore (load/save, never throws) and PrefsSessionStore on shared_preferences
   ui/
     theme.dart               # TvColors, TvMetrics, kPixelFontFamily, textTvTheme(): the chrome's colours and metrics, the only place they are defined
     text_tv_screen.dart      # TextTvScreen: state (page, part, history, number pad, request counter) and the layout of the screen
+    reader_view.dart         # ReaderView: the reader's page (ListView of blocks in the scheme's colours; its own loading/failed/not-broadcast messages)
+    reader_bar.dart          # ReaderBar: A-, A+ and a swatch per colour scheme
+    glasses_icon.dart        # GlassesIcon, drawn (Material has no glasses icon)
     text_tv_page_area.dart   # TvPageArea / TvGrid / TvMessage: the page, or loading / not-broadcast / failure
-    text_tv_controls.dart    # TvTopBar, TvPartBar, TvButton, TvNumberBox, TvShortcuts, TvKeypad, textTvShortcuts
+    text_tv_controls.dart    # TvTopBar (title, glasses, REFRESH), TvPartBar, TvButton, TvNumberBox, TvShortcuts, TvKeypad, textTvShortcuts
     text_tv_keys.dart        # the ValueKeys tests use to find controls
     tv_row.dart              # TvRow: one row drawn cell by cell (colour bars, block graphics, underlined links, tall headlines); tvColorOf = the fixed teletext palette
 test/                        # mirrors lib/; fakes/ holds FakeHttpFetcher and FakeTextTvRepository; fixtures/ holds real texttv.nu answers
@@ -99,6 +105,9 @@ The tests pin most of this; change the spec and the tests together.
 - One `textTvColumns` constant in `model/` is the grid width everywhere (client, parser, UI).
 - Release signing reads `android/key.properties` (untracked) and falls back to the debug key when it is absent, so CI and fresh clones build; see [android.md](android.md).
 - Remember where you were: `TextTvScreen` takes its starting `TextTvSession` and reports every move through `onSessionChanged`; it knows nothing about storage. `main.dart` loads the session before `runApp` and saves it fire-and-forget. A saved part the page no longer has is clamped when the page arrives; a stored page outside 100-899 or unreadable JSON means the front page. Dependency added: `shared_preferences` (Flutter team package, one JSON string under the key `session`).
+- Reader mode (I-3a): the glasses button toggles `ReaderSettings.enabled`; `TextTvScreen` then shows `ReaderView` instead of `TvPageArea` for the same result, so loading, retry, offline note, parts, swipes, history and back all work unchanged. The reader is independent of the teletext grid: its own palette (`readerPalette`, five schemes, contrast checked in `reader_test.dart`), the phone's own font (`kReaderFontFamily`, so Roboto) and its own size steps (`readerTextSizes`, on top of the system font scale). The chrome (top bar, controls, part bar, offline note) stays black. Settings are kept separately from the session (`ReaderSettingsStore`, key `reader`) because they are preferences, not a place.
+- Reflow rules (`buildReaderBlocks`): the first row is a caption; a blank row ends the text; a double-height row or a colour bar with text is a heading, and a plain line directly above it belongs to it; a row of only a page number links the block above; a row of only `label number` pairs is a link row; a line ending in a page number is its own linked paragraph (leader dots dropped); a line with a gap of 3+ spaces is a two-column row, split at the last gap; other lines join into a paragraph unless the line before was shorter than 24 characters. Where the site marked its links, a trailing number counts only if it is one of them, so a sentence ending in "500" is not a link; on a plain-text page the number alone decides. Block graphics are dropped. These are heuristics checked against pages 100, 104 and 377: when a real page reads badly, save it as a fixture and add the case to `reader_content_test.dart`.
+- Portrait only: `android:screenOrientation="portrait"` on the activity. The grid is fitted to the width, so a wide window would only make it small; reading text is what the reader is for. No landscape layout.
 - Offline cache (stale-while-revalidate): every page read is also saved as the site's raw answer (`PageDiskCache`), and parsed again when needed, so a parser improvement applies to old copies too. `LiveTextTvRepository.page` falls back to the saved copy when the site cannot be reached or answers nonsense, marked `TextTvShown.cachedAt`; the screen then shows `OFFLINE. SAVED 14:32`. `cached(n)` gives the held copy (memory, else disk) at once, so the screen draws it while the current page is read and replaces it when it arrives, unless the current one is already there. A page that is not in broadcast is deleted from disk; a failure never overwrites a saved copy. The cache lives in the app's cache folder (`getApplicationCacheDirectory`, from `path_provider`), which Android may clear: it is only ever a convenience. `date_updated_unix` is still not read; the note uses the time we saved it.
 - The improvement backlog is in [improvements.md](improvements.md).
 
