@@ -10,3 +10,7 @@
 - Version: `version:` in `pubspec.yaml` (`name+build`); bump the build number for every APK handed out.
 - Kotlin, Gradle and the manifest are not exercised by `flutter test` or `flutter analyze`: run `flutter build apk --debug` after touching `android/`.
 - **Icon**: the source art is `icons/original/app_icon.png` (the other files in `icons/` are web favicon sizes and are not used by the app). `python tool/make_app_icon.py` (needs Pillow) regenerates everything in `res/`: legacy `mipmap-*/ic_launcher.png` for API 24-25, and an adaptive icon for API 26+ (`mipmap-anydpi-v26/ic_launcher.xml`: solid black `ic_launcher_background` colour + `ic_launcher_foreground.png` with black made transparent and the artwork scaled to fit the mask's safe circle). Edit the script, not the generated PNGs. No monochrome (themed) layer: teletext colours do not reduce to one tint.
+
+## Release builds strip resources named only at runtime
+
+Flutter release builds shrink resources. A drawable that Dart (or a plugin) names as a string, such as the notification icon `ic_stat_texttv`, is invisible to the shrinker and is removed, which makes the plugin fail at runtime in release only. List such resources in `android/app/src/main/res/raw/keep.xml` (`tools:keep`), and check with `aapt2 dump resources app-release.apk | grep <name>` after `flutter build apk --release`. Debug builds do not show this.

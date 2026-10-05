@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Resources that are only named at runtime (as strings in Dart), which the
+     release build would otherwise strip as unused. The notification's small
+     icon is one: without it the notification plugin cannot start. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_texttv" />

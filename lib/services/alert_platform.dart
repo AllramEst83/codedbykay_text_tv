@@ -91,10 +91,13 @@ class LocalNotificationsAlerts implements AlertPlatform {
         AndroidFlutterLocalNotificationsPlugin
       >();
 
+  // The permission calls below do not set the plugin up first: they are about
+  // the phone, not about showing a notification, and a plugin that cannot start
+  // (a missing icon, say) must not make the switch impossible to turn on.
+
   @override
   Future<bool> requestPermission() async {
     try {
-      await _init();
       // Ask the phone what is so first: a request for a permission that is
       // already given (or one that Android will not put up a dialog for any
       // more) can answer "no", and the switch would never turn on.
@@ -111,7 +114,6 @@ class LocalNotificationsAlerts implements AlertPlatform {
   @override
   Future<bool> allowed() async {
     try {
-      await _init();
       return await _android?.areNotificationsEnabled() ?? false;
     } on Object {
       return false;
