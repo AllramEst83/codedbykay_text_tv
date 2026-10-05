@@ -6,6 +6,7 @@ import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
+import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/services/controls_settings_store.dart';
 import 'package:codedbykay_text_tv/services/crt_settings_store.dart';
@@ -15,6 +16,7 @@ import 'package:codedbykay_text_tv/services/live_text_tv_repository.dart';
 import 'package:codedbykay_text_tv/services/page_disk_cache.dart';
 import 'package:codedbykay_text_tv/services/reader_settings_store.dart';
 import 'package:codedbykay_text_tv/services/refresh_settings_store.dart';
+import 'package:codedbykay_text_tv/services/saved_pages_store.dart';
 import 'package:codedbykay_text_tv/services/session_store.dart';
 import 'package:codedbykay_text_tv/services/text_tv.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +38,8 @@ Future<void> main() async {
   final RefreshSettings refresh = await refreshStore.load();
   final ControlsSettingsStore controlsStore = PrefsControlsSettingsStore();
   final ControlsSettings controls = await controlsStore.load();
+  final SavedPagesStore savedStore = PrefsSavedPagesStore();
+  final SavedPages saved = await savedStore.load();
   runApp(
     TextTvApp(
       repository: LiveTextTvRepository(
@@ -52,6 +56,8 @@ Future<void> main() async {
       controls: controls,
       onControlsChanged: (ControlsSettings c) =>
           unawaited(controlsStore.save(c)),
+      saved: saved,
+      onSavedChanged: (SavedPages p) => unawaited(savedStore.save(p)),
       onReaderChanged: (ReaderSettings r) => unawaited(readerStore.save(r)),
     ),
   );

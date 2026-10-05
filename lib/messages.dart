@@ -8,6 +8,12 @@ abstract final class Messages {
   static const String refresh = 'REFRESH';
   static const String part = 'PART';
   static const String settingsTitle = 'SETTINGS';
+  static const String sectionFavourites = 'FAVOURITES';
+  static const String resetFavourites = 'RESET FAVOURITES';
+  static const String favouritesHint = 'NO FAVOURITES. TAP THE STAR.';
+  static const String addFavourite = 'Add to favourites';
+  static const String removeFavourite = 'Remove from favourites';
+  static String favouritesCount(int n, int max) => '$n OF $max SAVED';
   static const String sectionControls = 'CONTROLS';
   static const String quickEntry = 'ALWAYS-ON NUMBER PAD AND COLOUR KEYS';
   static const String sectionRefresh = 'REFRESH';

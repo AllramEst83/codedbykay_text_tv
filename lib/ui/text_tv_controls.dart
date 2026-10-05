@@ -1,21 +1,12 @@
 import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/fastext.dart';
+import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/ui/glasses_icon.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
 import 'package:codedbykay_text_tv/ui/tv_row.dart';
 import 'package:flutter/material.dart';
-
-/// The pages people actually open, one tap away.
-const List<(int, String)> textTvShortcuts = <(int, String)>[
-  (100, 'NYHETER'),
-  (101, 'INRIKES'),
-  (104, 'UTRIKES'),
-  (300, 'SPORT'),
-  (400, 'VÄDER'),
-  (700, 'INNEHÅLL'),
-];
 
 TextStyle tvText(double size, Color colour) =>
     TextStyle(fontFamily: kPixelFontFamily, fontSize: size, color: colour);
@@ -279,38 +270,59 @@ class TvNumberBox extends StatelessWidget {
 
 /// Shortcuts to the pages people read, scrolling sideways.
 class TvShortcuts extends StatelessWidget {
-  const TvShortcuts({super.key, required this.current, required this.onOpen});
+  const TvShortcuts({
+    super.key,
+    required this.favourites,
+    required this.current,
+    required this.onOpen,
+  });
 
+  /// The chips, in order.
+  final List<Favourite> favourites;
   final int current;
   final ValueChanged<int> onOpen;
 
   @override
   Widget build(BuildContext context) {
+    if (favourites.isEmpty) {
+      return ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 48),
+        child: Center(
+          child: Text(
+            Messages.favouritesHint,
+            key: textTvFavouritesHintKey,
+            style: tvText(8, TvColors.dim),
+          ),
+        ),
+      );
+    }
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: <Widget>[
-          for (final (int page, String name) in textTvShortcuts) ...<Widget>[
+          for (final Favourite favourite in favourites) ...<Widget>[
             InkWell(
-              key: textTvChipKey(page),
-              onTap: () => onOpen(page),
+              key: textTvChipKey(favourite.page),
+              onTap: () => onOpen(favourite.page),
               child: Container(
                 constraints: const BoxConstraints(minHeight: 48),
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: page == current
+                    color: favourite.page == current
                         ? TvColors.highlight
                         : TvColors.border,
                     width: TvMetrics.border,
                   ),
                 ),
                 child: Text(
-                  '$page $name',
+                  favourite.label,
                   style: tvText(
                     10,
-                    page == current ? TvColors.highlight : TvColors.white,
+                    favourite.page == current
+                        ? TvColors.highlight
+                        : TvColors.white,
                   ),
                 ),
               ),

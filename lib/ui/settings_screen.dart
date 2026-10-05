@@ -2,6 +2,7 @@ import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
+import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
@@ -25,7 +26,13 @@ class SettingsScreen extends StatefulWidget {
     required this.onChanged,
     required this.refresh,
     required this.onRefreshChanged,
+    required this.saved,
+    required this.onSavedChanged,
   });
+
+  /// The favourite pages, and the listener for them.
+  final SavedPages saved;
+  final ValueChanged<SavedPages> onSavedChanged;
 
   /// How the controls under the page work, and the listener for it.
   final ControlsSettings controls;
@@ -45,6 +52,13 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   late CrtSettings _crt = widget.crt;
   late ControlsSettings _controls = widget.controls;
+  late SavedPages _saved = widget.saved;
+
+  void _setSaved(SavedPages saved) {
+    if (saved == _saved) return;
+    setState(() => _saved = saved);
+    widget.onSavedChanged(saved);
+  }
 
   void _setControls(ControlsSettings controls) {
     if (controls == _controls) return;
@@ -113,6 +127,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         value: _controls.quickEntry,
                         onChanged: (bool v) =>
                             _setControls(_controls.copyWith(quickEntry: v)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: TvMetrics.margin * 2),
+                  _SettingsGroup(
+                    id: 'favourites',
+                    title: Messages.sectionFavourites,
+                    children: <Widget>[
+                      Text(
+                        Messages.favouritesCount(
+                          _saved.favourites.length,
+                          SavedPages.maxFavourites,
+                        ),
+                        style: tvText(10, TvColors.white),
+                      ),
+                      const SizedBox(height: TvMetrics.margin),
+                      TvButton(
+                        key: textTvFavouritesResetKey,
+                        label: Messages.resetFavourites,
+                        onTap: _saved == const SavedPages()
+                            ? null
+                            : () => _setSaved(_saved.resetFavourites()),
                       ),
                     ],
                   ),

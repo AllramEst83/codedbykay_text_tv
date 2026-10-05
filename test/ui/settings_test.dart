@@ -327,7 +327,12 @@ void main() {
   });
 
   group('the groups of settings', () {
-    const List<String> ids = <String>['controls', 'refresh', 'crt'];
+    const List<String> ids = <String>[
+      'controls',
+      'favourites',
+      'refresh',
+      'crt',
+    ];
 
     testWidgets('are three panels, each with a named header bar', (
       WidgetTester tester,
@@ -349,6 +354,7 @@ void main() {
       }
       for (final (String id, String title) in <(String, String)>[
         ('controls', Messages.sectionControls),
+        ('favourites', Messages.sectionFavourites),
         ('refresh', Messages.sectionRefresh),
         ('crt', Messages.sectionCrt),
       ]) {
@@ -470,6 +476,7 @@ void main() {
 
 String _title(String id) => switch (id) {
   'controls' => Messages.sectionControls,
+  'favourites' => Messages.sectionFavourites,
   'refresh' => Messages.sectionRefresh,
   _ => Messages.sectionCrt,
 };

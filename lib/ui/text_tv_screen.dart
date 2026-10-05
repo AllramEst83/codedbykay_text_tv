@@ -7,6 +7,7 @@ import 'package:codedbykay_text_tv/model/fastext.dart';
 import 'package:codedbykay_text_tv/model/prefetch.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
+import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/saved_time.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
@@ -48,6 +49,8 @@ class TextTvScreen extends StatefulWidget {
     this.onRefreshChanged,
     this.controls = ControlsSettings.defaults,
     this.onControlsChanged,
+    this.saved = const SavedPages(),
+    this.onSavedChanged,
     this.clock = _systemNow,
   });
 
@@ -76,6 +79,11 @@ class TextTvScreen extends StatefulWidget {
   final ControlsSettings controls;
   final ValueChanged<ControlsSettings>? onControlsChanged;
 
+  /// The reader's favourite pages, and the listener that hears when they
+  /// change (starring a page, or resetting them in the settings page).
+  final SavedPages saved;
+  final ValueChanged<SavedPages>? onSavedChanged;
+
   /// Today's date, for saying when a saved copy is from.
   final DateTime Function() clock;
 
@@ -91,6 +99,7 @@ class _TextTvScreenState extends State<TextTvScreen>
   late CrtSettings _crtSettings = widget.crt;
   late RefreshSettings _refresh = widget.refresh;
   late ControlsSettings _controls = widget.controls;
+  late SavedPages _saved = widget.saved;
   TextTvResult? _result;
   bool _loading = true;
 
@@ -272,6 +281,8 @@ class _TextTvScreenState extends State<TextTvScreen>
         builder: (BuildContext context) => SettingsScreen(
           controls: _controls,
           onControlsChanged: _setControls,
+          saved: _saved,
+          onSavedChanged: _setSaved,
           crt: _crtSettings,
           onChanged: _setCrt,
           refresh: _refresh,
@@ -471,6 +482,12 @@ class _TextTvScreenState extends State<TextTvScreen>
     });
   }
 
+  void _setSaved(SavedPages saved) {
+    if (saved == _saved) return;
+    setState(() => _saved = saved);
+    widget.onSavedChanged?.call(saved);
+  }
+
   void _setControls(ControlsSettings controls) {
     if (controls == _controls) return;
     _typedTimer?.cancel();
@@ -603,6 +620,23 @@ class _TextTvScreenState extends State<TextTvScreen>
                               : () => _open(_previous!),
                         ),
                         const SizedBox(width: TvMetrics.gutter),
+                        TvIconButton(
+                          key: textTvStarKey,
+                          icon: (Color colour) => Icon(
+                            _saved.isFavourite(_number)
+                                ? Icons.star
+                                : Icons.star_border,
+                            color: colour,
+                            size: 26,
+                          ),
+                          selected: _saved.isFavourite(_number),
+                          semanticLabel: _saved.isFavourite(_number)
+                              ? Messages.removeFavourite
+                              : Messages.addFavourite,
+                          onTap: () =>
+                              _setSaved(_saved.toggleFavourite(_number)),
+                        ),
+                        const SizedBox(width: TvMetrics.gutter),
                         Expanded(
                           child: TvNumberBox(
                             key: textTvNumberKey,
@@ -627,7 +661,11 @@ class _TextTvScreenState extends State<TextTvScreen>
                       ],
                       TvDigitPad(typed: _typed, onDigit: _digit),
                       const SizedBox(height: TvMetrics.gutter),
-                      TvShortcuts(current: _number, onOpen: _open),
+                      TvShortcuts(
+                        favourites: _saved.favourites,
+                        current: _number,
+                        onOpen: _open,
+                      ),
                     ] else if (_keypad)
                       TvKeypad(
                         onDigit: _digit,
@@ -635,7 +673,11 @@ class _TextTvScreenState extends State<TextTvScreen>
                         onClose: _back,
                       )
                     else
-                      TvShortcuts(current: _number, onOpen: _open),
+                      TvShortcuts(
+                        favourites: _saved.favourites,
+                        current: _number,
+                        onOpen: _open,
+                      ),
                   ],
                 ),
               ),
