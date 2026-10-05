@@ -152,6 +152,36 @@ abstract class AppLocalizations {
   /// **'FAVOURITES'**
   String get sectionFavourites;
 
+  /// No description provided for @sectionLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'LANGUAGE'**
+  String get sectionLanguage;
+
+  /// No description provided for @langSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'SYSTEM'**
+  String get langSystem;
+
+  /// No description provided for @langSwedish.
+  ///
+  /// In en, this message translates to:
+  /// **'SVENSKA'**
+  String get langSwedish;
+
+  /// No description provided for @langEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'ENGLISH'**
+  String get langEnglish;
+
+  /// No description provided for @languageNote.
+  ///
+  /// In en, this message translates to:
+  /// **'SYSTEM follows the phone\'s language. If the phone uses a language this app does not have, English is used.'**
+  String get languageNote;
+
   /// No description provided for @sectionControls.
   ///
   /// In en, this message translates to:

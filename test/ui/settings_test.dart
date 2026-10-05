@@ -328,6 +328,7 @@ void main() {
 
   group('the groups of settings', () {
     const List<String> ids = <String>[
+      'language',
       'controls',
       'favourites',
       'refresh',
@@ -476,6 +477,7 @@ void main() {
 }
 
 String _title(String id) => switch (id) {
+  'language' => en.sectionLanguage,
   'controls' => en.sectionControls,
   'favourites' => en.sectionFavourites,
   'refresh' => en.sectionRefresh,

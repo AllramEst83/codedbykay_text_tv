@@ -1,6 +1,7 @@
 import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
+import 'package:codedbykay_text_tv/model/language_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
@@ -21,6 +22,8 @@ import 'package:flutter/material.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
     super.key,
+    required this.language,
+    required this.onLanguageChanged,
     required this.controls,
     required this.onControlsChanged,
     required this.crt,
@@ -30,6 +33,10 @@ class SettingsScreen extends StatefulWidget {
     required this.saved,
     required this.onSavedChanged,
   });
+
+  /// The language of the app, and the listener for it.
+  final LanguageSettings language;
+  final ValueChanged<LanguageSettings> onLanguageChanged;
 
   /// The favourite pages, and the listener for them.
   final SavedPages saved;
@@ -51,6 +58,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  late LanguageSettings _language = widget.language;
   late CrtSettings _crt = widget.crt;
   late ControlsSettings _controls = widget.controls;
   late SavedPages _saved = widget.saved;
@@ -59,6 +67,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (saved == _saved) return;
     setState(() => _saved = saved);
     widget.onSavedChanged(saved);
+  }
+
+  void _setLanguage(LanguageSettings language) {
+    if (language == _language) return;
+    setState(() => _language = language);
+    widget.onLanguageChanged(language);
   }
 
   void _setControls(ControlsSettings controls) {
@@ -118,6 +132,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   TvMetrics.margin * 2,
                 ),
                 children: <Widget>[
+                  _SettingsGroup(
+                    id: 'language',
+                    title: context.l10n.sectionLanguage,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          for (final AppLanguage language in AppLanguage.values)
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  right: language == AppLanguage.values.last
+                                      ? 0
+                                      : TvMetrics.gutter,
+                                ),
+                                child: TvChoice(
+                                  choiceKey: textTvLanguageKey(language),
+                                  label: context.l10n.languageName(language),
+                                  selected: _language.language == language,
+                                  onTap: () => _setLanguage(
+                                    _language.copyWith(language: language),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: TvMetrics.margin),
+                      Text(
+                        context.l10n.languageNote,
+                        key: textTvLanguageNoteKey,
+                        style: readerTextStyle(13, TvColors.white),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: TvMetrics.margin * 2),
                   _SettingsGroup(
                     id: 'controls',
                     title: context.l10n.sectionControls,

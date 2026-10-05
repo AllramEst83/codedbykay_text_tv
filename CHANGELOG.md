@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Language (settings > LANGUAGE): choose SYSTEM, SVENSKA or ENGLISH. SYSTEM follows the phone (Swedish on a Swedish phone, English on any other language, Danish say); the choice applies at once and is remembered.
 - Screen reader (I-16): the page announces itself ("Page 377, part 1 of 2") when it changes, and each page link in a row can be reached and activated on its own.
 - Live canary (I-15): `tool/check_live.dart` and a weekly workflow read a few live pages and fail if the site's markup has changed so that colours would be lost.
 - About and privacy (I-14): an ABOUT panel in settings credits SVT Text and texttv.nu and says what the app does and does not send; `PRIVACY.md` has the full statement and a store data-safety note.

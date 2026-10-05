@@ -11,6 +11,11 @@
   "back": "Tillbaka",
 
   "sectionFavourites": "FAVORITER",
+  "sectionLanguage": "SPRÅK",
+  "langSystem": "SYSTEM",
+  "langSwedish": "SVENSKA",
+  "langEnglish": "ENGLISH",
+  "languageNote": "SYSTEM följer telefonens språk. Om telefonen använder ett språk som appen saknar blir det engelska.",
   "sectionControls": "KNAPPAR",
   "sectionRefresh": "UPPDATERING",
   "sectionAbout": "OM APPEN",

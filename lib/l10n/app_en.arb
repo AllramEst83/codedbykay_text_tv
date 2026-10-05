@@ -14,6 +14,11 @@
   "back": "Back",
 
   "sectionFavourites": "FAVOURITES",
+  "sectionLanguage": "LANGUAGE",
+  "langSystem": "SYSTEM",
+  "langSwedish": "SVENSKA",
+  "langEnglish": "ENGLISH",
+  "languageNote": "SYSTEM follows the phone's language. If the phone uses a language this app does not have, English is used.",
   "sectionControls": "CONTROLS",
   "sectionRefresh": "REFRESH",
   "sectionAbout": "ABOUT",

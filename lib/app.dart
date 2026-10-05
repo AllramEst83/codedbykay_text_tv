@@ -1,6 +1,7 @@
 import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
+import 'package:codedbykay_text_tv/model/language_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
@@ -24,7 +25,7 @@ const SystemUiOverlayStyle textTvSystemUi = SystemUiOverlayStyle(
   systemNavigationBarContrastEnforced: false,
 );
 
-class TextTvApp extends StatelessWidget {
+class TextTvApp extends StatefulWidget {
   const TextTvApp({
     super.key,
     required this.repository,
@@ -36,6 +37,8 @@ class TextTvApp extends StatelessWidget {
     this.onCrtChanged,
     this.refresh = const RefreshSettings(),
     this.onRefreshChanged,
+    this.language = LanguageSettings.defaults,
+    this.onLanguageChanged,
     this.controls = ControlsSettings.defaults,
     this.onControlsChanged,
     this.saved = const SavedPages(),
@@ -62,6 +65,10 @@ class TextTvApp extends StatelessWidget {
   final RefreshSettings refresh;
   final ValueChanged<RefreshSettings>? onRefreshChanged;
 
+  /// The language of the app, as of the last run.
+  final LanguageSettings language;
+  final ValueChanged<LanguageSettings>? onLanguageChanged;
+
   /// How the controls under the page work, as of the last run.
   final ControlsSettings controls;
   final ValueChanged<ControlsSettings>? onControlsChanged;
@@ -77,6 +84,19 @@ class TextTvApp extends StatelessWidget {
   final SharePlatform? share;
 
   @override
+  State<TextTvApp> createState() => _TextTvAppState();
+}
+
+class _TextTvAppState extends State<TextTvApp> {
+  late LanguageSettings _language = widget.language;
+
+  void _setLanguage(LanguageSettings language) {
+    if (language == _language) return;
+    setState(() => _language = language);
+    widget.onLanguageChanged?.call(language);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: textTvSystemUi,
@@ -84,24 +104,32 @@ class TextTvApp extends StatelessWidget {
         onGenerateTitle: (BuildContext context) => context.l10n.title,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
+        locale: _language.language.locale,
+        // A phone in a language the app lacks (Danish, say) gets English.
+        localeResolutionCallback: (
+          Locale? device,
+          Iterable<Locale> supported,
+        ) => resolveLocale(device),
         debugShowCheckedModeBanner: false,
         theme: textTvTheme(),
         home: TextTvScreen(
-          repository: repository,
-          initial: session,
-          onSessionChanged: onSessionChanged,
-          reader: reader,
-          onReaderChanged: onReaderChanged,
-          crt: crt,
-          onCrtChanged: onCrtChanged,
-          refresh: refresh,
-          onRefreshChanged: onRefreshChanged,
-          controls: controls,
-          onControlsChanged: onControlsChanged,
-          saved: saved,
-          onSavedChanged: onSavedChanged,
-          shortcuts: shortcuts,
-          share: share,
+          repository: widget.repository,
+          initial: widget.session,
+          onSessionChanged: widget.onSessionChanged,
+          reader: widget.reader,
+          onReaderChanged: widget.onReaderChanged,
+          crt: widget.crt,
+          onCrtChanged: widget.onCrtChanged,
+          refresh: widget.refresh,
+          onRefreshChanged: widget.onRefreshChanged,
+          controls: widget.controls,
+          onControlsChanged: widget.onControlsChanged,
+          saved: widget.saved,
+          onSavedChanged: widget.onSavedChanged,
+          shortcuts: widget.shortcuts,
+          share: widget.share,
+          language: _language,
+          onLanguageChanged: _setLanguage,
         ),
       ),
     );

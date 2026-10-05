@@ -117,3 +117,53 @@ class TvSliderRow extends StatelessWidget {
     );
   }
 }
+
+/// One of a few exclusive choices as a bordered button, the chosen one in
+/// yellow. Sits in a [Row] in an [Expanded]; a long [label] shrinks to fit.
+class TvChoice extends StatelessWidget {
+  const TvChoice({
+    super.key,
+    required this.choiceKey,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  /// Key of the tappable area, for finding it.
+  final Key choiceKey;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      excludeSemantics: true,
+      child: InkWell(
+        key: choiceKey,
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 48),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: selected ? TvColors.highlight : TvColors.border,
+              width: TvMetrics.border,
+            ),
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: tvText(10, selected ? TvColors.highlight : TvColors.white),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

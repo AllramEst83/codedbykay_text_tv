@@ -4,6 +4,7 @@ import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/fastext.dart';
+import 'package:codedbykay_text_tv/model/language_settings.dart';
 import 'package:codedbykay_text_tv/model/page_share.dart';
 import 'package:codedbykay_text_tv/model/prefetch.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
@@ -55,6 +56,8 @@ class TextTvScreen extends StatefulWidget {
     this.onCrtChanged,
     this.refresh = const RefreshSettings(),
     this.onRefreshChanged,
+    this.language = LanguageSettings.defaults,
+    this.onLanguageChanged,
     this.controls = ControlsSettings.defaults,
     this.onControlsChanged,
     this.saved = const SavedPages(),
@@ -88,6 +91,11 @@ class TextTvScreen extends StatefulWidget {
   /// changing it.
   final ControlsSettings controls;
   final ValueChanged<ControlsSettings>? onControlsChanged;
+
+  /// The language of the app: the app holds it (it sets the locale of
+  /// everything), the settings page changes it through [onLanguageChanged].
+  final LanguageSettings language;
+  final ValueChanged<LanguageSettings>? onLanguageChanged;
 
   /// The reader's favourite pages, and the listener that hears when they
   /// change (starring a page, or resetting them in the settings page).
@@ -327,6 +335,9 @@ class _TextTvScreenState extends State<TextTvScreen>
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) => SettingsScreen(
+          language: widget.language,
+          onLanguageChanged: (LanguageSettings l) =>
+              widget.onLanguageChanged?.call(l),
           controls: _controls,
           onControlsChanged: _setControls,
           saved: _saved,

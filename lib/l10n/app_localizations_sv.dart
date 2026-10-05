@@ -37,6 +37,22 @@ class AppLocalizationsSv extends AppLocalizations {
   String get sectionFavourites => 'FAVORITER';
 
   @override
+  String get sectionLanguage => 'SPRÅK';
+
+  @override
+  String get langSystem => 'SYSTEM';
+
+  @override
+  String get langSwedish => 'SVENSKA';
+
+  @override
+  String get langEnglish => 'ENGLISH';
+
+  @override
+  String get languageNote =>
+      'SYSTEM följer telefonens språk. Om telefonen använder ett språk som appen saknar blir det engelska.';
+
+  @override
   String get sectionControls => 'KNAPPAR';
 
   @override

@@ -37,6 +37,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sectionFavourites => 'FAVOURITES';
 
   @override
+  String get sectionLanguage => 'LANGUAGE';
+
+  @override
+  String get langSystem => 'SYSTEM';
+
+  @override
+  String get langSwedish => 'SVENSKA';
+
+  @override
+  String get langEnglish => 'ENGLISH';
+
+  @override
+  String get languageNote =>
+      'SYSTEM follows the phone\'s language. If the phone uses a language this app does not have, English is used.';
+
+  @override
   String get sectionControls => 'CONTROLS';
 
   @override

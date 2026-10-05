@@ -1,3 +1,4 @@
+import 'package:codedbykay_text_tv/model/language_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:flutter/widgets.dart';
 
@@ -67,3 +68,6 @@ Key textTvReaderFontKey(ReaderFont font) =>
     ValueKey<String>('text-tv-reader-font-${font.name}');
 const Key textTvAboutCreditKey = ValueKey<String>('text-tv-about-credit');
 const Key textTvAboutPrivacyKey = ValueKey<String>('text-tv-about-privacy');
+Key textTvLanguageKey(AppLanguage language) =>
+    ValueKey<String>('text-tv-language-${language.name}');
+const Key textTvLanguageNoteKey = ValueKey<String>('text-tv-language-note');
