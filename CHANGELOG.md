@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Settings page: a gear button in the top bar opens it (empty for now; settings are added to it as the app gets them).
 - Reader mode (I-3a): a glasses button shows the page as reflowed text with its own size (`A-`/`A+`) and five colour schemes; the choice is remembered.
 - The app is portrait-only.
 - Offline cache (I-1): pages read are saved on the phone and shown at once; when the site cannot be reached the saved copy is shown with "OFFLINE. SAVED 14:32".

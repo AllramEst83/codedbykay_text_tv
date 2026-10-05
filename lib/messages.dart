@@ -7,6 +7,10 @@ abstract final class Messages {
   static const String tryAgain = 'TRY AGAIN';
   static const String refresh = 'REFRESH';
   static const String part = 'PART';
+  static const String settingsTitle = 'SETTINGS';
+  static const String settings = 'Settings';
+  static const String back = 'Back';
+  static const String noSettings = 'NOTHING TO SET YET.';
   static const String readerOn = 'Reader mode';
   static const String readerOff = 'Show the teletext page';
   static const String smallerText = 'Smaller text';

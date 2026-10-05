@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 
 /// Keys so tests can find the parts.
 const Key textTvOfflineKey = ValueKey<String>('text-tv-offline');
+const Key textTvSettingsKey = ValueKey<String>('text-tv-settings');
+const Key textTvSettingsBackKey = ValueKey<String>('text-tv-settings-back');
 const Key textTvReaderKey = ValueKey<String>('text-tv-reader');
 const Key textTvReaderViewKey = ValueKey<String>('text-tv-reader-view');
 const Key textTvReaderSmallerKey = ValueKey<String>('text-tv-reader-smaller');

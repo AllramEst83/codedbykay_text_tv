@@ -24,6 +24,7 @@ class TvTopBar extends StatelessWidget {
     required this.onRefresh,
     required this.readerOn,
     required this.onReader,
+    required this.onSettings,
   });
 
   final VoidCallback? onRefresh;
@@ -31,6 +32,9 @@ class TvTopBar extends StatelessWidget {
   /// Whether the page is shown as reader text, and the button that switches.
   final bool readerOn;
   final VoidCallback onReader;
+
+  /// Opens the settings page.
+  final VoidCallback onSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +58,14 @@ class TvTopBar extends StatelessWidget {
               selected: readerOn,
               semanticLabel: readerOn ? Messages.readerOff : Messages.readerOn,
               onTap: onReader,
+            ),
+            const SizedBox(width: TvMetrics.gutter),
+            TvIconButton(
+              key: textTvSettingsKey,
+              icon: (Color colour) =>
+                  Icon(Icons.settings, color: colour, size: 26),
+              semanticLabel: Messages.settings,
+              onTap: onSettings,
             ),
             const SizedBox(width: TvMetrics.gutter),
             TvButton(

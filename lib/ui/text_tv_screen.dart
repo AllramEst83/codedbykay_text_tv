@@ -8,6 +8,7 @@ import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 import 'package:codedbykay_text_tv/ui/reader_bar.dart';
 import 'package:codedbykay_text_tv/ui/reader_view.dart';
+import 'package:codedbykay_text_tv/ui/settings_screen.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_page_area.dart';
@@ -70,6 +71,14 @@ class _TextTvScreenState extends State<TextTvScreen> {
   void initState() {
     super.initState();
     _load(_number, part: _part);
+  }
+
+  void _openSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => const SettingsScreen(),
+      ),
+    );
   }
 
   void _setReader(ReaderSettings reader) {
@@ -231,6 +240,7 @@ class _TextTvScreenState extends State<TextTvScreen> {
               readerOn: _reader.enabled,
               onReader: () =>
                   _setReader(_reader.copyWith(enabled: !_reader.enabled)),
+              onSettings: _openSettings,
             ),
             if (_reader.enabled)
               ReaderBar(settings: _reader, onChanged: _setReader),
