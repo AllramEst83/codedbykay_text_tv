@@ -443,3 +443,52 @@ class _FastextKey extends StatelessWidget {
     );
   }
 }
+
+/// The classic number pad, like a remote's: 1 to 9, then DEL, 0, and a key that
+/// puts it away. The third digit opens the page. Opened by tapping the number
+/// box when the quick pad is off (see `ControlsSettings`).
+class TvKeypad extends StatelessWidget {
+  const TvKeypad({
+    super.key,
+    required this.onDigit,
+    required this.onDelete,
+    required this.onClose,
+  });
+
+  final ValueChanged<int> onDigit;
+  final VoidCallback onDelete;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget key(Key key, String label, VoidCallback onTap) => Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(2),
+        child: TvButton(key: key, label: label, onTap: onTap),
+      ),
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (final int row in <int>[0, 1, 2])
+          Row(
+            children: <Widget>[
+              for (final int digit in <int>[
+                row * 3 + 1,
+                row * 3 + 2,
+                row * 3 + 3,
+              ])
+                key(textTvDigitKey(digit), '$digit', () => onDigit(digit)),
+            ],
+          ),
+        Row(
+          children: <Widget>[
+            key(textTvDeleteKey, 'DEL', onDelete),
+            key(textTvDigitKey(0), '0', () => onDigit(0)),
+            key(textTvKeypadCloseKey, 'X', onClose),
+          ],
+        ),
+      ],
+    );
+  }
+}

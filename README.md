@@ -8,12 +8,13 @@ Personal project, built with Flutter.
 
 - Every page, 100–899, drawn as the 40-column teletext grid: the eight teletext colours, double-height headlines, the block-graphics logo, underlined page links.
 - Tap a page number in the page to open it. Swipe left/right to move between the parts of a page and then between pages.
-- `<` / `>` arrows (following the site's own neighbouring pages), an always-visible number pad for typing a page number (the box shows `1--` as you type), coloured Fastext keys built from a page's bottom row of links, and shortcuts to 100 NYHETER, 101 INRIKES, 104 UTRIKES, 300 SPORT, 400 VÄDER and 700 INNEHÅLL.
+- `<` / `>` arrows (following the site's own neighbouring pages), a number pad (tap the page number to open it), and shortcuts to 100 NYHETER, 101 INRIKES, 104 UTRIKES, 300 SPORT, 400 VÄDER and 700 INNEHÅLL.
 - Reader mode (the glasses button): the page as text reflowed to the screen, with `A-`/`A+` for the text size, five colour schemes (black, grey, beige, paper, high contrast), and options for line spacing, letter spacing, margins and bold. Headlines, links and tables are kept.
 - Portrait only.
 - A settings page (the gear button) with an optional CRT look for the teletext page: a slight screen bulge, scanlines and a vignette, each adjustable within safe limits and remembered. Taps still land on what you see.
 - Back steps through the pages you have read, then leaves the app.
 - Opens where you left off: the page, its part and the pages you came through.
+- Optional (settings > CONTROLS): an always-visible number pad (the box shows `1--` as you type) and coloured Fastext keys built from a page's bottom row of links. Off by default, which leaves the page the most height.
 - Pull the page down to read it again. It also refreshes itself when you come back to the app after a couple of minutes, and, if you turn it on in settings, every 30 seconds, minute or two minutes while you read. A dim line shows when it was last updated.
 - Pages read in the last five minutes are reused; REFRESH asks the site again. Failures say why and offer TRY AGAIN.
 - Works offline for pages you have read: they are saved on the phone, shown at once, refreshed behind, and marked "OFFLINE. SAVED 14:32" when the site cannot be reached.

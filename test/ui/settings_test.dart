@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
@@ -13,6 +14,8 @@ Future<void> _open(
   WidgetTester tester, {
   CrtSettings crt = CrtSettings.defaults,
   ValueChanged<CrtSettings>? onCrtChanged,
+  ControlsSettings controls = ControlsSettings.defaults,
+  ValueChanged<ControlsSettings>? onControlsChanged,
 }) async {
   tester.view
     ..physicalSize = const Size(800, 2400)
@@ -32,6 +35,8 @@ Future<void> _open(
         }),
         crt: crt,
         onCrtChanged: onCrtChanged,
+        controls: controls,
+        onControlsChanged: onControlsChanged,
       ),
     ),
   );
@@ -223,6 +228,99 @@ void main() {
         isTrue,
       );
       expect(_slider(tester, textTvCrtPeriodKey).value, 4);
+    });
+  });
+
+  group('the controls setting', () {
+    testWidgets('is off by default: the classic controls', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester);
+
+      // The classic controls: shortcuts, and no always-on pad.
+      expect(find.byKey(textTvChipKey(300)), findsOneWidget);
+      expect(find.byKey(textTvDigitKey(5)), findsNothing);
+
+      await _openSettings(tester);
+      expect(
+        tester.widget<Switch>(find.byKey(textTvQuickEntryKey)).value,
+        isFalse,
+      );
+    });
+
+    testWidgets('turning it on shows the always-on pad, and reports it', (
+      WidgetTester tester,
+    ) async {
+      final List<ControlsSettings> heard = <ControlsSettings>[];
+      await _open(tester, onControlsChanged: heard.add);
+      await _openSettings(tester);
+
+      await tester.tap(find.byKey(textTvQuickEntryKey));
+      await tester.pumpAndSettle();
+      expect(heard.last, const ControlsSettings(quickEntry: true));
+
+      await tester.tap(find.byKey(textTvSettingsBackKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(textTvDigitKey(5)), findsOneWidget);
+    });
+
+    testWidgets('turning it off again brings back the tap-the-number pad', (
+      WidgetTester tester,
+    ) async {
+      final List<ControlsSettings> heard = <ControlsSettings>[];
+      await _open(
+        tester,
+        controls: const ControlsSettings(quickEntry: true),
+        onControlsChanged: heard.add,
+      );
+      expect(find.byKey(textTvDigitKey(5)), findsOneWidget);
+      await _openSettings(tester);
+
+      await tester.tap(find.byKey(textTvQuickEntryKey));
+      await tester.pumpAndSettle();
+      expect(heard.last, const ControlsSettings());
+
+      await tester.tap(find.byKey(textTvSettingsBackKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(textTvDigitKey(5)), findsNothing);
+      expect(find.byKey(textTvChipKey(300)), findsOneWidget);
+
+      await tester.tap(find.byKey(textTvNumberKey));
+      await tester.pump();
+      expect(find.byKey(textTvDigitKey(5)), findsOneWidget);
+      expect(find.byKey(textTvDeleteKey), findsOneWidget);
+    });
+
+    testWidgets('opens with the saved setting', (WidgetTester tester) async {
+      await _open(tester, controls: const ControlsSettings(quickEntry: true));
+      await _openSettings(tester);
+
+      expect(
+        tester.widget<Switch>(find.byKey(textTvQuickEntryKey)).value,
+        isTrue,
+      );
+    });
+
+    testWidgets('switching drops a half-typed number', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, controls: const ControlsSettings(quickEntry: true));
+      await tester.tap(find.byKey(textTvDigitKey(3)));
+      await tester.pump();
+      await _openSettings(tester);
+
+      await tester.tap(find.byKey(textTvQuickEntryKey));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(textTvSettingsBackKey));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.descendant(
+          of: find.byKey(textTvNumberKey),
+          matching: find.text('100'),
+        ),
+        findsOneWidget,
+      );
     });
   });
 }

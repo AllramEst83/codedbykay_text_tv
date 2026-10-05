@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
@@ -18,11 +19,17 @@ import 'package:flutter/material.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
     super.key,
+    required this.controls,
+    required this.onControlsChanged,
     required this.crt,
     required this.onChanged,
     required this.refresh,
     required this.onRefreshChanged,
   });
+
+  /// How the controls under the page work, and the listener for it.
+  final ControlsSettings controls;
+  final ValueChanged<ControlsSettings> onControlsChanged;
 
   final CrtSettings crt;
   final ValueChanged<CrtSettings> onChanged;
@@ -37,6 +44,14 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   late CrtSettings _crt = widget.crt;
+  late ControlsSettings _controls = widget.controls;
+
+  void _setControls(ControlsSettings controls) {
+    if (controls == _controls) return;
+    setState(() => _controls = controls);
+    widget.onControlsChanged(controls);
+  }
+
   late RefreshSettings _refresh = widget.refresh;
 
   void _setRefresh(RefreshSettings refresh) {
@@ -88,6 +103,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   TvMetrics.margin * 2,
                 ),
                 children: <Widget>[
+                  _SectionTitle(Messages.sectionControls),
+                  TvSwitchRow(
+                    switchKey: textTvQuickEntryKey,
+                    label: Messages.quickEntry,
+                    value: _controls.quickEntry,
+                    onChanged: (bool v) =>
+                        _setControls(_controls.copyWith(quickEntry: v)),
+                  ),
+                  const SizedBox(height: TvMetrics.margin * 2),
                   _SectionTitle(Messages.sectionRefresh),
                   TvSliderRow(
                     sliderKey: textTvAutoRefreshKey,

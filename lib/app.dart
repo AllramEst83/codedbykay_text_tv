@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
@@ -32,6 +33,8 @@ class TextTvApp extends StatelessWidget {
     this.onCrtChanged,
     this.refresh = const RefreshSettings(),
     this.onRefreshChanged,
+    this.controls = ControlsSettings.defaults,
+    this.onControlsChanged,
   });
 
   final TextTvRepository repository;
@@ -52,6 +55,10 @@ class TextTvApp extends StatelessWidget {
   final RefreshSettings refresh;
   final ValueChanged<RefreshSettings>? onRefreshChanged;
 
+  /// How the controls under the page work, as of the last run.
+  final ControlsSettings controls;
+  final ValueChanged<ControlsSettings>? onControlsChanged;
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -70,6 +77,8 @@ class TextTvApp extends StatelessWidget {
           onCrtChanged: onCrtChanged,
           refresh: refresh,
           onRefreshChanged: onRefreshChanged,
+          controls: controls,
+          onControlsChanged: onControlsChanged,
         ),
       ),
     );

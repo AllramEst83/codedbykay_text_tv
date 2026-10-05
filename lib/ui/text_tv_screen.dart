@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/fastext.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
@@ -43,6 +44,8 @@ class TextTvScreen extends StatefulWidget {
     this.onCrtChanged,
     this.refresh = const RefreshSettings(),
     this.onRefreshChanged,
+    this.controls = ControlsSettings.defaults,
+    this.onControlsChanged,
     this.clock = _systemNow,
   });
 
@@ -65,6 +68,12 @@ class TextTvScreen extends StatefulWidget {
   final RefreshSettings refresh;
   final ValueChanged<RefreshSettings>? onRefreshChanged;
 
+  /// How the controls under the page work (the always-on pad and colour keys,
+  /// or the tap-the-number pad), and the listener for the settings page
+  /// changing it.
+  final ControlsSettings controls;
+  final ValueChanged<ControlsSettings>? onControlsChanged;
+
   /// Today's date, for saying when a saved copy is from.
   final DateTime Function() clock;
 
@@ -79,6 +88,7 @@ class _TextTvScreenState extends State<TextTvScreen>
   late ReaderSettings _reader = widget.reader;
   late CrtSettings _crtSettings = widget.crt;
   late RefreshSettings _refresh = widget.refresh;
+  late ControlsSettings _controls = widget.controls;
   TextTvResult? _result;
   bool _loading = true;
 
@@ -89,6 +99,9 @@ class _TextTvScreenState extends State<TextTvScreen>
   // if the third never comes (a real set does the same).
   String _typed = '';
   Timer? _typedTimer;
+
+  // The classic number pad, open or not (only with the quick pad off).
+  bool _keypad = false;
   static const Duration _typedTimeout = Duration(seconds: 4);
 
   // Only the answer to the latest request counts; a slow one that was
@@ -216,6 +229,8 @@ class _TextTvScreenState extends State<TextTvScreen>
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) => SettingsScreen(
+          controls: _controls,
+          onControlsChanged: _setControls,
           crt: _crtSettings,
           onChanged: _setCrt,
           refresh: _refresh,
@@ -242,6 +257,7 @@ class _TextTvScreenState extends State<TextTvScreen>
       _part = part;
       _loading = true;
       _typed = '';
+      _keypad = false;
     });
     _typedTimer?.cancel();
     _report();
@@ -281,7 +297,12 @@ class _TextTvScreenState extends State<TextTvScreen>
   }
 
   void _back() {
-    if (_typed.isNotEmpty) {
+    if (_keypad) {
+      setState(() {
+        _keypad = false;
+        _typed = '';
+      });
+    } else if (_typed.isNotEmpty) {
       _clearTyped();
     } else if (_history.isNotEmpty) {
       _load(_history.removeLast());
@@ -332,7 +353,7 @@ class _TextTvScreenState extends State<TextTvScreen>
   /// The coloured keys of the page on screen; none while it is loading.
   List<FastextLink> get _fastext {
     final TextTvPage? page = _page;
-    return page == null || _loading
+    return page == null || _loading || !_controls.quickEntry
         ? const <FastextLink>[]
         : fastextLinks(page, _part);
   }
@@ -372,9 +393,50 @@ class _TextTvScreenState extends State<TextTvScreen>
       _open(int.parse(typed));
       return;
     }
-    _typedTimer?.cancel();
-    _typedTimer = Timer(_typedTimeout, _clearTyped);
+    // The quick pad forgets a half-typed number; the classic one has a DEL key
+    // and an X, and keeps it until they are used.
+    if (_controls.quickEntry) {
+      _typedTimer?.cancel();
+      _typedTimer = Timer(_typedTimeout, _clearTyped);
+    }
     setState(() => _typed = typed);
+  }
+
+  void _deleteDigit() {
+    if (_typed.isEmpty) return;
+    setState(() => _typed = _typed.substring(0, _typed.length - 1));
+  }
+
+  /// What the number box says: the page, or the digits typed so far.
+  String get _numberText {
+    final bool typing = _controls.quickEntry ? _typed.isNotEmpty : _keypad;
+    return typing ? _typed.padRight(3, '-') : '$_number';
+  }
+
+  bool get _numberActive => _controls.quickEntry ? _typed.isNotEmpty : _keypad;
+
+  /// A tap on the number box: clears what was typed on the quick pad, and
+  /// opens or puts away the classic one.
+  void _numberTapped() {
+    if (_controls.quickEntry) {
+      _clearTyped();
+      return;
+    }
+    setState(() {
+      _keypad = !_keypad;
+      _typed = '';
+    });
+  }
+
+  void _setControls(ControlsSettings controls) {
+    if (controls == _controls) return;
+    _typedTimer?.cancel();
+    setState(() {
+      _controls = controls;
+      _keypad = false;
+      _typed = '';
+    });
+    widget.onControlsChanged?.call(controls);
   }
 
   void _clearTyped() {
@@ -393,7 +455,7 @@ class _TextTvScreenState extends State<TextTvScreen>
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: _history.isEmpty && _typed.isEmpty,
+      canPop: _history.isEmpty && _typed.isEmpty && !_keypad,
       onPopInvokedWithResult: (bool didPop, Object? result) {
         if (!didPop) _back();
       },
@@ -494,11 +556,9 @@ class _TextTvScreenState extends State<TextTvScreen>
                         Expanded(
                           child: TvNumberBox(
                             key: textTvNumberKey,
-                            text: _typed.isEmpty
-                                ? '$_number'
-                                : _typed.padRight(3, '-'),
-                            active: _typed.isNotEmpty,
-                            onTap: _clearTyped,
+                            text: _numberText,
+                            active: _numberActive,
+                            onTap: _numberTapped,
                           ),
                         ),
                         const SizedBox(width: TvMetrics.gutter),
@@ -510,13 +570,22 @@ class _TextTvScreenState extends State<TextTvScreen>
                       ],
                     ),
                     const SizedBox(height: TvMetrics.gutter),
-                    if (_fastext.isNotEmpty) ...<Widget>[
-                      TvFastext(links: _fastext, onOpen: _open),
+                    if (_controls.quickEntry) ...<Widget>[
+                      if (_fastext.isNotEmpty) ...<Widget>[
+                        TvFastext(links: _fastext, onOpen: _open),
+                        const SizedBox(height: TvMetrics.gutter),
+                      ],
+                      TvDigitPad(typed: _typed, onDigit: _digit),
                       const SizedBox(height: TvMetrics.gutter),
-                    ],
-                    TvDigitPad(typed: _typed, onDigit: _digit),
-                    const SizedBox(height: TvMetrics.gutter),
-                    TvShortcuts(current: _number, onOpen: _open),
+                      TvShortcuts(current: _number, onOpen: _open),
+                    ] else if (_keypad)
+                      TvKeypad(
+                        onDigit: _digit,
+                        onDelete: _deleteDigit,
+                        onClose: _back,
+                      )
+                    else
+                      TvShortcuts(current: _number, onOpen: _open),
                   ],
                 ),
               ),

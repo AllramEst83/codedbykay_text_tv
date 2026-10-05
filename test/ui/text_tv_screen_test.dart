@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
@@ -46,6 +47,7 @@ Future<void> _open(
   TextTvSession? session,
   ValueChanged<TextTvSession>? onSessionChanged,
   DateTime Function()? clock,
+  ControlsSettings controls = const ControlsSettings(quickEntry: true),
 }) async {
   await tester.pumpWidget(
     MaterialApp(
@@ -55,6 +57,7 @@ Future<void> _open(
         initial: session ?? TextTvSession(page: start),
         onSessionChanged: onSessionChanged,
         clock: clock ?? DateTime.now,
+        controls: controls,
       ),
     ),
   );
@@ -334,6 +337,163 @@ void main() {
 
       expect(_number('130'), findsOneWidget);
       expect(repository.requests.last, (130, false));
+    });
+  });
+
+  group('the classic number pad (quick pad off)', () {
+    testWidgets('tapping the number shows a pad; three digits open a page', (
+      WidgetTester tester,
+    ) async {
+      final FakeTextTvRepository repository = _repository();
+      await _open(tester, repository, controls: const ControlsSettings());
+      expect(find.byKey(textTvDigitKey(5)), findsNothing);
+
+      await tester.tap(find.byKey(textTvNumberKey));
+      await tester.pump();
+      expect(find.byKey(textTvDigitKey(5)), findsOneWidget);
+      expect(_number('---'), findsOneWidget);
+
+      await tester.tap(find.byKey(textTvDigitKey(1)));
+      await tester.pump();
+      expect(_number('1--'), findsOneWidget);
+      await tester.tap(find.byKey(textTvDigitKey(0)));
+      await tester.pump();
+      expect(_number('10-'), findsOneWidget);
+      await tester.tap(find.byKey(textTvDigitKey(4)));
+      await tester.pumpAndSettle();
+
+      expect(_number('104'), findsOneWidget);
+      expect(repository.requests.last, (104, false));
+      // The pad puts itself away once a page is chosen.
+      expect(find.byKey(textTvDigitKey(5)), findsNothing);
+    });
+
+    testWidgets('a page number cannot start with 0 or 9', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository(), controls: const ControlsSettings());
+      await tester.tap(find.byKey(textTvNumberKey));
+      await tester.pump();
+
+      await tester.tap(find.byKey(textTvDigitKey(0)));
+      await tester.tap(find.byKey(textTvDigitKey(9)));
+      await tester.pump();
+
+      expect(_number('---'), findsOneWidget);
+    });
+
+    testWidgets('DEL takes back a digit', (WidgetTester tester) async {
+      await _open(tester, _repository(), controls: const ControlsSettings());
+      await tester.tap(find.byKey(textTvNumberKey));
+      await tester.pump();
+      await tester.tap(find.byKey(textTvDigitKey(3)));
+      await tester.tap(find.byKey(textTvDigitKey(0)));
+      await tester.pump();
+
+      await tester.tap(find.byKey(textTvDeleteKey));
+      await tester.pump();
+
+      expect(_number('3--'), findsOneWidget);
+    });
+
+    testWidgets('the X puts the pad away without going anywhere', (
+      WidgetTester tester,
+    ) async {
+      final FakeTextTvRepository repository = _repository();
+      await _open(tester, repository, controls: const ControlsSettings());
+      await tester.tap(find.byKey(textTvNumberKey));
+      await tester.pump();
+
+      await tester.tap(find.byKey(textTvKeypadCloseKey));
+      await tester.pump();
+
+      expect(find.byKey(textTvDigitKey(5)), findsNothing);
+      expect(_number('100'), findsOneWidget);
+      expect(repository.requests, hasLength(1));
+    });
+
+    testWidgets('a page number that is not in broadcast says so', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository(), controls: const ControlsSettings());
+      await tester.tap(find.byKey(textTvNumberKey));
+      await tester.pump();
+      for (final int d in <int>[7, 7, 7]) {
+        await tester.tap(find.byKey(textTvDigitKey(d)));
+      }
+      await tester.pumpAndSettle();
+
+      expect(find.text(Messages.pageNotBroadcast(777)), findsOneWidget);
+    });
+
+    testWidgets('puts the number pad away first', (WidgetTester tester) async {
+      await _open(tester, _repository(), controls: const ControlsSettings());
+      await tester.tap(find.byKey(textTvNumberKey));
+      await tester.pump();
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(textTvDigitKey(5)), findsNothing);
+      expect(_backLeaves(tester), isTrue);
+    });
+
+    testWidgets(
+      'the shortcuts show when the pad is shut, with no coloured keys',
+      (WidgetTester tester) async {
+        final FakeTextTvRepository repository = _repository();
+        repository.pages[100] = _page(
+          100,
+          parts: <List<String>>[
+            <String>[
+              '100 SVT Text',
+              '',
+              '  Rubrik',
+              '    Inrikes 101 Utrikes 104',
+            ],
+          ],
+        );
+        await _open(tester, repository, controls: const ControlsSettings());
+
+        expect(find.byKey(textTvChipKey(300)), findsOneWidget);
+        expect(find.byKey(textTvDigitKey(5)), findsNothing);
+        expect(find.byKey(textTvFastextKey(0)), findsNothing);
+      },
+    );
+
+    testWidgets('never forgets a half-typed number, unlike the quick pad', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository(), controls: const ControlsSettings());
+      await tester.tap(find.byKey(textTvNumberKey));
+      await tester.pump();
+      await tester.tap(find.byKey(textTvDigitKey(3)));
+      await tester.pump();
+
+      await tester.pump(const Duration(seconds: 30));
+
+      expect(_number('3--'), findsOneWidget);
+    });
+
+    testWidgets('the page gets more height than with the quick pad', (
+      WidgetTester tester,
+    ) async {
+      tester.view
+        ..physicalSize = const Size(360, 640)
+        ..devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await _open(tester, _repository(), controls: const ControlsSettings());
+      final double classicHeight = tester
+          .getSize(find.byType(SingleChildScrollView).first)
+          .height;
+      await tester.pumpWidget(const SizedBox());
+      await _open(tester, _repository());
+      final double quickHeight = tester
+          .getSize(find.byType(SingleChildScrollView).first)
+          .height;
+
+      expect(classicHeight, greaterThan(quickHeight + 80));
     });
   });
 

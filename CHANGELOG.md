@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The always-on number pad and colour keys are now a setting (settings > CONTROLS, off by default). Off is how the app worked before they were added: tap the page number to open the pad, which leaves the page the most height.
 - Refresh (I-5): pull the page down to read it again (teletext and reader), automatic refresh on return to the app after 2 minutes, an optional timer (off, 30 s, 60 s, 2 min) in settings, and an `UPDATED 14:32` line.
 - Always-visible digits and Fastext (I-4): a compact number pad under the page (no more tap-to-open), `1--` progress in the number box, and red/green/yellow/blue keys from the page's bottom row of links.
 - Reader options (I-3b): line spacing, letter spacing, margin width and a bold switch, in a sheet opened from the reader bar; remembered.

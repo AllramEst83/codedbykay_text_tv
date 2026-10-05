@@ -8,6 +8,8 @@ abstract final class Messages {
   static const String refresh = 'REFRESH';
   static const String part = 'PART';
   static const String settingsTitle = 'SETTINGS';
+  static const String sectionControls = 'CONTROLS';
+  static const String quickEntry = 'ALWAYS-ON NUMBER PAD AND COLOUR KEYS';
   static const String sectionRefresh = 'REFRESH';
   static const String sectionCrt = 'CRT SCREEN';
   static const String autoRefresh = 'AUTO REFRESH';
