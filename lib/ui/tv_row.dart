@@ -308,8 +308,18 @@ class _TvRowPainter extends CustomPainter {
     );
     canvas.translate(gutterLeft * cellWidth, 0);
     _paintRow(canvas, size);
+    // The glyphs laid out for this paint are done with.
+    for (final painter in _glyphs.values) {
+      painter.dispose();
+    }
+    _glyphs.clear();
     canvas.restore();
   }
+
+  // A row repeats its letters, so each (character, colour) is laid out once per
+  // paint instead of once per cell. Not kept between paints: the painter
+  // holds no engine objects once a paint is over.
+  final Map<(int, int), TextPainter> _glyphs = <(int, int), TextPainter>{};
 
   void _paintRow(Canvas canvas, Size size) {
     var column = 0;
@@ -407,21 +417,23 @@ class _TvRowPainter extends CustomPainter {
     Color color,
     double left,
   ) {
-    final painter = TextPainter(
-      text: TextSpan(
-        text: character,
-        style: font.copyWith(color: color),
-      ),
-      textScaler: scaler,
-      textDirection: TextDirection.ltr,
-    )..layout();
+    final painter = _glyphs.putIfAbsent(
+      (character.runes.first, color.toARGB32()),
+      () => TextPainter(
+        text: TextSpan(
+          text: character,
+          style: font.copyWith(color: color),
+        ),
+        textScaler: scaler,
+        textDirection: TextDirection.ltr,
+      )..layout(),
+    );
     // Stretched about the middle of the cell, so the letter stays centred.
     canvas.save();
     canvas.translate(left + cellWidth / 2, size.height / 2);
     canvas.scale(1, stretch);
     painter.paint(canvas, Offset(-painter.width / 2, -painter.height / 2));
     canvas.restore();
-    painter.dispose();
   }
 
   @override

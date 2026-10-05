@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Cheaper drawing (part of I-12): a row lays out each letter once per paint and the page sits in its own layer; nothing looks different.
 - Golden tests (I-17): two pages drawn with the real pixel font, checked by hand with `flutter test --tags golden` (left out of CI, where font rendering differs).
 - Language (settings > LANGUAGE): choose SYSTEM, SVENSKA or ENGLISH. SYSTEM follows the phone (Swedish on a Swedish phone, English on any other language, Danish say); the choice applies at once and is remembered.
 - Screen reader (I-16): the page announces itself ("Page 377, part 1 of 2") when it changes, and each page link in a row can be reached and activated on its own.

@@ -194,23 +194,27 @@ class TvGrid extends StatelessWidget {
         ? cell * 1.6
         : (height / units).clamp(cell * 1.6, cell * _tallestRow);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        for (final List<StyledRun> row in rows)
-          TvRow(
-            runs: row,
-            columns: textTvColumns,
-            style: style,
-            // The text is centred by what it says; a bar, which runs the width
-            // of the page, by its edges, so it has the same margin both sides.
-            gutterLeft: tvIsBar(row, columns: textTvColumns)
-                ? tvGutterCells ~/ 2
-                : gutters.left,
-            rowHeight: rowHeight,
-            onRun: onLink,
-          ),
-      ],
+    // Its own layer: a page is painted once and then only moved (a page turn,
+    // a pull to refresh), not drawn again.
+    return RepaintBoundary(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          for (final List<StyledRun> row in rows)
+            TvRow(
+              runs: row,
+              columns: textTvColumns,
+              style: style,
+              // The text is centred by what it says; a bar, which runs the width
+              // of the page, by its edges, so it has the same margin both sides.
+              gutterLeft: tvIsBar(row, columns: textTvColumns)
+                  ? tvGutterCells ~/ 2
+                  : gutters.left,
+              rowHeight: rowHeight,
+              onRun: onLink,
+            ),
+        ],
+      ),
     );
   }
 }
