@@ -80,9 +80,11 @@ class TvTopBar extends StatelessWidget {
               onTap: onSettings,
             ),
             const SizedBox(width: TvMetrics.gutter),
-            TvButton(
+            TvIconButton(
               key: textTvRefreshKey,
-              label: Messages.refresh,
+              icon: (Color colour) =>
+                  Icon(Icons.refresh, color: colour, size: 26),
+              semanticLabel: Messages.refreshPage,
               onTap: onRefresh,
             ),
           ],

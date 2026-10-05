@@ -6,7 +6,7 @@ abstract final class Messages {
   static const String title = 'TEXT TV';
   static const String loading = 'LOADING...';
   static const String tryAgain = 'TRY AGAIN';
-  static const String refresh = 'REFRESH';
+  static const String refreshPage = 'Refresh the page';
   static const String part = 'PART';
   static const String settingsTitle = 'SETTINGS';
   static const String sectionFavourites = 'FAVOURITES';

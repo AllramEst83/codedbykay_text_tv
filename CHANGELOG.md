@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The refresh button in the top bar is now an icon (it makes room for the search button, and for words that are longer in other languages).
 - Copy and share (I-10): a share button beside the page number copies the page text, shares it with a link to texttv.nu, shares just the link, or shares a picture of the page (its colours on black, with its address under it; the same whether reader mode or the CRT look is on).
 - Search (I-9): a magnifier button opens a search over the pages saved on the phone; type a word (Swedish letters match with or without their marks) to list the pages that have it, or a page number to go straight there.
 - Network handling (I-8): a failure now says what kind it was (no connection, no answer in time, a server problem, a site that has changed); a failure that may pass is tried once more after a second, and a read-ahead that fails stays silent.
