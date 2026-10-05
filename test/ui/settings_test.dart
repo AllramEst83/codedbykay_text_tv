@@ -1,10 +1,12 @@
 import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
+import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_screen.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
+import 'package:codedbykay_text_tv/ui/tv_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -323,4 +325,151 @@ void main() {
       );
     });
   });
+
+  group('the groups of settings', () {
+    const List<String> ids = <String>['controls', 'refresh', 'crt'];
+
+    testWidgets('are three panels, each with a named header bar', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester);
+      await _openSettings(tester);
+
+      for (final String id in ids) {
+        expect(
+          find.byKey(textTvSettingsGroupKey(id)),
+          findsOneWidget,
+          reason: id,
+        );
+        expect(
+          find.byKey(textTvSettingsHeaderKey(id)),
+          findsOneWidget,
+          reason: id,
+        );
+      }
+      for (final (String id, String title) in <(String, String)>[
+        ('controls', Messages.sectionControls),
+        ('refresh', Messages.sectionRefresh),
+        ('crt', Messages.sectionCrt),
+      ]) {
+        expect(
+          find.descendant(
+            of: find.byKey(textTvSettingsHeaderKey(id)),
+            matching: find.text(title),
+          ),
+          findsOneWidget,
+          reason: id,
+        );
+      }
+    });
+
+    testWidgets('each has its own settings inside it, and only those', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester);
+      await _openSettings(tester);
+      Finder inside(String id, Key key) => find.descendant(
+        of: find.byKey(textTvSettingsGroupKey(id)),
+        matching: find.byKey(key),
+      );
+
+      expect(inside('controls', textTvQuickEntryKey), findsOneWidget);
+      expect(inside('refresh', textTvAutoRefreshKey), findsOneWidget);
+      for (final Key key in <Key>[
+        textTvCrtSwitchKey,
+        textTvCrtCurveKey,
+        textTvCrtDepthKey,
+        textTvCrtPeriodKey,
+        textTvCrtResetKey,
+        textTvCrtPreviewKey,
+      ]) {
+        expect(inside('crt', key), findsOneWidget, reason: '$key');
+        expect(inside('controls', key), findsNothing, reason: '$key');
+        expect(inside('refresh', key), findsNothing, reason: '$key');
+      }
+      expect(inside('refresh', textTvQuickEntryKey), findsNothing);
+      expect(inside('crt', textTvAutoRefreshKey), findsNothing);
+    });
+
+    testWidgets('are framed, with a header bar in teletext blue', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester);
+      await _openSettings(tester);
+
+      for (final String id in ids) {
+        final Container group = tester.widget<Container>(
+          find.byKey(textTvSettingsGroupKey(id)),
+        );
+        final BoxDecoration frame = group.decoration! as BoxDecoration;
+        expect(frame.border, isNotNull, reason: '$id has a frame');
+
+        final Container header = tester.widget<Container>(
+          find.byKey(textTvSettingsHeaderKey(id)),
+        );
+        expect(header.color, tvColorOf(TvColor.blue), reason: '$id header');
+      }
+    });
+
+    testWidgets('are clearly apart: a gap between one panel and the next', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester);
+      await _openSettings(tester);
+
+      for (int i = 0; i < ids.length - 1; i++) {
+        final Rect above = tester.getRect(
+          find.byKey(textTvSettingsGroupKey(ids[i])),
+        );
+        final Rect below = tester.getRect(
+          find.byKey(textTvSettingsGroupKey(ids[i + 1])),
+        );
+
+        expect(
+          below.top - above.bottom,
+          greaterThanOrEqualTo(TvMetrics.margin * 2 - 0.5),
+        );
+        expect(above.overlaps(below), isFalse);
+      }
+    });
+
+    testWidgets('panels use the whole width, so their frames line up', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester);
+      await _openSettings(tester);
+
+      final List<Rect> rects = <Rect>[
+        for (final String id in ids)
+          tester.getRect(find.byKey(textTvSettingsGroupKey(id))),
+      ];
+      for (final Rect r in rects) {
+        expect(r.left, rects.first.left);
+        expect(r.width, rects.first.width);
+      }
+    });
+
+    testWidgets('headers are announced as headers to a screen reader', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await _open(tester);
+      await _openSettings(tester);
+
+      for (final String id in ids) {
+        expect(
+          tester.getSemantics(find.byKey(textTvSettingsHeaderKey(id))),
+          matchesSemantics(isHeader: true, label: _title(id)),
+          reason: id,
+        );
+      }
+      handle.dispose();
+    });
+  });
 }
+
+String _title(String id) => switch (id) {
+  'controls' => Messages.sectionControls,
+  'refresh' => Messages.sectionRefresh,
+  _ => Messages.sectionCrt,
+};

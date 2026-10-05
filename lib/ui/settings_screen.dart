@@ -98,81 +98,96 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(
                   TvMetrics.margin,
-                  0,
+                  TvMetrics.gutter,
                   TvMetrics.margin,
                   TvMetrics.margin * 2,
                 ),
                 children: <Widget>[
-                  _SectionTitle(Messages.sectionControls),
-                  TvSwitchRow(
-                    switchKey: textTvQuickEntryKey,
-                    label: Messages.quickEntry,
-                    value: _controls.quickEntry,
-                    onChanged: (bool v) =>
-                        _setControls(_controls.copyWith(quickEntry: v)),
+                  _SettingsGroup(
+                    id: 'controls',
+                    title: Messages.sectionControls,
+                    children: <Widget>[
+                      TvSwitchRow(
+                        switchKey: textTvQuickEntryKey,
+                        label: Messages.quickEntry,
+                        value: _controls.quickEntry,
+                        onChanged: (bool v) =>
+                            _setControls(_controls.copyWith(quickEntry: v)),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: TvMetrics.margin * 2),
-                  _SectionTitle(Messages.sectionRefresh),
-                  TvSliderRow(
-                    sliderKey: textTvAutoRefreshKey,
-                    label: Messages.autoRefresh,
-                    value: _refresh.auto.toDouble(),
-                    max: (autoRefreshIntervals.length - 1).toDouble(),
-                    divisions: autoRefreshIntervals.length - 1,
-                    text: Messages.autoRefreshValue(_refresh.interval),
-                    onChanged: (double v) =>
-                        _setRefresh(_refresh.copyWith(auto: v.round())),
+                  _SettingsGroup(
+                    id: 'refresh',
+                    title: Messages.sectionRefresh,
+                    children: <Widget>[
+                      TvSliderRow(
+                        sliderKey: textTvAutoRefreshKey,
+                        label: Messages.autoRefresh,
+                        value: _refresh.auto.toDouble(),
+                        max: (autoRefreshIntervals.length - 1).toDouble(),
+                        divisions: autoRefreshIntervals.length - 1,
+                        text: Messages.autoRefreshValue(_refresh.interval),
+                        onChanged: (double v) =>
+                            _setRefresh(_refresh.copyWith(auto: v.round())),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: TvMetrics.margin * 2),
-                  _SectionTitle(Messages.sectionCrt),
-                  TvSwitchRow(
-                    switchKey: textTvCrtSwitchKey,
-                    label: Messages.crtEffect,
-                    value: on,
-                    onChanged: (bool v) => _set(_crt.copyWith(enabled: v)),
-                  ),
-                  const SizedBox(height: TvMetrics.margin),
-                  _Preview(settings: _crt),
-                  const SizedBox(height: TvMetrics.margin),
-                  TvSliderRow(
-                    sliderKey: textTvCrtCurveKey,
-                    label: Messages.crtCurve,
-                    value: _crt.curve,
-                    max: crtCurveMax,
-                    text: _percent(_crt.curve, 0, crtCurveMax),
-                    onChanged: on
-                        ? (double v) => _set(_crt.copyWith(curve: v))
-                        : null,
-                  ),
-                  TvSliderRow(
-                    sliderKey: textTvCrtDepthKey,
-                    label: Messages.crtScanDepth,
-                    value: _crt.scanDepth,
-                    max: crtScanDepthMax,
-                    text: _percent(_crt.scanDepth, 0, crtScanDepthMax),
-                    onChanged: on
-                        ? (double v) => _set(_crt.copyWith(scanDepth: v))
-                        : null,
-                  ),
-                  TvSliderRow(
-                    sliderKey: textTvCrtPeriodKey,
-                    label: Messages.crtScanPeriod,
-                    value: _crt.scanPeriod,
-                    min: crtScanPeriodMin,
-                    max: crtScanPeriodMax,
-                    text: Messages.pixels(_crt.scanPeriod),
-                    onChanged: on
-                        ? (double v) => _set(_crt.copyWith(scanPeriod: v))
-                        : null,
-                  ),
-                  const SizedBox(height: TvMetrics.margin),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TvButton(
-                      key: textTvCrtResetKey,
-                      label: Messages.reset,
-                      onTap: on ? () => _set(_crt.reset()) : null,
-                    ),
+                  _SettingsGroup(
+                    id: 'crt',
+                    title: Messages.sectionCrt,
+                    children: <Widget>[
+                      TvSwitchRow(
+                        switchKey: textTvCrtSwitchKey,
+                        label: Messages.crtEffect,
+                        value: on,
+                        onChanged: (bool v) => _set(_crt.copyWith(enabled: v)),
+                      ),
+                      const SizedBox(height: TvMetrics.margin),
+                      _Preview(settings: _crt),
+                      const SizedBox(height: TvMetrics.margin),
+                      TvSliderRow(
+                        sliderKey: textTvCrtCurveKey,
+                        label: Messages.crtCurve,
+                        value: _crt.curve,
+                        max: crtCurveMax,
+                        text: _percent(_crt.curve, 0, crtCurveMax),
+                        onChanged: on
+                            ? (double v) => _set(_crt.copyWith(curve: v))
+                            : null,
+                      ),
+                      TvSliderRow(
+                        sliderKey: textTvCrtDepthKey,
+                        label: Messages.crtScanDepth,
+                        value: _crt.scanDepth,
+                        max: crtScanDepthMax,
+                        text: _percent(_crt.scanDepth, 0, crtScanDepthMax),
+                        onChanged: on
+                            ? (double v) => _set(_crt.copyWith(scanDepth: v))
+                            : null,
+                      ),
+                      TvSliderRow(
+                        sliderKey: textTvCrtPeriodKey,
+                        label: Messages.crtScanPeriod,
+                        value: _crt.scanPeriod,
+                        min: crtScanPeriodMin,
+                        max: crtScanPeriodMax,
+                        text: Messages.pixels(_crt.scanPeriod),
+                        onChanged: on
+                            ? (double v) => _set(_crt.copyWith(scanPeriod: v))
+                            : null,
+                      ),
+                      const SizedBox(height: TvMetrics.margin),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TvButton(
+                          key: textTvCrtResetKey,
+                          label: Messages.reset,
+                          onTap: on ? () => _set(_crt.reset()) : null,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -254,16 +269,56 @@ class _Preview extends StatelessWidget {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle(this.text);
+/// One group of settings as a panel of its own: a grey frame, and across its
+/// top a bar in the blue of a teletext header with the group's name, so where
+/// one group ends and the next begins is plain at a glance.
+class _SettingsGroup extends StatelessWidget {
+  const _SettingsGroup({
+    required this.id,
+    required this.title,
+    required this.children,
+  });
 
-  final String text;
+  /// A short name for tests to find the group and its bar by.
+  final String id;
+  final String title;
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: TvMetrics.gutter),
-      child: Text(text, style: tvText(10, TvColors.highlight)),
+    return Semantics(
+      container: true,
+      explicitChildNodes: true,
+      child: Container(
+        key: textTvSettingsGroupKey(id),
+        decoration: BoxDecoration(
+          border: Border.all(color: TvColors.border, width: TvMetrics.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Semantics(
+              header: true,
+              child: Container(
+                key: textTvSettingsHeaderKey(id),
+                color: tvColorOf(TvColor.blue),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: TvMetrics.margin,
+                  vertical: TvMetrics.gutter + 2,
+                ),
+                child: Text(title, style: tvText(10, TvColors.white)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(TvMetrics.margin),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: children,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

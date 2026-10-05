@@ -5,6 +5,10 @@ import 'package:flutter/widgets.dart';
 const Key textTvOfflineKey = ValueKey<String>('text-tv-offline');
 const Key textTvUpdatedKey = ValueKey<String>('text-tv-updated');
 const Key textTvAutoRefreshKey = ValueKey<String>('text-tv-auto-refresh');
+Key textTvSettingsGroupKey(String id) =>
+    ValueKey<String>('text-tv-settings-group-$id');
+Key textTvSettingsHeaderKey(String id) =>
+    ValueKey<String>('text-tv-settings-header-$id');
 const Key textTvSettingsKey = ValueKey<String>('text-tv-settings');
 const Key textTvSettingsBackKey = ValueKey<String>('text-tv-settings-back');
 const Key textTvCrtSwitchKey = ValueKey<String>('text-tv-crt-switch');
