@@ -62,6 +62,7 @@
   "readerTryAgain": "Försök igen",
   "readerNotBroadcast": "Sidan {page} sänds inte.",
   "pageLabel": "Sida {page}",
+  "pageAndPart": "Sida {page}, del {part} av {parts}",
   "pageNotBroadcast": "SIDA {page} SÄNDS INTE.",
 
   "themeBlack": "Svart",

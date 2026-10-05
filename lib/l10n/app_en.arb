@@ -80,6 +80,8 @@
   "@readerNotBroadcast": {"placeholders": {"page": {"type": "int"}}},
   "pageLabel": "Page {page}",
   "@pageLabel": {"placeholders": {"page": {"type": "int"}}},
+  "pageAndPart": "Page {page}, part {part} of {parts}",
+  "@pageAndPart": {"description": "Spoken label of the page on show when it has several parts.", "placeholders": {"page": {"type": "int"}, "part": {"type": "int"}, "parts": {"type": "int"}}},
   "pageNotBroadcast": "PAGE {page} IS NOT IN BROADCAST.",
   "@pageNotBroadcast": {"placeholders": {"page": {"type": "int"}}},
 

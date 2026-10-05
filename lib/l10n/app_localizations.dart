@@ -434,6 +434,12 @@ abstract class AppLocalizations {
   /// **'Page {page}'**
   String pageLabel(int page);
 
+  /// Spoken label of the page on show when it has several parts.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page}, part {part} of {parts}'**
+  String pageAndPart(int page, int part, int parts);
+
   /// No description provided for @pageNotBroadcast.
   ///
   /// In en, this message translates to:

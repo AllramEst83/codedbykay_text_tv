@@ -31,6 +31,7 @@ lib/
     text_tv_session.dart     # TextTvSession (page, part, history <= 50): what a cold start returns to; tolerant encode/decode
     page_search.dart         # searchPages(pages, query) -> SearchHit(page, line, matches); foldForSearch (å/ä/ö); every word on one line, best 30
     page_section.dart        # PageSection (the six built-in favourites' pages), sectionOf(page), legacyDefaultNames (the Swedish names older versions saved)
+    page_semantics.dart      # PageSemantics: the page-level node (label, live region) around the rows
     page_share.dart          # pageText(page, part), pageLink(n), shareMessage: what copying and sharing send
     network_failure.dart     # NetworkFailure (offline/timeout/server/changed/other, .transient): why a request failed, for the wording and the retry
     text_tv_headlines.dart   # textTvHeadlines(page): the headline lines of a page (no title, bare numbers or navigation); not used by the UI yet

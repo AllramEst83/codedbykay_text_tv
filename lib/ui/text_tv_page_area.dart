@@ -3,6 +3,7 @@ import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/tv_layout.dart';
+import 'package:codedbykay_text_tv/ui/page_semantics.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
@@ -47,12 +48,17 @@ class TvPageArea extends StatelessWidget {
           content = TvMessage(lines: <String>[context.l10n.loading]);
         } else {
           content = switch (shown) {
-            TextTvShown(:final TextTvPage page) => TvGrid(
-              page: page,
+            TextTvShown(:final TextTvPage page) => PageSemantics(
+              page: page.number,
               part: part,
-              onLink: onLink,
-              width: constraints.maxWidth,
-              height: constraints.maxHeight - 2 * _airAbove,
+              parts: page.parts.length,
+              child: TvGrid(
+                page: page,
+                part: part,
+                onLink: onLink,
+                width: constraints.maxWidth,
+                height: constraints.maxHeight - 2 * _airAbove,
+              ),
             ),
             TextTvNotBroadcast(:final int number) => TvMessage(
               lines: <String>[context.l10n.pageNotBroadcast(number)],

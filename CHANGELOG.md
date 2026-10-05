@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Screen reader (I-16): the page announces itself ("Page 377, part 1 of 2") when it changes, and each page link in a row can be reached and activated on its own.
 - Live canary (I-15): `tool/check_live.dart` and a weekly workflow read a few live pages and fail if the site's markup has changed so that colours would be lost.
 - About and privacy (I-14): an ABOUT panel in settings credits SVT Text and texttv.nu and says what the app does and does not send; `PRIVACY.md` has the full statement and a store data-safety note.
 - Reader typefaces (I-3c): the reader options have a FONT row: the phone's own, Atkinson Hyperlegible (made for low vision) or OpenDyslexic, both bundled so they work offline. The choice is remembered, and RESET leaves it alone.

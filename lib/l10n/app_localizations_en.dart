@@ -194,6 +194,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String pageAndPart(int page, int part, int parts) {
+    return 'Page $page, part $part of $parts';
+  }
+
+  @override
   String pageNotBroadcast(int page) {
     return 'PAGE $page IS NOT IN BROADCAST.';
   }

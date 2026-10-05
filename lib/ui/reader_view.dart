@@ -3,6 +3,7 @@ import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/reader_content.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
+import 'package:codedbykay_text_tv/ui/page_semantics.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
 import 'package:flutter/gestures.dart';
@@ -59,12 +60,17 @@ class ReaderView extends StatelessWidget {
       );
     } else {
       content = switch (shown) {
-        TextTvShown(:final TextTvPage page) => _Page(
-          blocks: buildReaderBlocks(page, part),
-          settings: settings,
-          palette: palette,
-          onLink: onLink,
-          onPull: onPull,
+        TextTvShown(:final TextTvPage page) => PageSemantics(
+          page: page.number,
+          part: part,
+          parts: page.parts.length,
+          child: _Page(
+            blocks: buildReaderBlocks(page, part),
+            settings: settings,
+            palette: palette,
+            onLink: onLink,
+            onPull: onPull,
+          ),
         ),
         TextTvNotBroadcast(:final int number) => _Message(
           lines: <String>[context.l10n.readerNotBroadcast(number)],

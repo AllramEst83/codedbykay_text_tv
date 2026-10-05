@@ -1,8 +1,10 @@
 import 'dart:math' as math;
 
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 /// How far a coloured grid may be enlarged to fill a screen wider than it
 /// needs, the same limit plain grids use.
@@ -109,6 +111,48 @@ class TvRow extends StatelessWidget {
   /// Runs the command of a tapped link. Links are not tappable without it.
   final ValueChanged<String>? onRun;
 
+  /// A button for each link of the row, so TalkBack can reach it: the cells
+  /// the link covers, at least 48 wide so it is a target a finger can find.
+  List<CustomPainterSemantics> _linkNodes(
+    BuildContext context,
+    Size size,
+    double cellWidth,
+  ) {
+    final nodes = <CustomPainterSemantics>[];
+    var start = 0;
+    for (final run in runs) {
+      final end = start + run.text.runes.length;
+      final command = run.command;
+      if (command != null && onRun != null) {
+        final centre = (gutterLeft + (start + end) / 2) * cellWidth;
+        final half = math.max((end - start) * cellWidth / 2, 24.0);
+        final page = int.tryParse(command);
+        final text = run.text.trim();
+        nodes.add(
+          CustomPainterSemantics(
+            key: ValueKey<int>(start),
+            rect: Rect.fromLTRB(
+              math.max(0, centre - half),
+              0,
+              math.min(size.width, centre + half),
+              size.height,
+            ),
+            properties: SemanticsProperties(
+              button: true,
+              textDirection: TextDirection.ltr,
+              label: page == null || text != '$page'
+                  ? text
+                  : context.l10n.pageLabel(page),
+              onTap: () => onRun!(command),
+            ),
+          ),
+        );
+      }
+      start = end;
+    }
+    return nodes;
+  }
+
   @override
   Widget build(BuildContext context) {
     final base = style ?? DefaultTextStyle.of(context).style;
@@ -142,13 +186,17 @@ class TvRow extends StatelessWidget {
 
         return Semantics(
           label: label,
-          excludeSemantics: true,
+          container: true,
+          // The row reads as its text; its links, when it has any, follow as
+          // buttons of their own (see the painter's semantics below).
+          explicitChildNodes: onRun != null,
           child: Align(
             alignment: Alignment.center,
             widthFactor: 1,
             heightFactor: 1,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
+              excludeFromSemantics: true,
               onTapUp: onRun == null
                   ? null
                   : (details) {
@@ -163,6 +211,9 @@ class TvRow extends StatelessWidget {
                 height: rowHeight * (tall ? 2 : 1),
                 child: CustomPaint(
                   painter: _TvRowPainter(
+                    linkNodes: onRun == null
+                        ? null
+                        : (Size size) => _linkNodes(context, size, cellWidth),
                     runs: runs,
                     font: font,
                     scaler: scaler,
@@ -217,7 +268,18 @@ class _TvRowPainter extends CustomPainter {
     required this.tall,
     required this.gutterLeft,
     required this.stretch,
+    this.linkNodes,
   });
+
+  /// The semantics nodes of the row's links, when they can be tapped.
+  final SemanticsBuilderCallback? linkNodes;
+
+  @override
+  SemanticsBuilderCallback? get semanticsBuilder => linkNodes;
+
+  @override
+  bool shouldRebuildSemantics(_TvRowPainter old) =>
+      old.runs != runs || old.cellWidth != cellWidth;
 
   final List<StyledRun> runs;
   final TextStyle font;

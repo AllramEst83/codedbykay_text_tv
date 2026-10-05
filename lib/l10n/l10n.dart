@@ -36,6 +36,11 @@ extension AppWording on AppLocalizations {
     ReaderTheme.contrast => themeContrast,
   };
 
+  /// What a screen reader says for the page on show: `Page 377`, or
+  /// `Page 377, part 1 of 2` when it has parts ([part] counts from 0).
+  String pageDescription(int page, int part, int parts) =>
+      parts > 1 ? pageAndPart(page, part + 1, parts) : pageLabel(page);
+
   String fontName(ReaderFont font) => switch (font) {
     ReaderFont.system => fontSystem,
     ReaderFont.atkinson => fontAtkinson,

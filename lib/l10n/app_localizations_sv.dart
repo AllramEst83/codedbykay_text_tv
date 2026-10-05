@@ -194,6 +194,11 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String pageAndPart(int page, int part, int parts) {
+    return 'Sida $page, del $part av $parts';
+  }
+
+  @override
   String pageNotBroadcast(int page) {
     return 'SIDA $page SÄNDS INTE.';
   }
