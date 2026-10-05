@@ -24,6 +24,46 @@ void main() {
       }
     });
 
+    test('the typeface is the system font until chosen, and is saved', () {
+      expect(const ReaderSettings().font, ReaderFont.system);
+      for (final ReaderFont font in ReaderFont.values) {
+        final ReaderSettings s = ReaderSettings(font: font);
+
+        expect(ReaderSettings.decode(s.encode()), s);
+        expect(ReaderSettings.decode(s.encode()).font, font);
+      }
+    });
+
+    test('an unknown typeface, or an older save with none, is the system', () {
+      expect(
+        ReaderSettings.decode('{"font": "comic"}').font,
+        ReaderFont.system,
+      );
+      expect(ReaderSettings.decode('{"font": 3}').font, ReaderFont.system);
+      expect(ReaderSettings.decode('{"size": 3}').font, ReaderFont.system);
+    });
+
+    test('settings that differ only in typeface are not equal', () {
+      expect(
+        const ReaderSettings(font: ReaderFont.atkinson),
+        isNot(const ReaderSettings()),
+      );
+      expect(
+        const ReaderSettings(font: ReaderFont.atkinson).hashCode,
+        isNot(const ReaderSettings().hashCode),
+      );
+    });
+
+    test('resetLayout leaves the typeface alone', () {
+      const ReaderSettings s = ReaderSettings(
+        font: ReaderFont.dyslexic,
+        bold: true,
+        margin: 4,
+      );
+
+      expect(s.resetLayout(), const ReaderSettings(font: ReaderFont.dyslexic));
+    });
+
     test('copyWith changes only what it is told to', () {
       const ReaderSettings s = ReaderSettings(
         theme: ReaderTheme.beige,

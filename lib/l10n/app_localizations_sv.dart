@@ -137,6 +137,18 @@ class AppLocalizationsSv extends AppLocalizations {
   String get readerOptionsTitle => 'LÄSLÄGE';
 
   @override
+  String get readerFont => 'TYPSNITT';
+
+  @override
+  String get fontSystem => 'SYSTEM';
+
+  @override
+  String get fontAtkinson => 'ATKINSON';
+
+  @override
+  String get fontDyslexic => 'OPENDYSLEXIC';
+
+  @override
   String get lineSpacing => 'RADAVSTÅND';
 
   @override

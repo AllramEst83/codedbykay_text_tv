@@ -60,6 +60,9 @@ void main() {
       const Set<String> same = <String>{
         'sectionSport',
         'themeBeige',
+        'fontSystem',
+        'fontAtkinson',
+        'fontDyslexic',
         'autoRefreshSeconds',
         'autoRefreshMinutes',
       };

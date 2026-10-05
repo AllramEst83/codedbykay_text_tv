@@ -18,6 +18,20 @@ enum ReaderTheme {
   contrast,
 }
 
+/// The typefaces the reader can set text in, by the name they are saved under.
+enum ReaderFont {
+  /// The phone's own.
+  system,
+
+  /// Atkinson Hyperlegible: made by the Braille Institute for low vision, with
+  /// letters that cannot be mistaken for each other.
+  atkinson,
+
+  /// OpenDyslexic: heavy-bottomed letters, which some people with dyslexia
+  /// find keep still on the line.
+  dyslexic,
+}
+
 /// Text sizes the reader steps through, in logical pixels before the phone's
 /// own font-size setting is applied on top.
 const List<double> readerTextSizes = <double>[14, 16, 18, 20, 24, 28, 32, 40];
@@ -51,6 +65,7 @@ class ReaderSettings {
     this.letterSpacing = readerDefaultLetterSpacing,
     this.margin = readerDefaultMargin,
     this.bold = false,
+    this.font = ReaderFont.system,
   });
 
   /// Pages show as reader text instead of the teletext grid.
@@ -72,6 +87,9 @@ class ReaderSettings {
   /// Thicker strokes, which many people find easier to read.
   final bool bold;
 
+  /// The typeface of the text.
+  final ReaderFont font;
+
   double get fontSize => readerTextSizes[size];
   double get lineHeight => readerLineHeights[lineSpacing];
   double get letterSpacingEm => readerLetterSpacings[letterSpacing];
@@ -85,6 +103,7 @@ class ReaderSettings {
     int? letterSpacing,
     int? margin,
     bool? bold,
+    ReaderFont? font,
   }) => ReaderSettings(
     enabled: enabled ?? this.enabled,
     theme: theme ?? this.theme,
@@ -93,12 +112,14 @@ class ReaderSettings {
     letterSpacing: letterSpacing ?? this.letterSpacing,
     margin: margin ?? this.margin,
     bold: bold ?? this.bold,
+    font: font ?? this.font,
   );
 
   /// The spacing, margins and weight back to their defaults; the mode, the
-  /// colours and the text size are left as they are.
+  /// colours, the text size and the typeface (a choice of the reader's, not
+  /// of layout) are left as they are.
   ReaderSettings resetLayout() =>
-      ReaderSettings(enabled: enabled, theme: theme, size: size);
+      ReaderSettings(enabled: enabled, theme: theme, size: size, font: font);
 
   static int _step(Object? value, int length, int fallback) =>
       value is int && value >= 0 && value < length ? value : fallback;
@@ -131,6 +152,7 @@ class ReaderSettings {
       ),
       margin: _step(json['margin'], readerMargins.length, readerDefaultMargin),
       bold: bold is bool && bold,
+      font: ReaderFont.values.asNameMap()[json['font']] ?? ReaderFont.system,
     );
   }
 
@@ -142,6 +164,7 @@ class ReaderSettings {
     'letterSpacing': letterSpacing,
     'margin': margin,
     'bold': bold,
+    'font': font.name,
   });
 
   @override
@@ -153,7 +176,8 @@ class ReaderSettings {
       other.lineSpacing == lineSpacing &&
       other.letterSpacing == letterSpacing &&
       other.margin == margin &&
-      other.bold == bold;
+      other.bold == bold &&
+      other.font == font;
 
   @override
   int get hashCode => Object.hash(
@@ -164,5 +188,6 @@ class ReaderSettings {
     letterSpacing,
     margin,
     bold,
+    font,
   );
 }

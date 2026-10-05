@@ -30,8 +30,20 @@ flutter:
   shaders:
     - shaders/crt.frag
 
-  # Bundled (OFL 1.1, see fonts/OFL.txt) so the app works offline.
+  # Bundled (OFL 1.1, the licences are the fonts/OFL-*.txt files) so the app
+  # works offline: Press Start 2P for the teletext page, Atkinson Hyperlegible
+  # and OpenDyslexic as the reader's choice of typeface.
   fonts:
     - family: PressStart2P
       fonts:
         - asset: fonts/PressStart2P-Regular.ttf
+    - family: AtkinsonHyperlegible
+      fonts:
+        - asset: fonts/AtkinsonHyperlegible-Regular.ttf
+        - asset: fonts/AtkinsonHyperlegible-Bold.ttf
+          weight: 700
+    - family: OpenDyslexic
+      fonts:
+        - asset: fonts/OpenDyslexic-Regular.otf
+        - asset: fonts/OpenDyslexic-Bold.otf
+          weight: 700

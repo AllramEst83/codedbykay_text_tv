@@ -36,6 +36,12 @@ extension AppWording on AppLocalizations {
     ReaderTheme.contrast => themeContrast,
   };
 
+  String fontName(ReaderFont font) => switch (font) {
+    ReaderFont.system => fontSystem,
+    ReaderFont.atkinson => fontAtkinson,
+    ReaderFont.dyslexic => fontDyslexic,
+  };
+
   /// `OFF`, `30 S` or `2 MIN`.
   String autoRefreshValue(Duration? every) => every == null
       ? autoRefreshOff

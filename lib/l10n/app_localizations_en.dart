@@ -137,6 +137,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerOptionsTitle => 'READER OPTIONS';
 
   @override
+  String get readerFont => 'FONT';
+
+  @override
+  String get fontSystem => 'SYSTEM';
+
+  @override
+  String get fontAtkinson => 'ATKINSON';
+
+  @override
+  String get fontDyslexic => 'OPENDYSLEXIC';
+
+  @override
   String get lineSpacing => 'LINE SPACING';
 
   @override

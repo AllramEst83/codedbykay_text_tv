@@ -100,6 +100,28 @@ class _ReaderOptionsSheetState extends State<ReaderOptionsSheet> {
                   _set(_settings.copyWith(margin: v.round())),
             ),
             const SizedBox(height: TvMetrics.gutter),
+            Text(context.l10n.readerFont, style: tvText(12, TvColors.white)),
+            const SizedBox(height: TvMetrics.gutter),
+            Row(
+              children: <Widget>[
+                for (final ReaderFont font in ReaderFont.values)
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        right: font == ReaderFont.values.last
+                            ? 0
+                            : TvMetrics.gutter,
+                      ),
+                      child: _FontChoice(
+                        font: font,
+                        selected: _settings.font == font,
+                        onTap: () => _set(_settings.copyWith(font: font)),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: TvMetrics.margin),
             TvSwitchRow(
               switchKey: textTvReaderBoldKey,
               label: context.l10n.boldText,
@@ -113,6 +135,59 @@ class _ReaderOptionsSheetState extends State<ReaderOptionsSheet> {
               onTap: () => _set(_settings.resetLayout()),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// One typeface to pick, its name set in it so it can be judged by looking.
+class _FontChoice extends StatelessWidget {
+  const _FontChoice({
+    required this.font,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final ReaderFont font;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final String name = context.l10n.fontName(font);
+    final Color colour = selected ? TvColors.highlight : TvColors.white;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: name,
+      excludeSemantics: true,
+      child: InkWell(
+        key: textTvReaderFontKey(font),
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 48),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: selected ? TvColors.highlight : TvColors.border,
+              width: TvMetrics.border,
+            ),
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              name,
+              style: readerTextStyle(
+                14,
+                colour,
+                weight: FontWeight.w700,
+                height: 1.2,
+                font: font,
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -332,6 +332,30 @@ abstract class AppLocalizations {
   /// **'READER OPTIONS'**
   String get readerOptionsTitle;
 
+  /// No description provided for @readerFont.
+  ///
+  /// In en, this message translates to:
+  /// **'FONT'**
+  String get readerFont;
+
+  /// No description provided for @fontSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'SYSTEM'**
+  String get fontSystem;
+
+  /// No description provided for @fontAtkinson.
+  ///
+  /// In en, this message translates to:
+  /// **'ATKINSON'**
+  String get fontAtkinson;
+
+  /// No description provided for @fontDyslexic.
+  ///
+  /// In en, this message translates to:
+  /// **'OPENDYSLEXIC'**
+  String get fontDyslexic;
+
   /// No description provided for @lineSpacing.
   ///
   /// In en, this message translates to:

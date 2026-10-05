@@ -87,8 +87,16 @@ ReaderPalette readerPalette(ReaderTheme theme) => switch (theme) {
   ),
 };
 
-/// The reader sets text in the phone's own face, not the pixel font.
+/// The reader sets text in the phone's own face (or one of the bundled ones
+/// the reader picks), not the pixel font.
 const String kReaderFontFamily = 'Roboto';
+
+/// The font family [font] is set in. The bundled families are in pubspec.yaml.
+String readerFontFamily(ReaderFont font) => switch (font) {
+  ReaderFont.system => kReaderFontFamily,
+  ReaderFont.atkinson => 'AtkinsonHyperlegible',
+  ReaderFont.dyslexic => 'OpenDyslexic',
+};
 
 TextStyle readerTextStyle(
   double size,
@@ -96,8 +104,9 @@ TextStyle readerTextStyle(
   FontWeight? weight,
   double height = 1.5,
   double letterSpacing = 0,
+  ReaderFont font = ReaderFont.system,
 }) => TextStyle(
-  fontFamily: kReaderFontFamily,
+  fontFamily: readerFontFamily(font),
   fontSize: size,
   height: height,
   color: colour,

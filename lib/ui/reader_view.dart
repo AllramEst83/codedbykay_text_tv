@@ -48,6 +48,7 @@ class ReaderView extends StatelessWidget {
       height: settings.lineHeight,
       letterSpacing: settings.letterSpacingEm * settings.fontSize,
       weight: settings.bold ? FontWeight.w700 : null,
+      font: settings.font,
     );
     final TextTvResult? shown = result;
     final Widget content;
@@ -115,6 +116,7 @@ class _Page extends StatelessWidget {
       height: settings.lineHeight,
       letterSpacing: tracking,
       weight: settings.bold ? FontWeight.w700 : null,
+      font: settings.font,
     );
     // A heading is tighter than the text under it, by the same step.
     final TextStyle heading = readerTextStyle(
@@ -123,6 +125,7 @@ class _Page extends StatelessWidget {
       weight: settings.bold ? FontWeight.w900 : FontWeight.w700,
       height: (settings.lineHeight - 0.25).clamp(1.1, 2.0),
       letterSpacing: tracking * 1.3,
+      font: settings.font,
     );
     final TextStyle dim = readerTextStyle(
       size * 0.75,
@@ -130,6 +133,7 @@ class _Page extends StatelessWidget {
       height: settings.lineHeight,
       letterSpacing: tracking * 0.75,
       weight: settings.bold ? FontWeight.w700 : null,
+      font: settings.font,
     );
 
     Widget tappable(int page, String label, Widget child) => Semantics(

@@ -62,7 +62,91 @@ FontWeight? _weight(WidgetTester tester, String text) {
   return ((p.text as TextSpan).children!.first as TextSpan).style?.fontWeight;
 }
 
+String? _family(WidgetTester tester, String text) {
+  final RenderParagraph p = tester.renderObject<RenderParagraph>(_text(text));
+  return ((p.text as TextSpan).children!.first as TextSpan).style?.fontFamily;
+}
+
 void main() {
+  group('the typeface', () {
+    testWidgets('the reader starts in the system font', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester);
+
+      expect(_family(tester, 'Incidenter'), 'Roboto');
+    });
+
+    testWidgets('a saved choice is used', (WidgetTester tester) async {
+      await _open(
+        tester,
+        reader: const ReaderSettings(enabled: true, font: ReaderFont.dyslexic),
+      );
+
+      expect(_family(tester, 'Incidenter'), 'OpenDyslexic');
+    });
+
+    testWidgets('the options offer the three, each named in itself', (
+      WidgetTester tester,
+    ) async {
+      await _open(
+        tester,
+        reader: const ReaderSettings(enabled: true, font: ReaderFont.atkinson),
+      );
+      await _openOptions(tester);
+
+      for (final ReaderFont font in ReaderFont.values) {
+        expect(find.byKey(textTvReaderFontKey(font)), findsOneWidget);
+      }
+      expect(find.text('ATKINSON'), findsOneWidget);
+      expect(find.text('OPENDYSLEXIC'), findsOneWidget);
+    });
+
+    testWidgets('choosing one sets the text in it at once, and says so', (
+      WidgetTester tester,
+    ) async {
+      final List<ReaderSettings> heard = <ReaderSettings>[];
+      await _open(tester, onReaderChanged: heard.add);
+      await _openOptions(tester);
+
+      await tester.tap(find.byKey(textTvReaderFontKey(ReaderFont.atkinson)));
+      await tester.pumpAndSettle();
+
+      expect(heard.last.font, ReaderFont.atkinson);
+      expect(_family(tester, 'Incidenter'), 'AtkinsonHyperlegible');
+    });
+
+    testWidgets('and back to the system font', (WidgetTester tester) async {
+      await _open(
+        tester,
+        reader: const ReaderSettings(enabled: true, font: ReaderFont.dyslexic),
+      );
+      await _openOptions(tester);
+
+      await tester.tap(find.byKey(textTvReaderFontKey(ReaderFont.system)));
+      await tester.pumpAndSettle();
+
+      expect(_family(tester, 'Incidenter'), 'Roboto');
+    });
+
+    testWidgets('RESET leaves the chosen typeface', (
+      WidgetTester tester,
+    ) async {
+      final List<ReaderSettings> heard = <ReaderSettings>[];
+      await _open(
+        tester,
+        reader: const ReaderSettings(enabled: true, font: ReaderFont.dyslexic),
+        onReaderChanged: heard.add,
+      );
+      await _openOptions(tester);
+
+      await tester.tap(find.byKey(textTvReaderResetKey));
+      await tester.pumpAndSettle();
+
+      expect(heard.last.font, ReaderFont.dyslexic);
+    });
+  });
+
   group('the options button', () {
     testWidgets('opens the options over the page', (WidgetTester tester) async {
       await _open(tester);
