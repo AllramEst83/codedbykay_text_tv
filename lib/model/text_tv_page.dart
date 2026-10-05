@@ -41,9 +41,13 @@ sealed class TextTvResult {
 }
 
 class TextTvShown extends TextTvResult {
-  const TextTvShown(this.page);
+  const TextTvShown(this.page, {this.cachedAt});
 
   final TextTvPage page;
+
+  /// Set when the site could not be reached and this is the copy saved at that
+  /// time instead. Null for a page just read.
+  final DateTime? cachedAt;
 }
 
 /// The number is valid but not in broadcast.

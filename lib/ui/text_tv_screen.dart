@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/saved_time.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
@@ -13,17 +17,23 @@ import 'package:flutter/material.dart';
 /// system back button steps back through the pages read, then leaves the app.
 /// [onSessionChanged] hears where the reader is after every move, so a later
 /// run can start there.
+DateTime _systemNow() => DateTime.now();
+
 class TextTvScreen extends StatefulWidget {
   const TextTvScreen({
     super.key,
     required this.repository,
     this.initial = const TextTvSession(),
     this.onSessionChanged,
+    this.clock = _systemNow,
   });
 
   final TextTvRepository repository;
   final TextTvSession initial;
   final ValueChanged<TextTvSession>? onSessionChanged;
+
+  /// Today's date, for saying when a saved copy is from.
+  final DateTime Function() clock;
 
   @override
   State<TextTvScreen> createState() => _TextTvScreenState();
@@ -66,10 +76,26 @@ class _TextTvScreenState extends State<TextTvScreen> {
       _typed = '';
     });
     _report();
-    final TextTvResult result = await widget.repository.page(
+    final Future<TextTvResult> reading = widget.repository.page(
       number,
       fresh: fresh,
     );
+    if (!fresh) {
+      // Show the copy already held (saved on disk, say) while the current page
+      // is read, unless the current one is already here.
+      bool read = false;
+      unawaited(reading.whenComplete(() => read = true));
+      final TextTvShown? held = await widget.repository.cached(number);
+      if (!mounted || request != _request) return;
+      if (held != null && !read) {
+        setState(() {
+          _loading = false;
+          _result = held;
+          _part = _part.clamp(0, held.page.parts.length - 1);
+        });
+      }
+    }
+    final TextTvResult result = await reading;
     if (!mounted || request != _request) return;
     setState(() {
       _loading = false;
@@ -121,6 +147,13 @@ class _TextTvScreenState extends State<TextTvScreen> {
     return number >= textTvFirstPage && number <= textTvLastPage
         ? number
         : null;
+  }
+
+  /// When the page on screen was saved, if it is an old copy shown because the
+  /// site could not be reached.
+  DateTime? get _savedAt {
+    final TextTvResult? result = _result;
+    return !_loading && result is TextTvShown ? result.cachedAt : null;
   }
 
   int get _parts => _page?.parts.length ?? 1;
@@ -203,6 +236,12 @@ class _TextTvScreenState extends State<TextTvScreen> {
                         ),
                       ),
                     ),
+                    if (_savedAt case final DateTime savedAt)
+                      TvOfflineNote(
+                        text: Messages.offlineSaved(
+                          formatSavedAt(savedAt, widget.clock()),
+                        ),
+                      ),
                     if (_parts > 1)
                       TvPartBar(
                         part: _part,

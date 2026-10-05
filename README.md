@@ -12,6 +12,7 @@ Personal project, built with Flutter.
 - Back steps through the pages you have read, then leaves the app.
 - Opens where you left off: the page, its part and the pages you came through.
 - Pages read in the last five minutes are reused; REFRESH asks the site again. Failures say why and offer TRY AGAIN.
+- Works offline for pages you have read: they are saved on the phone, shown at once, refreshed behind, and marked "OFFLINE. SAVED 14:32" when the site cannot be reached.
 - Bundled pixel font; the only permission is `INTERNET`.
 
 ## Build and run

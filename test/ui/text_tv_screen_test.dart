@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/model/tv_layout.dart';
+import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_screen.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
@@ -42,6 +45,7 @@ Future<void> _open(
   int start = 100,
   TextTvSession? session,
   ValueChanged<TextTvSession>? onSessionChanged,
+  DateTime Function()? clock,
 }) async {
   await tester.pumpWidget(
     MaterialApp(
@@ -50,6 +54,7 @@ Future<void> _open(
         repository: repository,
         initial: session ?? TextTvSession(page: start),
         onSessionChanged: onSessionChanged,
+        clock: clock ?? DateTime.now,
       ),
     ),
   );
@@ -684,6 +689,157 @@ void main() {
     });
   });
 
+  group('saved copies', () {
+    testWidgets('a saved copy shows at once while the page is read', (
+      WidgetTester tester,
+    ) async {
+      final _SlowRepository repository = _SlowRepository(
+        saved: _page(
+          300,
+          parts: <List<String>>[
+            <String>['Saved Rubrik'],
+          ],
+        ),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: textTvTheme(),
+          home: TextTvScreen(
+            repository: repository,
+            initial: const TextTvSession(page: 300),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // Nothing from the site yet, but the saved copy is already drawn.
+      expect(find.byType(TvRow), findsOneWidget);
+      expect(find.text(Messages.loading), findsNothing);
+
+      repository.answer(
+        TextTvShown(
+          _page(
+            300,
+            parts: <List<String>>[
+              <String>['Fresh one', 'Fresh two'],
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(TvRow), findsNWidgets(2));
+      expect(find.byKey(textTvOfflineKey), findsNothing);
+    });
+
+    testWidgets('with nothing saved it says loading, as before', (
+      WidgetTester tester,
+    ) async {
+      final _SlowRepository repository = _SlowRepository();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: textTvTheme(),
+          home: TextTvScreen(repository: repository),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text(Messages.loading), findsOneWidget);
+      expect(find.byType(TvRow), findsNothing);
+    });
+
+    testWidgets('a saved copy does not replace a page that is already here', (
+      WidgetTester tester,
+    ) async {
+      final _SlowRepository repository = _SlowRepository(
+        saved: _page(
+          300,
+          parts: <List<String>>[
+            <String>['Saved'],
+          ],
+        ),
+        answerAtOnce: TextTvShown(
+          _page(
+            300,
+            parts: <List<String>>[
+              <String>['Fresh one', 'Fresh two'],
+            ],
+          ),
+        ),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: textTvTheme(),
+          home: TextTvScreen(
+            repository: repository,
+            initial: const TextTvSession(page: 300),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(TvRow), findsNWidgets(2));
+    });
+
+    testWidgets('an old copy says when it was saved', (
+      WidgetTester tester,
+    ) async {
+      final FakeTextTvRepository repository = _repository();
+      repository.failure = TextTvShown(
+        _page(100),
+        cachedAt: DateTime(2026, 10, 5, 14, 32),
+      );
+
+      await _open(tester, repository, clock: () => DateTime(2026, 10, 5, 18));
+
+      expect(
+        tester.widget<Text>(find.byKey(textTvOfflineKey)).data,
+        Messages.offlineSaved('14:32'),
+      );
+      expect(find.byType(TvRow), findsNWidgets(3));
+    });
+
+    testWidgets('a copy from another day says the day too', (
+      WidgetTester tester,
+    ) async {
+      final FakeTextTvRepository repository = _repository();
+      repository.failure = TextTvShown(
+        _page(100),
+        cachedAt: DateTime(2026, 10, 3, 9, 5),
+      );
+
+      await _open(tester, repository, clock: () => DateTime(2026, 10, 5, 18));
+
+      expect(find.text(Messages.offlineSaved('3/10 09:05')), findsOneWidget);
+    });
+
+    testWidgets('a page just read carries no note', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository());
+
+      expect(find.byKey(textTvOfflineKey), findsNothing);
+    });
+
+    testWidgets('REFRESH once back online drops the note', (
+      WidgetTester tester,
+    ) async {
+      final FakeTextTvRepository repository = _repository();
+      repository.failure = TextTvShown(
+        _page(100),
+        cachedAt: DateTime(2026, 10, 5, 14, 32),
+      );
+      await _open(tester, repository, clock: () => DateTime(2026, 10, 5, 18));
+      expect(find.byKey(textTvOfflineKey), findsOneWidget);
+
+      repository.failure = null;
+      await tester.tap(find.byKey(textTvRefreshKey));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(textTvOfflineKey), findsNothing);
+    });
+  });
+
   testWidgets('a page whose coloured version was sent is drawn from it', (
     WidgetTester tester,
   ) async {
@@ -711,4 +867,26 @@ void main() {
     expect(find.byType(TvRow), findsNWidgets(2));
     expect(tester.takeException(), isNull);
   });
+}
+
+/// A repository whose current page is held back until [answer], with an
+/// optional copy [saved] that [cached] gives at once.
+class _SlowRepository implements TextTvRepository {
+  _SlowRepository({this.saved, this.answerAtOnce});
+
+  final TextTvPage? saved;
+  final TextTvResult? answerAtOnce;
+  final Completer<TextTvResult> _answer = Completer<TextTvResult>();
+
+  void answer(TextTvResult result) => _answer.complete(result);
+
+  @override
+  Future<TextTvResult> page(int number, {bool fresh = false}) =>
+      answerAtOnce != null
+      ? Future<TextTvResult>.value(answerAtOnce)
+      : _answer.future;
+
+  @override
+  Future<TextTvShown?> cached(int number) async =>
+      saved == null ? null : TextTvShown(saved!);
 }

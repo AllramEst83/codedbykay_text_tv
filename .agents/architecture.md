@@ -8,7 +8,7 @@ Keep the file list below in step with `lib/` as it changes.
 
 ```
 lib/
-  main.dart                  # runApp + wiring: IoHttpFetcher -> TextTv -> LiveTextTvRepository, PrefsSessionStore -> saved session -> TextTvApp
+  main.dart                  # runApp + wiring: IoHttpFetcher -> TextTv -> LiveTextTvRepository, PrefsSessionStore -> saved session, FilePageDiskCache (app cache folder) -> TextTvApp
   app.dart                   # TextTvApp: MaterialApp, theme, edge-to-edge black system bars
   messages.dart              # user-facing strings
   model/                     # pure Dart (values and parsers): no platform, no I/O
@@ -17,15 +17,17 @@ lib/
     text_tv_html.dart        # parseTextTvHtml: a page's HTML as styled rows (null if not the shape expected, so the plain text is the fallback)
     tv_mosaic.dart           # tvPictureFor(hash): texttv.nu's block-graphics GIFs rebuilt and looked up by CRC-32 (no downloads)
     tv_layout.dart           # tvIsBar / tvTextMargins / tvGutters: the black gutter each side of a page that gives its TEXT equal margins
+    saved_time.dart          # formatSavedAt: `14:32` for today, `3/10 14:32` otherwise
     text_tv_session.dart     # TextTvSession (page, part, history <= 50): what a cold start returns to; tolerant encode/decode
     text_tv_headlines.dart   # textTvHeadlines(page): the headline lines of a page (no title, bare numbers or navigation); not used by the UI yet
   services/
+    page_disk_cache.dart     # PageDiskCache (read/write/remove, never throws), SavedPage, FilePageDiskCache: one `<n>.json` per page holding the site's raw answer, mtime = saved time, 200 pages max
     http_fetcher.dart        # HttpFetcher: GET a URL, return the body
     io_http_fetcher.dart     # IoHttpFetcher on dart:io: 10 s timeouts, 2 MB cap, UTF-8, new client per request, no retry
     network_exception.dart   # NetworkException(message): the one failure the services throw
-    text_tv.dart             # TextTv: the texttv.nu client; page(n) -> TextTvPage? (null = not in broadcast), throws NetworkException
-    text_tv_repository.dart  # TextTvRepository: page(n, {fresh}) -> TextTvResult, never throws
-    live_text_tv_repository.dart # in-memory cache over TextTv: 5 min, 40 pages
+    text_tv.dart             # TextTv: the texttv.nu client; fetchBody(n) + parse(n, body), page(n) = both; null = not in broadcast, throws NetworkException
+    text_tv_repository.dart  # TextTvRepository: page(n, {fresh}) -> TextTvResult, never throws; cached(n) -> the copy already held, quickly
+    live_text_tv_repository.dart # cache over TextTv: memory 5 min / 40 pages, plus the optional disk cache (offline fallback)
     session_store.dart       # SessionStore (load/save, never throws) and PrefsSessionStore on shared_preferences
   ui/
     theme.dart               # TvColors, TvMetrics, kPixelFontFamily, textTvTheme(): the chrome's colours and metrics, the only place they are defined
@@ -97,6 +99,7 @@ The tests pin most of this; change the spec and the tests together.
 - One `textTvColumns` constant in `model/` is the grid width everywhere (client, parser, UI).
 - Release signing reads `android/key.properties` (untracked) and falls back to the debug key when it is absent, so CI and fresh clones build; see [android.md](android.md).
 - Remember where you were: `TextTvScreen` takes its starting `TextTvSession` and reports every move through `onSessionChanged`; it knows nothing about storage. `main.dart` loads the session before `runApp` and saves it fire-and-forget. A saved part the page no longer has is clamped when the page arrives; a stored page outside 100-899 or unreadable JSON means the front page. Dependency added: `shared_preferences` (Flutter team package, one JSON string under the key `session`).
+- Offline cache (stale-while-revalidate): every page read is also saved as the site's raw answer (`PageDiskCache`), and parsed again when needed, so a parser improvement applies to old copies too. `LiveTextTvRepository.page` falls back to the saved copy when the site cannot be reached or answers nonsense, marked `TextTvShown.cachedAt`; the screen then shows `OFFLINE. SAVED 14:32`. `cached(n)` gives the held copy (memory, else disk) at once, so the screen draws it while the current page is read and replaces it when it arrives, unless the current one is already there. A page that is not in broadcast is deleted from disk; a failure never overwrites a saved copy. The cache lives in the app's cache folder (`getApplicationCacheDirectory`, from `path_provider`), which Android may clear: it is only ever a convenience. `date_updated_unix` is still not read; the note uses the time we saved it.
 - The improvement backlog is in [improvements.md](improvements.md).
 
 ### Viewer design

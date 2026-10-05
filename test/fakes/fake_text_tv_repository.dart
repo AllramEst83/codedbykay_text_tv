@@ -10,6 +10,9 @@ class FakeTextTvRepository implements TextTvRepository {
   final Map<int, TextTvPage> pages;
   TextTvResult? failure;
 
+  /// Pages [cached] has at once, as a saved copy would; empty by default.
+  final Map<int, TextTvPage> cachedCopies = <int, TextTvPage>{};
+
   /// Every `(number, fresh)` asked for, in order.
   final List<(int, bool)> requests = <(int, bool)>[];
 
@@ -20,5 +23,11 @@ class FakeTextTvRepository implements TextTvRepository {
     if (failed != null) return failed;
     final TextTvPage? page = pages[number];
     return page == null ? TextTvNotBroadcast(number) : TextTvShown(page);
+  }
+
+  @override
+  Future<TextTvShown?> cached(int number) async {
+    final TextTvPage? page = cachedCopies[number];
+    return page == null ? null : TextTvShown(page);
   }
 }

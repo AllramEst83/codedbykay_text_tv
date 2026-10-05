@@ -5,6 +5,7 @@ abstract final class Messages {
   static const String tryAgain = 'TRY AGAIN';
   static const String refresh = 'REFRESH';
   static const String part = 'PART';
+  static String offlineSaved(String when) => 'OFFLINE. SAVED $when';
   static String pageNotBroadcast(int number) =>
       'PAGE $number IS NOT IN BROADCAST.';
 }

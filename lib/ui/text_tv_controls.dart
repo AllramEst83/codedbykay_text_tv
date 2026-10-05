@@ -45,6 +45,26 @@ class TvTopBar extends StatelessWidget {
   }
 }
 
+/// One dim line under the page saying it is a saved copy, not the live page.
+class TvOfflineNote extends StatelessWidget {
+  const TvOfflineNote({super.key, required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: TvMetrics.gutter),
+      child: Text(
+        text,
+        key: textTvOfflineKey,
+        style: tvText(8, TvColors.highlight),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
 /// `[<] PART 2/3 [>]` under a page that has several.
 class TvPartBar extends StatelessWidget {
   const TvPartBar({

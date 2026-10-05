@@ -18,13 +18,22 @@ class TextTv {
 
   /// The page, or null when it is not in broadcast. Throws [NetworkException]
   /// when the site cannot be reached or answers with something unexpected.
-  Future<TextTvPage?> page(int number) async {
+  Future<TextTvPage?> page(int number) async =>
+      parse(number, await fetchBody(number));
+
+  /// The site's raw answer for page [number]; [parse] reads it. Split from
+  /// [page] so an answer can be kept as it came and read again later.
+  Future<String> fetchBody(int number) {
     final url = Uri.https('texttv.nu', '/api/get/$number', {
       'app': _app,
       'includePlainTextContent': '1',
     });
-    final body = await _fetcher.get(url);
+    return _fetcher.get(url);
+  }
 
+  /// Reads an answer from [fetchBody]: the page, or null when it is not in
+  /// broadcast. Throws [NetworkException] when it is not what the site sends.
+  TextTvPage? parse(int number, String body) {
     final Object? json;
     try {
       json = jsonDecode(body);

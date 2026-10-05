@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/services/live_text_tv_repository.dart';
 import 'package:codedbykay_text_tv/services/network_exception.dart';
+import 'package:codedbykay_text_tv/services/page_disk_cache.dart';
 import 'package:codedbykay_text_tv/services/text_tv.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -107,4 +108,134 @@ void main() {
     await repository.page(101);
     expect(fetcher.requests, hasLength(5));
   });
+
+  group('with a disk cache', () {
+    late _MemoryDisk disk;
+    late LiveTextTvRepository saving;
+    setUp(() {
+      disk = _MemoryDisk();
+      saving = LiveTextTvRepository(
+        textTv: TextTv(fetcher: fetcher),
+        disk: disk,
+        clock: () => now,
+      );
+    });
+
+    test('a page read is saved as the site sent it, with the time', () async {
+      await saving.page(130);
+
+      expect(disk.saved[130]?.body, _page(130));
+      expect(disk.saved[130]?.savedAt, now);
+    });
+
+    test('when the site cannot be reached the saved copy is shown', () async {
+      await saving.page(130);
+      final DateTime savedAt = now;
+      now = now.add(const Duration(hours: 3));
+      fetcher.route('/api/get/', const NetworkException('no signal'));
+
+      final TextTvResult result = await saving.page(130, fresh: true);
+
+      expect(result, isA<TextTvShown>());
+      final TextTvShown shown = result as TextTvShown;
+      expect(shown.page.number, 130);
+      expect(shown.cachedAt, savedAt);
+    });
+
+    test('a saved copy from an earlier run is shown too', () async {
+      disk.saved[130] = SavedPage(
+        _page(130, line: 'Yesterday'),
+        DateTime(2026, 9, 27),
+      );
+      fetcher.route('/api/get/', const NetworkException('no signal'));
+
+      final TextTvShown shown = await saving.page(130) as TextTvShown;
+
+      expect(shown.page.parts.first, <String>['Yesterday']);
+      expect(shown.cachedAt, DateTime(2026, 9, 27));
+    });
+
+    test('with no saved copy a failure still says why', () async {
+      fetcher.route('/api/get/', const NetworkException('no signal'));
+
+      final TextTvResult result = await saving.page(130);
+
+      expect(result, isA<TextTvFailed>());
+      expect((result as TextTvFailed).reason, 'no signal');
+    });
+
+    test('a saved copy that cannot be read is ignored', () async {
+      disk.saved[130] = SavedPage('not json', now);
+      fetcher.route('/api/get/', const NetworkException('no signal'));
+
+      expect(await saving.page(130), isA<TextTvFailed>());
+    });
+
+    test('a page that is not in broadcast is forgotten from disk', () async {
+      await saving.page(130);
+      fetcher.route('/api/get/', '[]');
+
+      final TextTvResult result = await saving.page(130, fresh: true);
+
+      expect(result, isA<TextTvNotBroadcast>());
+      expect(disk.saved, isEmpty);
+    });
+
+    test('a page read again after a failure is a plain page again', () async {
+      await saving.page(130);
+      fetcher.route('/api/get/', const NetworkException('no signal'));
+      await saving.page(130, fresh: true);
+      fetcher.route('/api/get/', (Uri url) => _page(130, line: 'Back'));
+
+      final TextTvShown shown =
+          await saving.page(130, fresh: true) as TextTvShown;
+
+      expect(shown.cachedAt, isNull);
+      expect(shown.page.parts.first, <String>['Back']);
+    });
+
+    test('cached gives the copy held in memory, without asking', () async {
+      await saving.page(130);
+      fetcher.requests.clear();
+
+      final TextTvShown? held = await saving.cached(130);
+
+      expect(held?.page.number, 130);
+      expect(held?.cachedAt, isNull);
+      expect(fetcher.requests, isEmpty);
+    });
+
+    test('cached falls back to the disk, and to nothing', () async {
+      disk.saved[130] = SavedPage(_page(130, line: 'On disk'), now);
+
+      final TextTvShown? held = await saving.cached(130);
+
+      expect(held?.page.parts.first, <String>['On disk']);
+      expect(held?.cachedAt, isNull, reason: 'not marked as offline');
+      expect(await saving.cached(131), isNull);
+      expect(fetcher.requests, isEmpty);
+    });
+
+    test('without a disk cache a failure is a failure', () async {
+      await repository.page(130);
+      fetcher.route('/api/get/', const NetworkException('no signal'));
+
+      expect(await repository.page(130, fresh: true), isA<TextTvFailed>());
+      expect(await repository.cached(131), isNull);
+    });
+  });
+}
+
+class _MemoryDisk implements PageDiskCache {
+  final Map<int, SavedPage> saved = <int, SavedPage>{};
+
+  @override
+  Future<SavedPage?> read(int number) async => saved[number];
+
+  @override
+  Future<void> write(int number, String body, DateTime at) async =>
+      saved[number] = SavedPage(body, at);
+
+  @override
+  Future<void> remove(int number) async => saved.remove(number);
 }
