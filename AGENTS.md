@@ -13,6 +13,7 @@ Start with the index in [`.agents/README.md`](.agents/README.md), then:
 - New screen, widget or service; where code lives; how Text TV behaves → [.agents/architecture.md](.agents/architecture.md)
 - Manifest, Gradle, signing, permissions → [.agents/android.md](.agents/android.md)
 - Tests / finishing work → [.agents/testing-and-quality.md](.agents/testing-and-quality.md)
+- What to build next → [.agents/improvements.md](.agents/improvements.md)
 
 ## Non-negotiables
 1. `model/` is pure Dart and unit-tested; UI only renders state and forwards input.
@@ -23,4 +24,4 @@ Start with the index in [`.agents/README.md`](.agents/README.md), then:
 6. Send this app's own `app` id to texttv.nu (`texttv_android`), never another app's.
 7. Before calling work done: `dart format`, `flutter analyze`, `flutter test` all clean (and `flutter build apk --debug` after touching `android/`).
 8. Small steps; add or update a test with every behaviour change.
-9. The improvement backlog (offline cache, zoom, search, ...) is on hold until the user says the ported viewer is working; do not start it unprompted.
+9. Work from [.agents/improvements.md](.agents/improvements.md) one item at a time, and only the items the user asks for.

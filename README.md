@@ -2,7 +2,7 @@
 
 An Android viewer for **SVT Text**, Swedish teletext (pages 100–899), in its own colours and block graphics. It reads the public [texttv.nu](https://texttv.nu) API.
 
-Personal project, built with Flutter. It started as the Text TV module of my Tile Launcher and is now its own app.
+Personal project, built with Flutter.
 
 ## Features
 
