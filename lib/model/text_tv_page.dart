@@ -8,6 +8,22 @@ const int textTvColumns = 40;
 const int textTvFirstPage = 100;
 const int textTvLastPage = 899;
 
+/// A step on the way from the start page down to a page: `Hem > Sport >
+/// Resultatbörsen > Målservice`. [name] is the site's own (Swedish) word.
+class Crumb {
+  const Crumb(this.name, this.page);
+
+  final String name;
+  final int page;
+
+  @override
+  bool operator ==(Object other) =>
+      other is Crumb && other.name == name && other.page == page;
+
+  @override
+  int get hashCode => Object.hash(name, page);
+}
+
 /// One page of Swedish Text TV as plain text. A page can be several [parts]
 /// (sub-pages), each a grid of up to [textTvColumns] characters per line.
 class TextTvPage {
@@ -17,6 +33,10 @@ class TextTvPage {
     this.styledParts,
     this.previous,
     this.next,
+    this.updatedUnix,
+    this.id,
+    this.permalink,
+    this.breadcrumbs,
   });
 
   final int number;
@@ -33,6 +53,18 @@ class TextTvPage {
   /// Neighbouring page numbers, when the service says what they are.
   final int? previous;
   final int? next;
+
+  /// When the site last changed this page, in Unix seconds (the site's own
+  /// clock, so it can be given back to ask whether there is something newer).
+  final int? updatedUnix;
+
+  /// The site's id of this version of the page, and the link that names it
+  /// (the page as it was now, not whatever it says tomorrow).
+  final String? id;
+  final String? permalink;
+
+  /// The way down to this page from the start page, when the site says it.
+  final List<Crumb>? breadcrumbs;
 }
 
 /// What the viewer gets back for a page: the page, or why

@@ -63,6 +63,10 @@ class TextTv {
       styledParts: _styled(page['content'], parts.length),
       previous: _pageNumber(page['prev_page']),
       next: _pageNumber(page['next_page']),
+      updatedUnix: _int(page['date_updated_unix']),
+      id: _text(page['id']),
+      permalink: _link(page['permalink']),
+      breadcrumbs: _crumbs(page['breadcrumbs']),
     );
   }
 
@@ -93,6 +97,37 @@ class TextTv {
   }
 
   int? _pageNumber(Object? value) => int.tryParse('$value');
+
+  int? _int(Object? value) => value == null ? null : int.tryParse('$value');
+
+  String? _text(Object? value) {
+    final String? text = value == null ? null : '$value'.trim();
+    return text == null || text.isEmpty ? null : text;
+  }
+
+  /// A link of the site's own, nothing else: what the answer names as a link is
+  /// shared with others, so it is not taken on trust.
+  String? _link(Object? value) {
+    final String? text = _text(value);
+    final Uri? uri = text == null ? null : Uri.tryParse(text);
+    return uri != null &&
+            uri.scheme == 'https' &&
+            uri.host.endsWith('texttv.nu')
+        ? text
+        : null;
+  }
+
+  List<Crumb>? _crumbs(Object? value) {
+    if (value is! List) return null;
+    final List<Crumb> crumbs = <Crumb>[
+      for (final Object? entry in value)
+        if (entry is Map)
+          if (_pageNumber(entry['num']) case final int page
+              when page >= textTvFirstPage && page <= textTvLastPage)
+            Crumb('${entry['name'] ?? ''}'.trim(), page),
+    ];
+    return crumbs.isEmpty ? null : crumbs;
+  }
 
   NetworkException get _unexpected => const NetworkException(
     'texttv.nu sent an answer I could not read',
