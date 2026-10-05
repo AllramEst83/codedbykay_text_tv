@@ -24,6 +24,7 @@ All must pass (CI runs the same, plus `flutter build apk --debug`). If something
 - Write the failing test first for bugs; add a regression test with every fix.
 - Deterministic tests: no wall-clock, network or randomness without injection.
 - `flutter test` does not load the pixel font, so text layout is checked by geometry (rects, sizes), not by eye. Size-based assertions are easy to write so they pass for the wrong reason: when adding one, reintroduce the bug and confirm the test fails.
+- Goldens (`test/golden`, tag `golden`) load the real font and are made on one OS: CI runs `flutter test --exclude-tags golden`; check them by hand with `flutter test --tags golden` and update with `--update-goldens` after an intended visual change. A plain `flutter test` on another OS than the one that made them will fail them.
 - Tests load fixtures by file path relative to the repo root (`test/fixtures/...`), so run `flutter test` from the root.
 
 ## Review checklist

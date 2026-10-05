@@ -21,5 +21,7 @@ jobs:
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed .
       - run: flutter analyze
-      - run: flutter test
+      # The golden pictures are made on one machine's font rendering (see
+      # test/golden); they are checked by hand, not here.
+      - run: flutter test --exclude-tags golden
       - run: flutter build apk --debug
