@@ -6,6 +6,7 @@ import 'package:codedbykay_text_tv/ui/crt_screen.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
+import 'package:codedbykay_text_tv/ui/tv_option_rows.dart';
 import 'package:codedbykay_text_tv/ui/tv_row.dart';
 import 'package:flutter/material.dart';
 
@@ -67,7 +68,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   TvMetrics.margin * 2,
                 ),
                 children: <Widget>[
-                  _SwitchRow(
+                  TvSwitchRow(
+                    switchKey: textTvCrtSwitchKey,
                     label: Messages.crtEffect,
                     value: on,
                     onChanged: (bool v) => _set(_crt.copyWith(enabled: v)),
@@ -75,7 +77,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: TvMetrics.margin),
                   _Preview(settings: _crt),
                   const SizedBox(height: TvMetrics.margin),
-                  _SliderRow(
+                  TvSliderRow(
                     sliderKey: textTvCrtCurveKey,
                     label: Messages.crtCurve,
                     value: _crt.curve,
@@ -85,7 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ? (double v) => _set(_crt.copyWith(curve: v))
                         : null,
                   ),
-                  _SliderRow(
+                  TvSliderRow(
                     sliderKey: textTvCrtDepthKey,
                     label: Messages.crtScanDepth,
                     value: _crt.scanDepth,
@@ -95,7 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ? (double v) => _set(_crt.copyWith(scanDepth: v))
                         : null,
                   ),
-                  _SliderRow(
+                  TvSliderRow(
                     sliderKey: textTvCrtPeriodKey,
                     label: Messages.crtScanPeriod,
                     value: _crt.scanPeriod,
@@ -127,109 +129,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// [value] as a share of its range, for people, not for the shader.
   static String _percent(double value, double min, double max) =>
       '${((value - min) / (max - min) * 100).round()}%';
-}
-
-class _SwitchRow extends StatelessWidget {
-  const _SwitchRow({
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final String label;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      container: true,
-      label: label,
-      toggled: value,
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: ExcludeSemantics(
-              child: Text(label, style: tvText(12, TvColors.white)),
-            ),
-          ),
-          Switch(
-            key: textTvCrtSwitchKey,
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: TvColors.black,
-            activeTrackColor: TvColors.highlight,
-            inactiveThumbColor: TvColors.white,
-            inactiveTrackColor: TvColors.black,
-            trackOutlineColor: WidgetStatePropertyAll<Color>(
-              value ? TvColors.highlight : TvColors.border,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SliderRow extends StatelessWidget {
-  const _SliderRow({
-    required this.sliderKey,
-    required this.label,
-    required this.value,
-    required this.text,
-    required this.onChanged,
-    this.min = 0,
-    required this.max,
-  });
-
-  final Key sliderKey;
-  final String label;
-  final double value;
-  final double min;
-  final double max;
-
-  /// The value as shown next to the label.
-  final String text;
-
-  /// Null greys the slider, for when the effect is off.
-  final ValueChanged<double>? onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color colour = onChanged == null ? TvColors.dim : TvColors.white;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(child: Text(label, style: tvText(10, colour))),
-            Text(text, style: tvText(10, colour)),
-          ],
-        ),
-        SliderTheme(
-          data: SliderThemeData(
-            activeTrackColor: TvColors.highlight,
-            inactiveTrackColor: TvColors.border,
-            thumbColor: TvColors.highlight,
-            disabledActiveTrackColor: TvColors.dim,
-            disabledInactiveTrackColor: TvColors.border,
-            disabledThumbColor: TvColors.dim,
-            overlayColor: TvColors.highlight.withValues(alpha: 0.2),
-            trackHeight: 4,
-          ),
-          child: Slider(
-            key: sliderKey,
-            value: value.clamp(min, max),
-            min: min,
-            max: max,
-            divisions: 20,
-            semanticFormatterCallback: (double v) => '$label $text',
-            onChanged: onChanged,
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 /// A few rows of teletext, drawn as the page will be, so a slider can be

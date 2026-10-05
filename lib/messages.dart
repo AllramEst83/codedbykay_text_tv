@@ -19,6 +19,15 @@ abstract final class Messages {
   static String pixels(double value) => '${value.toStringAsFixed(1)} PX';
   static const String readerOn = 'Reader mode';
   static const String readerOff = 'Show the teletext page';
+  static const String readerOptions = 'Reader options';
+  static const String readerOptionsTitle = 'READER OPTIONS';
+  static const String lineSpacing = 'LINE SPACING';
+  static const String letterSpacing = 'LETTER SPACING';
+  static const String margins = 'MARGINS';
+  static const String boldText = 'BOLD TEXT';
+  static String times(double value) => 'x${value.toStringAsFixed(2)}';
+  static String percent(double fraction) => '${(fraction * 100).round()}%';
+  static String logicalPixels(double value) => '${value.round()} PX';
   static const String smallerText = 'Smaller text';
   static const String largerText = 'Larger text';
   static const String readerLoading = 'Loading…';

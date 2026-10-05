@@ -1,5 +1,6 @@
 import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
+import 'package:codedbykay_text_tv/ui/reader_options_sheet.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
@@ -39,6 +40,17 @@ class ReaderBar extends StatelessWidget {
               onTap: settings.size < readerTextSizes.length - 1
                   ? () => onChanged(settings.copyWith(size: settings.size + 1))
                   : null,
+            ),
+            const SizedBox(width: TvMetrics.gutter),
+            TvIconButton(
+              key: textTvReaderOptionsKey,
+              icon: (Color colour) => Icon(Icons.tune, color: colour, size: 26),
+              semanticLabel: Messages.readerOptions,
+              onTap: () => showReaderOptions(
+                context,
+                settings: settings,
+                onChanged: onChanged,
+              ),
             ),
             const SizedBox(width: TvMetrics.margin),
             for (final ReaderTheme theme in ReaderTheme.values)

@@ -95,10 +95,12 @@ TextStyle readerTextStyle(
   Color colour, {
   FontWeight? weight,
   double height = 1.5,
+  double letterSpacing = 0,
 }) => TextStyle(
   fontFamily: kReaderFontFamily,
   fontSize: size,
   height: height,
   color: colour,
   fontWeight: weight,
+  letterSpacing: letterSpacing,
 );

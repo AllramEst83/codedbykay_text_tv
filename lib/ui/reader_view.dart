@@ -37,7 +37,13 @@ class ReaderView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ReaderPalette palette = readerPalette(settings.theme);
-    final TextStyle base = readerTextStyle(settings.fontSize, palette.text);
+    final TextStyle base = readerTextStyle(
+      settings.fontSize,
+      palette.text,
+      height: settings.lineHeight,
+      letterSpacing: settings.letterSpacingEm * settings.fontSize,
+      weight: settings.bold ? FontWeight.w700 : null,
+    );
     final TextTvResult? shown = result;
     final Widget content;
     if (loading || shown == null) {
@@ -94,14 +100,29 @@ class _Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double size = settings.fontSize;
-    final TextStyle body = readerTextStyle(size, palette.text);
+    final double tracking = settings.letterSpacingEm * size;
+    final TextStyle body = readerTextStyle(
+      size,
+      palette.text,
+      height: settings.lineHeight,
+      letterSpacing: tracking,
+      weight: settings.bold ? FontWeight.w700 : null,
+    );
+    // A heading is tighter than the text under it, by the same step.
     final TextStyle heading = readerTextStyle(
       size * 1.3,
       palette.text,
-      weight: FontWeight.w700,
-      height: 1.25,
+      weight: settings.bold ? FontWeight.w900 : FontWeight.w700,
+      height: (settings.lineHeight - 0.25).clamp(1.1, 2.0),
+      letterSpacing: tracking * 1.3,
     );
-    final TextStyle dim = readerTextStyle(size * 0.75, palette.dim);
+    final TextStyle dim = readerTextStyle(
+      size * 0.75,
+      palette.dim,
+      height: settings.lineHeight,
+      letterSpacing: tracking * 0.75,
+      weight: settings.bold ? FontWeight.w700 : null,
+    );
 
     Widget tappable(int page, String label, Widget child) => Semantics(
       button: true,
@@ -187,7 +208,12 @@ class _Page extends StatelessWidget {
       });
     }
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+      padding: EdgeInsets.fromLTRB(
+        settings.marginWidth,
+        16,
+        settings.marginWidth,
+        32,
+      ),
       children: children,
     );
   }
