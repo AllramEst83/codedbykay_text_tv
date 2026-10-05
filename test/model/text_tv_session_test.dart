@@ -16,7 +16,6 @@ void main() {
         page: 377,
         part: 2,
         history: <int>[100, 300],
-        zoom: 3,
       );
 
       expect(TextTvSession.decode(session.encode()), session);
@@ -40,23 +39,6 @@ void main() {
           reason: page,
         );
       }
-    });
-
-    test('the zoom is a step of the size table, else the first', () {
-      expect(TextTvSession.decode('{"page": 300, "zoom": 2}').zoom, 2);
-      expect(TextTvSession.decode('{"page": 300}').zoom, 0);
-      for (final String bad in <String>['-1', '5', '99', '"x"', '1.5']) {
-        expect(
-          TextTvSession.decode('{"page": 300, "zoom": $bad}'),
-          const TextTvSession(page: 300),
-          reason: bad,
-        );
-      }
-    });
-
-    test('zoomFactor is the step in the table', () {
-      expect(const TextTvSession().zoomFactor, 1);
-      expect(const TextTvSession(zoom: 4).zoomFactor, textTvZoomSteps.last);
     });
 
     test('a bad part becomes 0 and keeps the page', () {

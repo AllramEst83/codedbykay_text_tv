@@ -2,7 +2,6 @@
 
 ## Unreleased
 
-- Text size (I-3a): `A-` / `A+` enlarge the page in five steps (up to 3x), panning sideways when it is wider than the screen; the size is remembered.
 - Offline cache (I-1): pages read are saved on the phone and shown at once; when the site cannot be reached the saved copy is shown with "OFFLINE. SAVED 14:32".
 - Remembers where you were (I-2): the last page, part and history survive restarts.
 - First version: the Text TV viewer (texttv.nu client, HTML-to-coloured-rows parser, block-graphics decoder, cache, viewer with page links, number pad, shortcuts, parts and swipes), with its own flat black look, CI, and agent guidelines in `.agents/`.

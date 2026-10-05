@@ -42,7 +42,6 @@ class TextTvScreen extends StatefulWidget {
 class _TextTvScreenState extends State<TextTvScreen> {
   late int _number = widget.initial.page;
   late int _part = widget.initial.part;
-  late int _zoom = widget.initial.zoom;
   TextTvResult? _result;
   bool _loading = true;
 
@@ -64,19 +63,8 @@ class _TextTvScreenState extends State<TextTvScreen> {
 
   /// Tells the listener where the reader is now.
   void _report() => widget.onSessionChanged?.call(
-    TextTvSession(
-      page: _number,
-      part: _part,
-      history: List<int>.of(_history),
-      zoom: _zoom,
-    ),
+    TextTvSession(page: _number, part: _part, history: List<int>.of(_history)),
   );
-
-  void _setZoom(int zoom) {
-    if (zoom < 0 || zoom >= textTvZoomSteps.length) return;
-    setState(() => _zoom = zoom);
-    _report();
-  }
 
   Future<void> _load(int number, {bool fresh = false, int part = 0}) async {
     final int request = ++_request;
@@ -224,10 +212,6 @@ class _TextTvScreenState extends State<TextTvScreen> {
           children: <Widget>[
             TvTopBar(
               onRefresh: _loading ? null : () => _load(_number, fresh: true),
-              onSmaller: _zoom > 0 ? () => _setZoom(_zoom - 1) : null,
-              onLarger: _zoom < textTvZoomSteps.length - 1
-                  ? () => _setZoom(_zoom + 1)
-                  : null,
             ),
             Expanded(
               child: ColoredBox(
@@ -244,7 +228,6 @@ class _TextTvScreenState extends State<TextTvScreen> {
                           part: _part,
                           loading: _loading,
                           result: _result,
-                          zoom: textTvZoomSteps[_zoom],
                           onLink: (String command) {
                             final int? page = int.tryParse(command);
                             if (page != null) _open(page);

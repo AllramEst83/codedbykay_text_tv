@@ -18,18 +18,9 @@ TextStyle tvText(double size, Color colour) =>
 
 /// The bar above the page: the name, and REFRESH.
 class TvTopBar extends StatelessWidget {
-  const TvTopBar({
-    super.key,
-    required this.onRefresh,
-    required this.onSmaller,
-    required this.onLarger,
-  });
+  const TvTopBar({super.key, required this.onRefresh});
 
   final VoidCallback? onRefresh;
-
-  /// Text size down and up; null at the end of the range.
-  final VoidCallback? onSmaller;
-  final VoidCallback? onLarger;
 
   @override
   Widget build(BuildContext context) {
@@ -40,27 +31,8 @@ class TvTopBar extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-              child: Text(
-                Messages.title,
-                style: tvText(14, TvColors.white),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              child: Text(Messages.title, style: tvText(14, TvColors.white)),
             ),
-            TvButton(
-              key: textTvSmallerKey,
-              label: 'A-',
-              semanticLabel: Messages.smallerText,
-              onTap: onSmaller,
-            ),
-            const SizedBox(width: TvMetrics.gutter),
-            TvButton(
-              key: textTvLargerKey,
-              label: 'A+',
-              semanticLabel: Messages.largerText,
-              onTap: onLarger,
-            ),
-            const SizedBox(width: TvMetrics.gutter),
             TvButton(
               key: textTvRefreshKey,
               label: Messages.refresh,
@@ -131,18 +103,10 @@ class TvPartBar extends StatelessWidget {
 
 /// A bordered text button in the viewer's flat look; a `null` [onTap] greys it.
 class TvButton extends StatelessWidget {
-  const TvButton({
-    super.key,
-    required this.label,
-    required this.onTap,
-    this.semanticLabel,
-  });
+  const TvButton({super.key, required this.label, required this.onTap});
 
   final String label;
   final VoidCallback? onTap;
-
-  /// What a screen reader says when the label is not words (`A+`).
-  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -157,11 +121,7 @@ class TvButton extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: colour, width: TvMetrics.border),
         ),
-        child: Text(
-          label,
-          style: tvText(12, colour),
-          semanticsLabel: semanticLabel,
-        ),
+        child: Text(label, style: tvText(12, colour)),
       ),
     );
   }
