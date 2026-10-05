@@ -1,4 +1,4 @@
-package com.codedbykay.codedbykay_text_tv
+package com.codedbykay.texttv
 
 import io.flutter.embedding.android.FlutterActivity
 
