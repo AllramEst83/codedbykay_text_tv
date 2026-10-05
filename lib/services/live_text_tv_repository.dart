@@ -1,3 +1,4 @@
+import 'package:codedbykay_text_tv/model/feed.dart';
 import 'package:codedbykay_text_tv/model/page_search.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/services/network_exception.dart';
@@ -107,6 +108,26 @@ class LiveTextTvRepository implements TextTvRepository {
     return saved == null
         ? null
         : TextTvShown(saved.page, readAt: saved.cachedAt);
+  }
+
+  final Map<FeedKind, (List<FeedItem>, DateTime)> _feeds =
+      <FeedKind, (List<FeedItem>, DateTime)>{};
+
+  /// How long a list is kept before the site is asked again.
+  static const Duration feedAge = Duration(minutes: 1);
+
+  @override
+  Future<List<FeedItem>?> feed(FeedKind kind) async {
+    final (List<FeedItem>, DateTime)? kept = _feeds[kind];
+    if (kept != null && clock().difference(kept.$2) < feedAge) return kept.$1;
+    try {
+      final List<FeedItem> items = await textTv.feed(kind);
+      _feeds[kind] = (items, clock());
+      return items;
+    } on NetworkException {
+      // An old list is better than none.
+      return kept?.$1;
+    }
   }
 
   @override

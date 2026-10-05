@@ -4,6 +4,8 @@ Text TV has no account, no ads, no analytics and no tracking.
 
 **What leaves the phone.** Only the request for a page: its number (100–899), sent to `texttv.nu` over HTTPS, for a page you open, or, if you have put the home-screen widget on a home screen, for the widget's page and, if you turn on breaking-news alerts, the alert page, every 30 minutes to 3 hours (your choice; nothing is requested in the background with neither a widget nor alerts), together with the app's identifier `texttv_android` (the site's API asks every app to send one). Like any web request, it reveals the phone's IP address to that site. Nothing else is sent anywhere; the app has no other server and no third-party code that phones home.
 
+The lists under the newspaper chip (what changed lately, what is read most) are asked of `texttv.nu` only when you open them.
+
 **What stays on the phone.** The page you were on and your history, the pages you have read (a cache of up to 200 pages, for offline use and search), your favourites and recent pages, and your settings. Uninstalling the app removes all of it. Sharing or copying a page happens only when you choose it, through the phone's own share sheet.
 
 **Permissions.** Internet access; and, only if you turn on alerts, permission to show notifications (Android 13 and later ask). The background refresh uses Android's normal job scheduling, which needs no extra permission.

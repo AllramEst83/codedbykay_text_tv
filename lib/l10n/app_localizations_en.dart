@@ -320,6 +320,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failureOther => 'Something went wrong.';
 
   @override
+  String get newsTitle => 'WHAT\'S NEW';
+
+  @override
+  String get newsLabel => 'What\'s new';
+
+  @override
+  String get feedNews => 'NEWS';
+
+  @override
+  String get feedSport => 'SPORT';
+
+  @override
+  String get feedMostRead => 'MOST READ';
+
+  @override
+  String get feedFailed => 'THE LIST COULD NOT BE READ.';
+
+  @override
+  String get feedEmpty => 'NOTHING TO SHOW.';
+
+  @override
+  String get feedHint =>
+      'FROM TEXTTV.NU: THE PAGES CHANGED LATELY, AND THE ONES READ MOST TODAY.';
+
+  @override
   String get search => 'Search';
 
   @override

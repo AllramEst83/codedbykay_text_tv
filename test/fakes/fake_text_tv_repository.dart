@@ -1,3 +1,4 @@
+import 'package:codedbykay_text_tv/model/feed.dart';
 import 'package:codedbykay_text_tv/model/page_search.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
@@ -46,6 +47,18 @@ class FakeTextTvRepository implements TextTvRepository {
   @override
   Future<void> prefetch(int number) async {
     prefetched.add(number);
+  }
+
+  /// What [feed] gives for each kind; a kind not here has no list.
+  final Map<FeedKind, List<FeedItem>> feeds = <FeedKind, List<FeedItem>>{};
+
+  /// Every kind of list asked for, in order.
+  final List<FeedKind> feedRequests = <FeedKind>[];
+
+  @override
+  Future<List<FeedItem>?> feed(FeedKind kind) async {
+    feedRequests.add(kind);
+    return feeds[kind];
   }
 
   /// Every query searched for, in order.

@@ -1,5 +1,6 @@
 import 'package:codedbykay_text_tv/l10n/app_localizations.dart';
 import 'package:codedbykay_text_tv/l10n/app_localizations_en.dart';
+import 'package:codedbykay_text_tv/model/feed.dart';
 import 'package:codedbykay_text_tv/model/language_settings.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/page_font_settings.dart';
@@ -52,6 +53,12 @@ extension AppWording on AppLocalizations {
     0 => every30Min,
     1 => every1Hour,
     _ => every3Hours,
+  };
+
+  String feedName(FeedKind kind) => switch (kind) {
+    FeedKind.latestNews => feedNews,
+    FeedKind.latestSport => feedSport,
+    FeedKind.mostRead => feedMostRead,
   };
 
   String languageName(AppLanguage language) => switch (language) {

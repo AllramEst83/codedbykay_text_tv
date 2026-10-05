@@ -668,6 +668,54 @@ abstract class AppLocalizations {
   /// **'Something went wrong.'**
   String get failureOther;
 
+  /// No description provided for @newsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WHAT\'S NEW'**
+  String get newsTitle;
+
+  /// No description provided for @newsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new'**
+  String get newsLabel;
+
+  /// No description provided for @feedNews.
+  ///
+  /// In en, this message translates to:
+  /// **'NEWS'**
+  String get feedNews;
+
+  /// No description provided for @feedSport.
+  ///
+  /// In en, this message translates to:
+  /// **'SPORT'**
+  String get feedSport;
+
+  /// No description provided for @feedMostRead.
+  ///
+  /// In en, this message translates to:
+  /// **'MOST READ'**
+  String get feedMostRead;
+
+  /// No description provided for @feedFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'THE LIST COULD NOT BE READ.'**
+  String get feedFailed;
+
+  /// No description provided for @feedEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'NOTHING TO SHOW.'**
+  String get feedEmpty;
+
+  /// No description provided for @feedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'FROM TEXTTV.NU: THE PAGES CHANGED LATELY, AND THE ONES READ MOST TODAY.'**
+  String get feedHint;
+
   /// No description provided for @search.
   ///
   /// In en, this message translates to:

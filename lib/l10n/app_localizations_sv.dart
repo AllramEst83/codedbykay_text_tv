@@ -321,6 +321,31 @@ class AppLocalizationsSv extends AppLocalizations {
   String get failureOther => 'Något gick fel.';
 
   @override
+  String get newsTitle => 'VAD ÄR NYTT';
+
+  @override
+  String get newsLabel => 'Vad är nytt';
+
+  @override
+  String get feedNews => 'NYHETER';
+
+  @override
+  String get feedSport => 'SPORT';
+
+  @override
+  String get feedMostRead => 'MEST LÄSTA';
+
+  @override
+  String get feedFailed => 'LISTAN KUNDE INTE LÄSAS.';
+
+  @override
+  String get feedEmpty => 'INGET ATT VISA.';
+
+  @override
+  String get feedHint =>
+      'FRÅN TEXTTV.NU: SIDOR SOM NYSS UPPDATERATS OCH DAGENS MEST LÄSTA.';
+
+  @override
   String get search => 'Sök';
 
   @override

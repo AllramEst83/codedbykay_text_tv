@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:codedbykay_text_tv/model/feed.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_html.dart';
@@ -30,6 +31,22 @@ class TextTv {
       'includePlainTextContent': '1',
     });
     return _fetcher.get(url);
+  }
+
+  /// One of the site's lists (`api/last_updated/news`, `.../sport`,
+  /// `api/most_read`). Throws [NetworkException] when the site cannot be
+  /// reached or the answer is not a list.
+  Future<List<FeedItem>> feed(FeedKind kind) async {
+    final String path = switch (kind) {
+      FeedKind.latestNews => '/api/last_updated/news',
+      FeedKind.latestSport => '/api/last_updated/sport',
+      FeedKind.mostRead => '/api/most_read',
+    };
+    final List<FeedItem>? items = parseFeed(
+      await _fetcher.get(Uri.https('texttv.nu', path, {'app': _app})),
+    );
+    if (items == null) throw _unexpected;
+    return items;
   }
 
   /// Whether the site has a newer version of [number] than the one changed at

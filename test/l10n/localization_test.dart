@@ -62,6 +62,7 @@ void main() {
         'themeBeige',
         'fontSystem',
         'langSystem',
+        'feedSport',
         'every30Min',
         'pageFontPixel',
         'pageFontBedstead',

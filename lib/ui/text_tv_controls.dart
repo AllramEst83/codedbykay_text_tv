@@ -298,10 +298,14 @@ class TvShortcuts extends StatelessWidget {
     required this.current,
     required this.onOpen,
     required this.onRecents,
+    this.onNews,
   });
 
   /// Opens the list of pages read last: the chip that starts the row.
   final VoidCallback onRecents;
+
+  /// Opens the lists of what is new (the chip after that one); none without it.
+  final VoidCallback? onNews;
 
   /// The chips, in order.
   final List<Favourite> favourites;
@@ -327,11 +331,42 @@ class TvShortcuts extends StatelessWidget {
         ),
       ),
     );
+    final VoidCallback? openNews = onNews;
+    final List<Widget> starters = <Widget>[
+      history,
+      const SizedBox(width: TvMetrics.gutter),
+      if (openNews != null) ...<Widget>[
+        InkWell(
+          key: textTvNewsKey,
+          onTap: openNews,
+          child: Semantics(
+            button: true,
+            label: context.l10n.newsLabel,
+            excludeSemantics: true,
+            child: Container(
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: TvColors.border,
+                  width: TvMetrics.border,
+                ),
+              ),
+              child: const Icon(
+                Icons.newspaper,
+                color: TvColors.white,
+                size: 26,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: TvMetrics.gutter),
+      ],
+    ];
     if (favourites.isEmpty) {
       return Row(
         children: <Widget>[
-          history,
-          const SizedBox(width: TvMetrics.gutter),
+          ...starters,
           Expanded(
             child: Text(
               context.l10n.favouritesHint,
@@ -346,8 +381,7 @@ class TvShortcuts extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: <Widget>[
-          history,
-          const SizedBox(width: TvMetrics.gutter),
+          ...starters,
           for (final Favourite favourite in favourites) ...<Widget>[
             InkWell(
               key: textTvChipKey(favourite.page),

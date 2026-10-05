@@ -22,6 +22,7 @@ import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 import 'package:codedbykay_text_tv/ui/breadcrumbs.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
+import 'package:codedbykay_text_tv/ui/news_sheet.dart';
 import 'package:codedbykay_text_tv/ui/page_snapshot.dart';
 import 'package:codedbykay_text_tv/ui/page_turn.dart';
 import 'package:codedbykay_text_tv/ui/reader_bar.dart';
@@ -663,6 +664,10 @@ class _TextTvScreenState extends State<TextTvScreen>
     );
   }
 
+  void _openNews() {
+    showNewsSheet(context, feed: widget.repository.feed, onOpen: _open);
+  }
+
   void _openSearch() {
     showSearchSheet(context, search: widget.repository.search, onOpen: _open);
   }
@@ -888,6 +893,7 @@ class _TextTvScreenState extends State<TextTvScreen>
                         current: _number,
                         onOpen: _open,
                         onRecents: _openRecents,
+                        onNews: _openNews,
                       ),
                     ] else if (_keypad)
                       TvKeypad(
@@ -901,6 +907,7 @@ class _TextTvScreenState extends State<TextTvScreen>
                         current: _number,
                         onOpen: _open,
                         onRecents: _openRecents,
+                        onNews: _openNews,
                       ),
                   ],
                 ),

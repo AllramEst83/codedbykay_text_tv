@@ -1,3 +1,4 @@
+import 'package:codedbykay_text_tv/model/feed.dart';
 import 'package:codedbykay_text_tv/model/language_settings.dart';
 import 'package:codedbykay_text_tv/model/page_font_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
@@ -91,3 +92,9 @@ const Key textTvBreadcrumbsSwitchKey = ValueKey<String>(
   'text-tv-breadcrumbs-switch',
 );
 Key textTvCrumbKey(int page) => ValueKey<String>('text-tv-crumb-$page');
+const Key textTvNewsKey = ValueKey<String>('text-tv-news');
+Key textTvFeedKindKey(FeedKind kind) =>
+    ValueKey<String>('text-tv-feed-${kind.name}');
+Key textTvFeedItemKey(int page) => ValueKey<String>('text-tv-feed-item-$page');
+const Key textTvFeedEmptyKey = ValueKey<String>('text-tv-feed-empty');
+const Key textTvFeedFailedKey = ValueKey<String>('text-tv-feed-failed');

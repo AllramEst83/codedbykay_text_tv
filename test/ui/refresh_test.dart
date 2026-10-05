@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:codedbykay_text_tv/model/feed.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/page_search.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
@@ -115,6 +116,9 @@ class _SlowRepository implements TextTvRepository {
 
   @override
   Future<List<SearchHit>> search(String query) async => const <SearchHit>[];
+
+  @override
+  Future<List<FeedItem>?> feed(FeedKind kind) async => null;
 }
 
 void main() {
