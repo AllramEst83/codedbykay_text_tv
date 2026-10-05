@@ -1,7 +1,10 @@
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/fastext.dart';
+import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/ui/glasses_icon.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
+import 'package:codedbykay_text_tv/ui/tv_row.dart';
 import 'package:flutter/material.dart';
 
 /// The pages people actually open, one tap away.
@@ -300,50 +303,123 @@ class TvShortcuts extends StatelessWidget {
   }
 }
 
-/// A number pad, like a remote's: 1 to 9, then DEL, 0, and a key that puts it
-/// away. The third digit opens the page.
-class TvKeypad extends StatelessWidget {
-  const TvKeypad({
-    super.key,
-    required this.onDigit,
-    required this.onDelete,
-    required this.onClose,
-  });
+/// The digits, always at hand like a remote's: 1 to 5 over 6 to 9 and 0. A page
+/// number starts with 1 to 8, so 0 and 9 are greyed until a first digit is in;
+/// the third digit opens the page (the screen decides, [onDigit] only says
+/// which key).
+class TvDigitPad extends StatelessWidget {
+  const TvDigitPad({super.key, required this.typed, required this.onDigit});
 
+  /// What has been typed so far, `''` to `'12'`.
+  final String typed;
   final ValueChanged<int> onDigit;
-  final VoidCallback onDelete;
-  final VoidCallback onClose;
+
+  static const List<List<int>> _rows = <List<int>>[
+    <int>[1, 2, 3, 4, 5],
+    <int>[6, 7, 8, 9, 0],
+  ];
 
   @override
   Widget build(BuildContext context) {
-    Widget key(Key key, String label, VoidCallback onTap) => Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(2),
-        child: TvButton(key: key, label: label, onTap: onTap),
-      ),
-    );
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        for (final int row in <int>[0, 1, 2])
+        for (final List<int> row in _rows)
           Row(
             children: <Widget>[
-              for (final int digit in <int>[
-                row * 3 + 1,
-                row * 3 + 2,
-                row * 3 + 3,
-              ])
-                key(textTvDigitKey(digit), '$digit', () => onDigit(digit)),
+              for (final int digit in row)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(2),
+                    child: TvButton(
+                      key: textTvDigitKey(digit),
+                      label: '$digit',
+                      onTap: typed.isEmpty && (digit < 1 || digit > 8)
+                          ? null
+                          : () => onDigit(digit),
+                    ),
+                  ),
+                ),
             ],
           ),
-        Row(
-          children: <Widget>[
-            key(textTvDeleteKey, 'DEL', onDelete),
-            key(textTvDigitKey(0), '0', () => onDigit(0)),
-            key(textTvKeypadCloseKey, 'X', onClose),
-          ],
-        ),
       ],
+    );
+  }
+}
+
+/// The coloured keys under a page that has links in its bottom row: red,
+/// green, yellow, blue, each with the page's own label over its number.
+class TvFastext extends StatelessWidget {
+  const TvFastext({super.key, required this.links, required this.onOpen});
+
+  final List<FastextLink> links;
+  final ValueChanged<int> onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        for (int i = 0; i < links.length; i++)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: _FastextKey(
+                key: textTvFastextKey(i),
+                link: links[i],
+                onTap: () => onOpen(links[i].page),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _FastextKey extends StatelessWidget {
+  const _FastextKey({super.key, required this.link, required this.onTap});
+
+  final FastextLink link;
+  final VoidCallback onTap;
+
+  static Color _fill(FastextColour colour) => tvColorOf(switch (colour) {
+    FastextColour.red => TvColor.red,
+    FastextColour.green => TvColor.green,
+    FastextColour.yellow => TvColor.yellow,
+    FastextColour.blue => TvColor.blue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final Color fill = _fill(link.colour);
+    // Dark letters on the light colours, white on the dark ones.
+    final Color ink = fill.computeLuminance() > 0.35
+        ? TvColors.black
+        : TvColors.white;
+    return Semantics(
+      button: true,
+      label: '${link.label}. ${Messages.pageLabel(link.page)}',
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 48),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          color: fill,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                link.label,
+                style: tvText(8, ink),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text('${link.page}', style: tvText(12, ink)),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -8,7 +8,7 @@ Personal project, built with Flutter.
 
 - Every page, 100–899, drawn as the 40-column teletext grid: the eight teletext colours, double-height headlines, the block-graphics logo, underlined page links.
 - Tap a page number in the page to open it. Swipe left/right to move between the parts of a page and then between pages.
-- `<` / `>` arrows (following the site's own neighbouring pages), a number pad for typing a page number, and shortcuts to 100 NYHETER, 101 INRIKES, 104 UTRIKES, 300 SPORT, 400 VÄDER and 700 INNEHÅLL.
+- `<` / `>` arrows (following the site's own neighbouring pages), an always-visible number pad for typing a page number (the box shows `1--` as you type), coloured Fastext keys built from a page's bottom row of links, and shortcuts to 100 NYHETER, 101 INRIKES, 104 UTRIKES, 300 SPORT, 400 VÄDER and 700 INNEHÅLL.
 - Reader mode (the glasses button): the page as text reflowed to the screen, with `A-`/`A+` for the text size, five colour schemes (black, grey, beige, paper, high contrast), and options for line spacing, letter spacing, margins and bold. Headlines, links and tables are kept.
 - Portrait only.
 - A settings page (the gear button) with an optional CRT look for the teletext page: a slight screen bulge, scanlines and a vignette, each adjustable within safe limits and remembered. Taps still land on what you see.

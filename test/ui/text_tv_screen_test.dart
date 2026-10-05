@@ -338,17 +338,37 @@ void main() {
   });
 
   group('the number pad', () {
-    testWidgets('tapping the number shows a pad; three digits open a page', (
+    bool enabled(WidgetTester tester, int digit) =>
+        tester
+            .widget<InkWell>(
+              find.descendant(
+                of: find.byKey(textTvDigitKey(digit)),
+                matching: find.byType(InkWell),
+              ),
+            )
+            .onTap !=
+        null;
+
+    testWidgets('is always there, one key for every digit', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository());
+
+      for (int digit = 0; digit <= 9; digit++) {
+        expect(
+          find.byKey(textTvDigitKey(digit)),
+          findsOneWidget,
+          reason: '$digit',
+        );
+      }
+    });
+
+    testWidgets('three digits open a page, showing 1-- and 10- on the way', (
       WidgetTester tester,
     ) async {
       final FakeTextTvRepository repository = _repository();
       await _open(tester, repository);
-      expect(find.byKey(textTvDigitKey(5)), findsNothing);
-
-      await tester.tap(find.byKey(textTvNumberKey));
-      await tester.pump();
-      expect(find.byKey(textTvDigitKey(5)), findsOneWidget);
-      expect(_number('---'), findsOneWidget);
+      expect(_number('100'), findsOneWidget);
 
       await tester.tap(find.byKey(textTvDigitKey(1)));
       await tester.pump();
@@ -361,66 +381,213 @@ void main() {
 
       expect(_number('104'), findsOneWidget);
       expect(repository.requests.last, (104, false));
-      // The pad puts itself away once a page is chosen.
-      expect(find.byKey(textTvDigitKey(5)), findsNothing);
     });
 
     testWidgets('a page number cannot start with 0 or 9', (
       WidgetTester tester,
     ) async {
       await _open(tester, _repository());
-      await tester.tap(find.byKey(textTvNumberKey));
+
+      expect(enabled(tester, 0), isFalse);
+      expect(enabled(tester, 9), isFalse);
+      for (final int d in <int>[1, 2, 3, 4, 5, 6, 7, 8]) {
+        expect(enabled(tester, d), isTrue, reason: '$d');
+      }
+
+      await tester.tap(find.byKey(textTvDigitKey(0)), warnIfMissed: false);
+      await tester.tap(find.byKey(textTvDigitKey(9)), warnIfMissed: false);
       await tester.pump();
 
-      await tester.tap(find.byKey(textTvDigitKey(0)));
-      await tester.tap(find.byKey(textTvDigitKey(9)));
-      await tester.pump();
-
-      expect(_number('---'), findsOneWidget);
+      expect(_number('100'), findsOneWidget);
     });
 
-    testWidgets('DEL takes back a digit', (WidgetTester tester) async {
+    testWidgets('once a digit is in, 0 and 9 are keys like the rest', (
+      WidgetTester tester,
+    ) async {
       await _open(tester, _repository());
-      await tester.tap(find.byKey(textTvNumberKey));
-      await tester.pump();
-      await tester.tap(find.byKey(textTvDigitKey(3)));
-      await tester.tap(find.byKey(textTvDigitKey(0)));
+      await tester.tap(find.byKey(textTvDigitKey(1)));
       await tester.pump();
 
-      await tester.tap(find.byKey(textTvDeleteKey));
-      await tester.pump();
-
-      expect(_number('3--'), findsOneWidget);
+      expect(enabled(tester, 0), isTrue);
+      expect(enabled(tester, 9), isTrue);
     });
 
-    testWidgets('the X puts the pad away without going anywhere', (
+    testWidgets('tapping the number clears what was typed', (
       WidgetTester tester,
     ) async {
       final FakeTextTvRepository repository = _repository();
       await _open(tester, repository);
+      await tester.tap(find.byKey(textTvDigitKey(3)));
+      await tester.pump();
+      await tester.tap(find.byKey(textTvDigitKey(0)));
+      await tester.pump();
+      expect(_number('30-'), findsOneWidget);
+
       await tester.tap(find.byKey(textTvNumberKey));
       await tester.pump();
 
-      await tester.tap(find.byKey(textTvKeypadCloseKey));
-      await tester.pump();
-
-      expect(find.byKey(textTvDigitKey(5)), findsNothing);
       expect(_number('100'), findsOneWidget);
       expect(repository.requests, hasLength(1));
+    });
+
+    testWidgets('a number left unfinished is forgotten after a few seconds', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository());
+      await tester.tap(find.byKey(textTvDigitKey(3)));
+      await tester.pump(const Duration(seconds: 3));
+      expect(_number('3--'), findsOneWidget);
+
+      await tester.pump(const Duration(seconds: 2));
+
+      expect(_number('100'), findsOneWidget);
+    });
+
+    testWidgets('every digit gives the number more time', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository());
+      await tester.tap(find.byKey(textTvDigitKey(3)));
+      await tester.pump(const Duration(seconds: 3));
+      await tester.tap(find.byKey(textTvDigitKey(0)));
+      await tester.pump(const Duration(seconds: 3));
+
+      expect(_number('30-'), findsOneWidget);
+    });
+
+    testWidgets('opening a page by other means drops what was typed', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository());
+      await tester.tap(find.byKey(textTvDigitKey(3)));
+      await tester.pump();
+
+      await tester.tap(find.byKey(textTvChipKey(300)));
+      await tester.pumpAndSettle();
+
+      expect(_number('300'), findsOneWidget);
     });
 
     testWidgets('a page number that is not in broadcast says so', (
       WidgetTester tester,
     ) async {
       await _open(tester, _repository());
-      await tester.tap(find.byKey(textTvNumberKey));
-      await tester.pump();
       for (final int d in <int>[7, 7, 7]) {
         await tester.tap(find.byKey(textTvDigitKey(d)));
       }
       await tester.pumpAndSettle();
 
       expect(find.text(Messages.pageNotBroadcast(777)), findsOneWidget);
+    });
+  });
+
+  group('the coloured keys', () {
+    FakeTextTvRepository withLinks() {
+      final FakeTextTvRepository repository = _repository();
+      repository.pages[100] = _page(
+        100,
+        parts: <List<String>>[
+          <String>[
+            '100 SVT Text',
+            '',
+            '  Rubrik',
+            '    Inrikes 101 Utrikes 104 Sport 300 Väder 400',
+          ],
+        ],
+      );
+      return repository;
+    }
+
+    Color fill(WidgetTester tester, int index) => tester
+        .widget<Container>(
+          find.descendant(
+            of: find.byKey(textTvFastextKey(index)),
+            matching: find.byType(Container),
+          ),
+        )
+        .color!;
+
+    testWidgets('come from the links in the bottom row', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, withLinks());
+
+      for (int i = 0; i < 4; i++) {
+        expect(find.byKey(textTvFastextKey(i)), findsOneWidget, reason: '$i');
+      }
+      expect(find.byKey(textTvFastextKey(4)), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byKey(textTvFastextKey(0)),
+          matching: find.text('Inrikes'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(textTvFastextKey(3)),
+          matching: find.text('400'),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('are red, green, yellow and blue in order', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, withLinks());
+
+      expect(fill(tester, 0), tvColorOf(TvColor.red));
+      expect(fill(tester, 1), tvColorOf(TvColor.green));
+      expect(fill(tester, 2), tvColorOf(TvColor.yellow));
+      expect(fill(tester, 3), tvColorOf(TvColor.blue));
+    });
+
+    testWidgets('open their page when tapped', (WidgetTester tester) async {
+      final FakeTextTvRepository repository = withLinks();
+      await _open(tester, repository);
+
+      await tester.tap(find.byKey(textTvFastextKey(2)));
+      await tester.pumpAndSettle();
+
+      expect(_number('300'), findsOneWidget);
+      expect(repository.requests.last, (300, false));
+    });
+
+    testWidgets('on a small phone everything fits and the page keeps room', (
+      WidgetTester tester,
+    ) async {
+      tester.view
+        ..physicalSize = const Size(360, 640)
+        ..devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await _open(tester, withLinks());
+
+      expect(tester.takeException(), isNull);
+      final double pageArea = tester
+          .getSize(find.byType(SingleChildScrollView).first)
+          .height;
+      expect(pageArea, greaterThan(200));
+    });
+
+    testWidgets('are not there on a page without a link row', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository());
+
+      expect(find.byKey(textTvFastextKey(0)), findsNothing);
+    });
+
+    testWidgets('name the page for a screen reader', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, withLinks());
+
+      expect(
+        find.bySemanticsLabel('Inrikes. ${Messages.pageLabel(101)}'),
+        findsOneWidget,
+      );
     });
   });
 
@@ -528,15 +695,31 @@ void main() {
       expect(_backLeaves(tester), isTrue);
     });
 
-    testWidgets('puts the number pad away first', (WidgetTester tester) async {
+    testWidgets('clears a half-typed number first', (
+      WidgetTester tester,
+    ) async {
       await _open(tester, _repository());
-      await tester.tap(find.byKey(textTvNumberKey));
+      await tester.tap(find.byKey(textTvChipKey(300)));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(textTvDigitKey(4)));
       await tester.pump();
+      expect(_number('4--'), findsOneWidget);
+      expect(_backLeaves(tester), isFalse);
 
       await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
 
-      expect(find.byKey(textTvDigitKey(5)), findsNothing);
+      expect(_number('300'), findsOneWidget, reason: 'still on the page');
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(_number('100'), findsOneWidget, reason: 'now back a page');
+    });
+
+    testWidgets('leaves the app straight away when nothing is typed', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, _repository());
+
       expect(_backLeaves(tester), isTrue);
     });
   });

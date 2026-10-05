@@ -13,7 +13,7 @@ All must pass (CI runs the same, plus `flutter build apk --debug`). If something
 
 ## What to test
 - **Unit tests (most tests live here)**: the texttv.nu client (`test/services/text_tv_test.dart`), the HTML parser and block-graphics decoder, page layout maths (`tv_layout`), headline extraction, and the cache.
-- **Widget tests**: `test/ui/text_tv_screen_test.dart` drives the screen with `FakeTextTvRepository`: opening, filling the screen, arrows, shortcuts, links, the number pad, parts and swipes, back, failure/retry/refresh. `test/app_test.dart` checks the app opens on the viewer.
+- **Widget tests**: `test/ui/text_tv_screen_test.dart` drives the screen with `FakeTextTvRepository`: opening, filling the screen, arrows, shortcuts, links, the number pad, the Fastext keys, parts and swipes, back, failure/retry/refresh. `test/app_test.dart` checks the app opens on the viewer.
 - **No network, no platform in tests**: `FakeHttpFetcher` and `FakeTextTvRepository` in `test/fakes/`. Real answers from texttv.nu are saved in `test/fixtures/` (pages 100, 104, 377); never hit the live API from a committed test.
 - When texttv.nu changes shape, save the new real answer as a fixture and make the parser pass it; do not loosen the parser's "everything unexpected is null" rule.
 

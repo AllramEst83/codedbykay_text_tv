@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Always-visible digits and Fastext (I-4): a compact number pad under the page (no more tap-to-open), `1--` progress in the number box, and red/green/yellow/blue keys from the page's bottom row of links.
 - Reader options (I-3b): line spacing, letter spacing, margin width and a bold switch, in a sheet opened from the reader bar; remembered.
 - CRT look (optional, in settings): the teletext page can be drawn as on a CRT tube, with sliders for the screen curve, scanline darkness and scanline spacing, all capped; touches are remapped so taps land on what is shown.
 - Settings page: a gear button in the top bar opens it (empty for now; settings are added to it as the app gets them).

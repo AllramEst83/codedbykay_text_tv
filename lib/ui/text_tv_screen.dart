@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
+import 'package:codedbykay_text_tv/model/fastext.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_time.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
@@ -70,8 +71,11 @@ class _TextTvScreenState extends State<TextTvScreen> {
   // The pages left behind, most recent last: what back returns to.
   late final List<int> _history = List<int>.of(widget.initial.history);
 
-  bool _keypad = false;
+  // The digits typed towards a page number, and the timer that forgets them
+  // if the third never comes (a real set does the same).
   String _typed = '';
+  Timer? _typedTimer;
+  static const Duration _typedTimeout = Duration(seconds: 4);
 
   // Only the answer to the latest request counts; a slow one that was
   // overtaken by a newer tap must not replace it.
@@ -117,9 +121,9 @@ class _TextTvScreenState extends State<TextTvScreen> {
       _number = number;
       _part = part;
       _loading = true;
-      _keypad = false;
       _typed = '';
     });
+    _typedTimer?.cancel();
     _report();
     final Future<TextTvResult> reading = widget.repository.page(
       number,
@@ -165,11 +169,8 @@ class _TextTvScreenState extends State<TextTvScreen> {
   }
 
   void _back() {
-    if (_keypad) {
-      setState(() {
-        _keypad = false;
-        _typed = '';
-      });
+    if (_typed.isNotEmpty) {
+      _clearTyped();
     } else if (_history.isNotEmpty) {
       _load(_history.removeLast());
     }
@@ -199,6 +200,14 @@ class _TextTvScreenState extends State<TextTvScreen> {
   DateTime? get _savedAt {
     final TextTvResult? result = _result;
     return !_loading && result is TextTvShown ? result.cachedAt : null;
+  }
+
+  /// The coloured keys of the page on screen; none while it is loading.
+  List<FastextLink> get _fastext {
+    final TextTvPage? page = _page;
+    return page == null || _loading
+        ? const <FastextLink>[]
+        : fastextLinks(page, _part);
   }
 
   int get _parts => _page?.parts.length ?? 1;
@@ -236,18 +245,26 @@ class _TextTvScreenState extends State<TextTvScreen> {
       _open(int.parse(typed));
       return;
     }
+    _typedTimer?.cancel();
+    _typedTimer = Timer(_typedTimeout, _clearTyped);
     setState(() => _typed = typed);
   }
 
-  void _deleteDigit() {
-    if (_typed.isEmpty) return;
-    setState(() => _typed = _typed.substring(0, _typed.length - 1));
+  void _clearTyped() {
+    _typedTimer?.cancel();
+    if (_typed.isNotEmpty) setState(() => _typed = '');
+  }
+
+  @override
+  void dispose() {
+    _typedTimer?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: _history.isEmpty && !_keypad,
+      canPop: _history.isEmpty && _typed.isEmpty,
       onPopInvokedWithResult: (bool didPop, Object? result) {
         if (!didPop) _back();
       },
@@ -340,14 +357,11 @@ class _TextTvScreenState extends State<TextTvScreen> {
                         Expanded(
                           child: TvNumberBox(
                             key: textTvNumberKey,
-                            text: _keypad
-                                ? _typed.padRight(3, '-')
-                                : '$_number',
-                            active: _keypad,
-                            onTap: () => setState(() {
-                              _keypad = !_keypad;
-                              _typed = '';
-                            }),
+                            text: _typed.isEmpty
+                                ? '$_number'
+                                : _typed.padRight(3, '-'),
+                            active: _typed.isNotEmpty,
+                            onTap: _clearTyped,
                           ),
                         ),
                         const SizedBox(width: TvMetrics.gutter),
@@ -359,14 +373,13 @@ class _TextTvScreenState extends State<TextTvScreen> {
                       ],
                     ),
                     const SizedBox(height: TvMetrics.gutter),
-                    if (_keypad)
-                      TvKeypad(
-                        onDigit: _digit,
-                        onDelete: _deleteDigit,
-                        onClose: _back,
-                      )
-                    else
-                      TvShortcuts(current: _number, onOpen: _open),
+                    if (_fastext.isNotEmpty) ...<Widget>[
+                      TvFastext(links: _fastext, onOpen: _open),
+                      const SizedBox(height: TvMetrics.gutter),
+                    ],
+                    TvDigitPad(typed: _typed, onDigit: _digit),
+                    const SizedBox(height: TvMetrics.gutter),
+                    TvShortcuts(current: _number, onOpen: _open),
                   ],
                 ),
               ),

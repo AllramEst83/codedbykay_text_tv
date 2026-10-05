@@ -146,7 +146,7 @@ List<ReaderBlock> buildReaderBlocks(TextTvPage page, int part) {
       afterHeading = false;
       continue;
     }
-    final List<ReaderLink>? nav = _navLinks(text);
+    final List<ReaderLink>? nav = readerNavLinks(text);
     if (nav != null) {
       flush();
       blocks.add(ReaderNav(nav));
@@ -229,7 +229,8 @@ RegExpMatch? _lastGap(String text) {
 }
 
 /// The links in a row that is nothing but `label number` pairs, else null.
-List<ReaderLink>? _navLinks(String text) {
+/// Two or more pairs: one is just a linked line.
+List<ReaderLink>? readerNavLinks(String text) {
   if (!_navRow.hasMatch(text)) return null;
   final List<ReaderLink> links = <ReaderLink>[
     for (final RegExpMatch m in _navPair.allMatches(text))
