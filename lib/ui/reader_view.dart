@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/reader_content.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
@@ -68,8 +69,8 @@ class ReaderView extends StatelessWidget {
           lines: <String>[Messages.readerNotBroadcast(number)],
           base: base,
         ),
-        TextTvFailed(:final String reason) => _Message(
-          lines: <String>[reason],
+        TextTvFailed(:final NetworkFailure failure) => _Message(
+          lines: <String>[Messages.failure(failure)],
           base: base,
           retry: _RetryButton(onTap: onRetry, palette: palette, base: base),
         ),

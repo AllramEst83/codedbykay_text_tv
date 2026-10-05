@@ -1,3 +1,4 @@
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 
 /// Text TV pages are laid out on a grid this many characters wide.
@@ -61,8 +62,10 @@ class TextTvNotBroadcast extends TextTvResult {
   final int number;
 }
 
+/// Why a page could not be had: [failure] says what went wrong in terms the
+/// viewer words for the reader.
 class TextTvFailed extends TextTvResult {
-  const TextTvFailed(this.reason);
+  const TextTvFailed(this.failure);
 
-  final String reason;
+  final NetworkFailure failure;
 }

@@ -1,5 +1,6 @@
 import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
@@ -124,7 +125,7 @@ void main() {
     testWidgets('a failure is not remembered', (WidgetTester tester) async {
       final List<SavedPages> heard = <SavedPages>[];
       final FakeTextTvRepository repository = _repository();
-      repository.failure = const TextTvFailed('No signal');
+      repository.failure = const TextTvFailed(NetworkFailure.offline);
       await _open(tester, onSavedChanged: heard.add, repository: repository);
 
       expect(heard.where((SavedPages s) => s.recents.isNotEmpty), isEmpty);

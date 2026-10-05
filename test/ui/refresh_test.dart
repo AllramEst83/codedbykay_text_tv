@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
@@ -263,12 +264,16 @@ void main() {
         <int, TextTvPage>{100: _page(100, 'Hej')},
       );
       await _open(tester, repository, size: _phone);
-      repository.failure = const TextTvFailed('No signal');
+      repository.failure = const TextTvFailed(NetworkFailure.offline);
 
       await pull(tester);
       await tester.pumpAndSettle();
 
-      expect(find.text('NO SIGNAL'), findsOneWidget, reason: 'the message');
+      expect(
+        find.text('NO CONNECTION. CHECK YOUR NETWORK.'),
+        findsOneWidget,
+        reason: 'the message',
+      );
       expect(find.byKey(textTvUpdatedKey), findsOneWidget, reason: 'the page');
       expect(find.byKey(textTvRetryKey), findsNothing);
     });
@@ -278,7 +283,7 @@ void main() {
     ) async {
       final FakeTextTvRepository repository = FakeTextTvRepository(
         <int, TextTvPage>{100: _page(100, 'Hej igen')},
-      )..failure = const TextTvFailed('No signal');
+      )..failure = const TextTvFailed(NetworkFailure.offline);
       await _open(tester, repository, size: _phone);
       expect(find.byKey(textTvRetryKey), findsOneWidget);
 
@@ -422,7 +427,7 @@ void main() {
         reader: const ReaderSettings(enabled: true),
       );
 
-      repository.failure = const TextTvFailed('No signal');
+      repository.failure = const TextTvFailed(NetworkFailure.offline);
       await tester.pump(const Duration(seconds: 31));
       expect(_text('Bra text'), findsOneWidget);
       expect(find.byKey(textTvRetryKey), findsNothing);

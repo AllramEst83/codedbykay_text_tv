@@ -1,14 +1,23 @@
+import 'package:codedbykay_text_tv/model/network_failure.dart';
+
 /// A request could not be completed: no connection, a timeout, an error
-/// status, or an answer that made no sense. [message] is worded for the user
-/// and names the host, so a command can print it as it is.
+/// status, or an answer that made no sense. [failure] says which, for the
+/// user-facing wording (see `Messages.failure`); [message] is a plain
+/// description for logs and tests.
 class NetworkException implements Exception {
-  const NetworkException(this.message, {this.statusCode});
+  const NetworkException(
+    this.message, {
+    this.statusCode,
+    this.failure = NetworkFailure.other,
+  });
 
   final String message;
 
   /// The HTTP status when the server answered with an error one (404, 503),
   /// so a caller can tell "nothing there" from "broken". Null otherwise.
   final int? statusCode;
+
+  final NetworkFailure failure;
 
   @override
   String toString() => message;

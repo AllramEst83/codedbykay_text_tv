@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
@@ -889,15 +890,15 @@ void main() {
       WidgetTester tester,
     ) async {
       final FakeTextTvRepository repository = _repository()
-        ..failure = const TextTvFailed('no connection');
+        ..failure = const TextTvFailed(NetworkFailure.offline);
       await _open(tester, repository);
-      expect(find.text('NO CONNECTION'), findsOneWidget);
+      expect(find.text('NO CONNECTION. CHECK YOUR NETWORK.'), findsOneWidget);
 
       repository.failure = null;
       await tester.tap(find.byKey(textTvRetryKey));
       await tester.pumpAndSettle();
 
-      expect(find.text('NO CONNECTION'), findsNothing);
+      expect(find.text('NO CONNECTION. CHECK YOUR NETWORK.'), findsNothing);
       expect(find.byType(TvRow), findsNWidgets(3));
       // The second read insisted on the site.
       expect(repository.requests.last, (100, true));

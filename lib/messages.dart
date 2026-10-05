@@ -1,3 +1,4 @@
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 
 /// Every string the viewer shows, so the wording stays in one place.
@@ -67,4 +68,13 @@ abstract final class Messages {
   static String offlineSaved(String when) => 'OFFLINE. SAVED $when';
   static String pageNotBroadcast(int number) =>
       'PAGE $number IS NOT IN BROADCAST.';
+  static String failure(NetworkFailure failure) => switch (failure) {
+    NetworkFailure.offline => 'No connection. Check your network.',
+    NetworkFailure.timeout => 'texttv.nu is not answering.',
+    NetworkFailure.server => 'texttv.nu has a problem. Try again soon.',
+    NetworkFailure.changed =>
+      'texttv.nu sent something this app cannot read. The site may have '
+          'changed.',
+    NetworkFailure.other => 'Something went wrong.',
+  };
 }

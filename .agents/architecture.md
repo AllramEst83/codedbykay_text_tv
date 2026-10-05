@@ -29,12 +29,13 @@ lib/
     reader_settings.dart     # ReaderSettings (enabled, ReaderTheme, size, lineSpacing, letterSpacing, margin, bold; every step an index into a table: readerTextSizes, readerLineHeights, readerLetterSpacings, readerMargins): how the reader looks; tolerant encode/decode; resetLayout
     saved_time.dart          # formatSavedAt: `14:32` for today, `3/10 14:32` otherwise
     text_tv_session.dart     # TextTvSession (page, part, history <= 50): what a cold start returns to; tolerant encode/decode
+    network_failure.dart     # NetworkFailure (offline/timeout/server/changed/other, .transient): why a request failed, for the wording and the retry
     text_tv_headlines.dart   # textTvHeadlines(page): the headline lines of a page (no title, bare numbers or navigation); not used by the UI yet
   services/
     page_disk_cache.dart     # PageDiskCache (read/write/remove, never throws), SavedPage, FilePageDiskCache: one `<n>.json` per page holding the site's raw answer, mtime = saved time, 200 pages max
     http_fetcher.dart        # HttpFetcher: GET a URL, return the body
     io_http_fetcher.dart     # IoHttpFetcher on dart:io: 10 s timeouts, 2 MB cap, UTF-8, new client per request, no retry
-    network_exception.dart   # NetworkException(message): the one failure the services throw
+    network_exception.dart   # NetworkException(message, failure, statusCode): the one failure the services throw
     text_tv.dart             # TextTv: the texttv.nu client; fetchBody(n) + parse(n, body), page(n) = both; null = not in broadcast, throws NetworkException
     text_tv_repository.dart  # TextTvRepository: page(n, {fresh}) -> TextTvResult, never throws; cached(n) -> the copy already held, quickly; prefetch(n) -> read ahead, silent
     live_text_tv_repository.dart # cache over TextTv: memory 5 min / 40 pages, plus the optional disk cache (offline fallback)

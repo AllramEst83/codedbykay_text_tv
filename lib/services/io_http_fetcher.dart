@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/services/http_fetcher.dart';
 import 'package:codedbykay_text_tv/services/network_exception.dart';
 
@@ -36,6 +37,9 @@ class IoHttpFetcher implements HttpFetcher {
         throw NetworkException(
           '${url.host} answered with status ${response.statusCode}',
           statusCode: response.statusCode,
+          failure: response.statusCode >= 500
+              ? NetworkFailure.server
+              : NetworkFailure.changed,
         );
       }
       final body = BytesBuilder(copy: false);
@@ -50,13 +54,19 @@ class IoHttpFetcher implements HttpFetcher {
     } on NetworkException {
       rethrow;
     } on TimeoutException {
-      throw NetworkException('${url.host} did not answer in time');
+      throw NetworkException(
+        '${url.host} did not answer in time',
+        failure: NetworkFailure.timeout,
+      );
     } on HandshakeException {
       throw NetworkException(
         'could not make a secure connection to ${url.host}',
       );
     } on SocketException {
-      throw NetworkException("can't reach ${url.host} (no connection?)");
+      throw NetworkException(
+        "can't reach ${url.host} (no connection?)",
+        failure: NetworkFailure.offline,
+      );
     } on HttpException catch (error) {
       throw NetworkException('${url.host}: ${error.message}');
     } finally {

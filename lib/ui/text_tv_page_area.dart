@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/tv_layout.dart';
@@ -56,8 +57,8 @@ class TvPageArea extends StatelessWidget {
             TextTvNotBroadcast(:final int number) => TvMessage(
               lines: <String>[Messages.pageNotBroadcast(number)],
             ),
-            TextTvFailed(:final String reason) => TvMessage(
-              lines: <String>[reason.toUpperCase()],
+            TextTvFailed(:final NetworkFailure failure) => TvMessage(
+              lines: <String>[Messages.failure(failure).toUpperCase()],
               retry: onRetry,
             ),
           };

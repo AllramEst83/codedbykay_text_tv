@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Network handling (I-8): a failure now says what kind it was (no connection, no answer in time, a server problem, a site that has changed); a failure that may pass is tried once more after a second, and a read-ahead that fails stays silent.
 - Icon shortcuts (I-7c): long-pressing the app icon lists your first four favourites and opens the one you choose; they follow your favourites as you change them.
 - Recent pages (I-7b): a clock chip at the start of the favourites row lists the last dozen pages you read (latest first, remembered between runs), with a CLEAR LIST button.
 - Favourites (I-7a): a star on the page-number row adds or removes the current page; the chips under the page are your favourites (the six old shortcuts to start with), saved, with a reset in settings.

@@ -23,6 +23,7 @@ class LiveTextTvRepository implements TextTvRepository {
     this.maxAge = const Duration(minutes: 5),
     this.capacity = 40,
     this.clock = _systemNow,
+    this.retryDelay = const Duration(seconds: 1),
   });
 
   final TextTv textTv;
@@ -31,18 +32,29 @@ class LiveTextTvRepository implements TextTvRepository {
   final int capacity;
   final DateTime Function() clock;
 
+  /// How long to wait before the one more try after a failure that may pass
+  /// (no connection for a moment, a slow answer, a server hiccup).
+  final Duration retryDelay;
+
   // Insertion order is read order, so the first key is the oldest.
   final Map<int, (TextTvPage, DateTime)> _kept =
       <int, (TextTvPage, DateTime)>{};
 
   @override
-  Future<TextTvResult> page(int number, {bool fresh = false}) async {
+  Future<TextTvResult> page(int number, {bool fresh = false}) =>
+      _page(number, fresh: fresh, retry: true);
+
+  Future<TextTvResult> _page(
+    int number, {
+    required bool fresh,
+    required bool retry,
+  }) async {
     final (TextTvPage, DateTime)? kept = _kept[number];
     if (!fresh && kept != null && clock().difference(kept.$2) < maxAge) {
       return TextTvShown(kept.$1, readAt: kept.$2);
     }
     try {
-      final String body = await textTv.fetchBody(number);
+      final String body = await _fetch(number, retry: retry);
       final TextTvPage? page = textTv.parse(number, body);
       if (page == null) {
         _kept.remove(number);
@@ -59,7 +71,7 @@ class LiveTextTvRepository implements TextTvRepository {
       return TextTvShown(page, readAt: now);
     } on NetworkException catch (error) {
       final TextTvShown? saved = await _saved(number);
-      if (saved == null) return TextTvFailed(error.message);
+      if (saved == null) return TextTvFailed(error.failure);
       return TextTvShown(
         saved.page,
         cachedAt: saved.cachedAt,
@@ -72,7 +84,18 @@ class LiveTextTvRepository implements TextTvRepository {
   Future<void> prefetch(int number) async {
     // page() answers a page held fresh from memory without asking the site, and
     // keeps what it reads in memory and on disk like any other read.
-    await page(number);
+    // No second try: a read-ahead that fails is read when it is asked for.
+    await _page(number, fresh: false, retry: false);
+  }
+
+  Future<String> _fetch(int number, {required bool retry}) async {
+    try {
+      return await textTv.fetchBody(number);
+    } on NetworkException catch (error) {
+      if (!retry || !error.failure.transient) rethrow;
+      await Future<void>.delayed(retryDelay);
+      return textTv.fetchBody(number);
+    }
   }
 
   @override

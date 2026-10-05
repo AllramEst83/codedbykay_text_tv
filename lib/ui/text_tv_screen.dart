@@ -245,7 +245,7 @@ class _TextTvScreenState extends State<TextTvScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            result.reason.toUpperCase(),
+            Messages.failure(result.failure).toUpperCase(),
             style: tvText(10, TvColors.white),
           ),
           backgroundColor: TvColors.black,

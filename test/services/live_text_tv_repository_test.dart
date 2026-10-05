@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/services/live_text_tv_repository.dart';
 import 'package:codedbykay_text_tv/services/network_exception.dart';
@@ -34,6 +35,7 @@ void main() {
       maxAge: const Duration(minutes: 5),
       capacity: 3,
       clock: () => now,
+      retryDelay: Duration.zero,
     );
   });
 
@@ -86,13 +88,81 @@ void main() {
   );
 
   test('a failure says why, and is not kept', () async {
-    fetcher.route('/api/get/500', NetworkException('no connection'));
+    fetcher.route(
+      '/api/get/500',
+      const NetworkException('x', failure: NetworkFailure.other),
+    );
 
     final TextTvResult first = await repository.page(500);
     await repository.page(500);
 
-    expect((first as TextTvFailed).reason, 'no connection');
+    expect((first as TextTvFailed).failure, NetworkFailure.other);
     expect(fetcher.requests, hasLength(2));
+  });
+
+  group('a failure that may pass is tried once more', () {
+    test('and the second try can save the day', () async {
+      int calls = 0;
+      fetcher.route('/api/get/500', (Uri url) {
+        calls++;
+        return calls == 1
+            ? const NetworkException('x', failure: NetworkFailure.timeout)
+            : _page(500);
+      });
+
+      final TextTvResult result = await repository.page(500);
+
+      expect(result, isA<TextTvShown>());
+      expect(fetcher.requests, hasLength(2));
+    });
+
+    test('and when it fails again, the failure is told', () async {
+      fetcher.route(
+        '/api/get/500',
+        const NetworkException('x', failure: NetworkFailure.server),
+      );
+
+      final TextTvResult result = await repository.page(500);
+
+      expect((result as TextTvFailed).failure, NetworkFailure.server);
+      expect(fetcher.requests, hasLength(2));
+    });
+
+    test('waits before it does', () async {
+      final LiveTextTvRepository slow = LiveTextTvRepository(
+        textTv: TextTv(fetcher: fetcher),
+        retryDelay: const Duration(seconds: 1),
+      );
+      fetcher.route(
+        '/api/get/500',
+        const NetworkException('x', failure: NetworkFailure.offline),
+      );
+
+      final Stopwatch watch = Stopwatch()..start();
+      await slow.page(500);
+
+      expect(watch.elapsedMilliseconds, greaterThanOrEqualTo(900));
+    });
+
+    test('a site that has changed is not asked again', () async {
+      fetcher.route('/api/get/500', 'not json');
+
+      final TextTvResult result = await repository.page(500);
+
+      expect((result as TextTvFailed).failure, NetworkFailure.changed);
+      expect(fetcher.requests, hasLength(1));
+    });
+
+    test('a read-ahead gives up at once and says nothing', () async {
+      fetcher.route(
+        '/api/get/500',
+        const NetworkException('x', failure: NetworkFailure.offline),
+      );
+
+      await repository.prefetch(500);
+
+      expect(fetcher.requests, hasLength(1));
+    });
   });
 
   test('keeps only the most recently read pages', () async {
@@ -218,7 +288,7 @@ void main() {
       final TextTvResult result = await saving.page(130);
 
       expect(result, isA<TextTvFailed>());
-      expect((result as TextTvFailed).reason, 'no signal');
+      expect((result as TextTvFailed).failure, NetworkFailure.other);
     });
 
     test('a saved copy that cannot be read is ignored', () async {

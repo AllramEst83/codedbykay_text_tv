@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/services/text_tv.dart';
@@ -234,10 +235,10 @@ void main() {
       WidgetTester tester,
     ) async {
       final FakeTextTvRepository repository = _repository();
-      repository.failure = const TextTvFailed('No signal');
+      repository.failure = const TextTvFailed(NetworkFailure.offline);
       await _open(tester, repository);
 
-      expect(_text('No signal'), findsOneWidget);
+      expect(_text('No connection. Check your network.'), findsOneWidget);
       expect(find.byKey(textTvRetryKey), findsOneWidget);
 
       repository.failure = null;

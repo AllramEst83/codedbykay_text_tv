@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_html.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
@@ -93,6 +94,8 @@ class TextTv {
 
   int? _pageNumber(Object? value) => int.tryParse('$value');
 
-  NetworkException get _unexpected =>
-      const NetworkException('texttv.nu sent an answer I could not read');
+  NetworkException get _unexpected => const NetworkException(
+    'texttv.nu sent an answer I could not read',
+    failure: NetworkFailure.changed,
+  );
 }

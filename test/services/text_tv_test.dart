@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/services/network_exception.dart';
@@ -39,11 +40,9 @@ String _pageJson(List<String> parts, {Object? next = '2', Object? prev = '1'}) {
 TextTv _service(FakeHttpFetcher fetcher) => TextTv(fetcher: fetcher);
 
 Matcher _unreadable() => throwsA(
-  isA<NetworkException>().having(
-    (e) => e.message,
-    'message',
-    contains('could not read'),
-  ),
+  isA<NetworkException>()
+      .having((e) => e.message, 'message', contains('could not read'))
+      .having((e) => e.failure, 'failure', NetworkFailure.changed),
 );
 
 void main() {
