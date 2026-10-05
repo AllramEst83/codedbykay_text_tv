@@ -30,6 +30,7 @@ lib/
     saved_time.dart          # formatSavedAt: `14:32` for today, `3/10 14:32` otherwise
     text_tv_session.dart     # TextTvSession (page, part, history <= 50): what a cold start returns to; tolerant encode/decode
     page_search.dart         # searchPages(pages, query) -> SearchHit(page, line, matches); foldForSearch (å/ä/ö); every word on one line, best 30
+    page_share.dart          # pageText(page, part), pageLink(n), shareMessage: what copying and sharing send
     network_failure.dart     # NetworkFailure (offline/timeout/server/changed/other, .transient): why a request failed, for the wording and the retry
     text_tv_headlines.dart   # textTvHeadlines(page): the headline lines of a page (no title, bare numbers or navigation); not used by the UI yet
   services/
@@ -41,6 +42,7 @@ lib/
     text_tv_repository.dart  # TextTvRepository: page(n, {fresh}) -> TextTvResult, never throws; cached(n) -> the copy already held, quickly; prefetch(n) -> read ahead, silent
     live_text_tv_repository.dart # cache over TextTv: memory 5 min / 40 pages, plus the optional disk cache (offline fallback)
     crt_settings_store.dart  # CrtSettingsStore (load/save, never throws) and PrefsCrtSettingsStore on shared_preferences (key `crt`)
+    share_service.dart       # SharePlatform (shareText) over share_plus (SharePlusPlatform); never throws
     shortcut_service.dart    # ShortcutPlatform (start/set: the thin plugin side), QuickActionsShortcuts (quick_actions), ShortcutService (keeps the icon's shortcuts in step with the favourites; `opened` stream of pages chosen from them; never throws)
     saved_pages_store.dart   # SavedPagesStore (load/save, never throws) and PrefsSavedPagesStore on shared_preferences (key `pages`)
     controls_settings_store.dart # ControlsSettingsStore (load/save, never throws) and PrefsControlsSettingsStore on shared_preferences (key `controls`)
@@ -53,6 +55,7 @@ lib/
     settings_screen.dart     # SettingsScreen: the page the gear button opens, as framed panels each under a blue header bar: CONTROLS (the quick-pad switch), FAVOURITES (count, RESET), REFRESH (auto-refresh step slider, read-ahead switch), CRT SCREEN (switch, live preview, three capped sliders, RESET)
     crt_screen.dart          # CrtScreen: draws its child through shaders/crt.frag (flutter_shaders AnimatedSampler) and routes touches through CrtHitMap
     crt_hit_map.dart         # CrtHitMap: a render object that remaps a touch through the CRT glass so a tap reaches what is shown
+    share_sheet.dart         # showShareSheet(onChosen): COPY TEXT / SHARE TEXT / SHARE LINK
     search_sheet.dart        # showSearchSheet: the search field, a go-to-page row and the hits; debounced, stale answers dropped
     page_turn.dart           # PageTurn: the 180 ms slide-and-fade a new page comes in with (from the side it was turned to); keyed per page, so the old page is already gone
     recent_pages_sheet.dart  # showRecentPages: bottom sheet listing the pages read last (not the one on show), each a tap away, with CLEAR LIST

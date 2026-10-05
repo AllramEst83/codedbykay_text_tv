@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Copy and share (I-10): a share button beside the page number copies the page text, shares it with a link to texttv.nu, or shares just the link.
 - Search (I-9): a magnifier button opens a search over the pages saved on the phone; type a word (Swedish letters match with or without their marks) to list the pages that have it, or a page number to go straight there.
 - Network handling (I-8): a failure now says what kind it was (no connection, no answer in time, a server problem, a site that has changed); a failure that may pass is tried once more after a second, and a read-ahead that fails stays silent.
 - Icon shortcuts (I-7c): long-pressing the app icon lists your first four favourites and opens the one you choose; they follow your favourites as you change them.

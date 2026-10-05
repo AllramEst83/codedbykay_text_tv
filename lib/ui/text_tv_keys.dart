@@ -58,3 +58,7 @@ const Key textTvSearchGoKey = ValueKey<String>('text-tv-search-go');
 const Key textTvSearchEmptyKey = ValueKey<String>('text-tv-search-empty');
 Key textTvSearchHitKey(int page) =>
     ValueKey<String>('text-tv-search-hit-$page');
+const Key textTvShareKey = ValueKey<String>('text-tv-share');
+const Key textTvCopyTextKey = ValueKey<String>('text-tv-copy-text');
+const Key textTvShareTextKey = ValueKey<String>('text-tv-share-text');
+const Key textTvShareLinkKey = ValueKey<String>('text-tv-share-link');

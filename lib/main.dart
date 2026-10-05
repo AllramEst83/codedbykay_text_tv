@@ -18,6 +18,7 @@ import 'package:codedbykay_text_tv/services/reader_settings_store.dart';
 import 'package:codedbykay_text_tv/services/refresh_settings_store.dart';
 import 'package:codedbykay_text_tv/services/saved_pages_store.dart';
 import 'package:codedbykay_text_tv/services/session_store.dart';
+import 'package:codedbykay_text_tv/services/share_service.dart';
 import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv.dart';
 import 'package:flutter/material.dart';
@@ -62,6 +63,7 @@ Future<void> main() async {
       saved: saved,
       onSavedChanged: (SavedPages p) => unawaited(savedStore.save(p)),
       shortcuts: shortcuts,
+      share: const SharePlusPlatform(),
       onReaderChanged: (ReaderSettings r) => unawaited(readerStore.save(r)),
     ),
   );

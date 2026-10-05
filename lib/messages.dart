@@ -25,6 +25,12 @@ abstract final class Messages {
   static const String searchScope = 'FINDS WORDS ON PAGES YOU HAVE READ.';
   static const String searchNothing = 'NO READ PAGE HAS THAT.';
   static String searchGo(int page) => 'GO TO PAGE $page';
+  static const String share = 'Copy or share this page';
+  static const String shareTitle = 'COPY OR SHARE';
+  static const String copyText = 'COPY TEXT';
+  static const String shareText = 'SHARE TEXT';
+  static const String shareLink = 'SHARE LINK';
+  static const String copied = 'COPIED';
   static const String sectionControls = 'CONTROLS';
   static const String quickEntry = 'ALWAYS-ON NUMBER PAD AND COLOUR KEYS';
   static const String sectionRefresh = 'REFRESH';

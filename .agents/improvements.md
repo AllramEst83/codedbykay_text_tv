@@ -35,6 +35,8 @@ Things built because they were wanted, not because they were planned. They are d
 - [x] **I-8. Network handling.** Failures are a `NetworkFailure` (offline / timeout / server error / site changed / other) with their own wording; the transient ones are retried once after 1 s (not for read-ahead, which stays silent).
 - [x] **I-9. Search.** Done: texttv.nu documents no search endpoint, so it searches the pages held (memory + on-disk cache, up to 200) with `searchPages` (every word on one line, å/ä/ö folded, best 30), in a sheet from a magnifier in the top bar; a 3-digit page number offers going straight there. It only finds pages already read, and says so.
 - [ ] **I-10. Share / copy.** Copy the page text, share it as text or as an image of the page (the plain text is already the source of truth), share a link to texttv.nu's page.
+  - [x] **I-10a.** Copy text (clipboard), share text with the link, share the link (`share_plus` behind `SharePlatform`; `pageText`/`shareMessage` in `page_share.dart`; a sheet from a share button beside the page number). Copies/shares the part on show.
+  - [ ] **I-10b.** Share as an image of the page.
 - [ ] **I-11. Localization.** Strings and shortcut names are hard-coded caps (English chrome, Swedish chips), and "not in broadcast" is detected by the Swedish phrase. Move strings to ARB (sv + en), name the shortcut chips by language, and treat the phrase check as one of two signals (empty list is the other) so a wording change on the site does not turn "not in broadcast" into a page.
 
 ## Tier 2

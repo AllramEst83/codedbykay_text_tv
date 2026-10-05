@@ -4,6 +4,7 @@ import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/fastext.dart';
+import 'package:codedbykay_text_tv/model/page_share.dart';
 import 'package:codedbykay_text_tv/model/prefetch.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
@@ -11,6 +12,7 @@ import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/saved_time.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
+import 'package:codedbykay_text_tv/services/share_service.dart';
 import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
@@ -20,11 +22,13 @@ import 'package:codedbykay_text_tv/ui/reader_view.dart';
 import 'package:codedbykay_text_tv/ui/recent_pages_sheet.dart';
 import 'package:codedbykay_text_tv/ui/search_sheet.dart';
 import 'package:codedbykay_text_tv/ui/settings_screen.dart';
+import 'package:codedbykay_text_tv/ui/share_sheet.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_page_area.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 DateTime _systemNow() => DateTime.now();
 
@@ -55,6 +59,7 @@ class TextTvScreen extends StatefulWidget {
     this.saved = const SavedPages(),
     this.onSavedChanged,
     this.shortcuts,
+    this.share,
     this.clock = _systemNow,
   });
 
@@ -91,6 +96,9 @@ class TextTvScreen extends StatefulWidget {
   /// The app icon's long-press shortcuts: kept in step with the first
   /// favourites, and a page chosen from one is opened here.
   final ShortcutService? shortcuts;
+
+  /// The phone's share sheet; without it the page can still be copied.
+  final SharePlatform? share;
 
   /// Today's date, for saying when a saved copy is from.
   final DateTime Function() clock;
@@ -505,6 +513,45 @@ class _TextTvScreenState extends State<TextTvScreen>
       a.length == b.length &&
       Iterable<int>.generate(a.length).every((int i) => a[i] == b[i]);
 
+  void _openShare() {
+    final TextTvResult? result = _result;
+    if (result is! TextTvShown) return;
+    final TextTvPage page = result.page;
+    final int part = _part;
+    showShareSheet(
+      context,
+      onChosen: (ShareAction action) {
+        switch (action) {
+          case ShareAction.copyText:
+            unawaited(
+              Clipboard.setData(ClipboardData(text: pageText(page, part))),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  Messages.copied,
+                  style: tvText(10, TvColors.white),
+                ),
+                backgroundColor: TvColors.black,
+                shape: const Border.fromBorderSide(
+                  BorderSide(color: TvColors.border, width: TvMetrics.border),
+                ),
+              ),
+            );
+          case ShareAction.shareText:
+            unawaited(
+              widget.share?.shareText(
+                shareMessage(page, part),
+                subject: Messages.pageLabel(page.number),
+              ),
+            );
+          case ShareAction.shareLink:
+            unawaited(widget.share?.shareText(pageLink(page.number)));
+        }
+      },
+    );
+  }
+
   void _openSearch() {
     showSearchSheet(context, search: widget.repository.search, onOpen: _open);
   }
@@ -696,6 +743,14 @@ class _TextTvScreenState extends State<TextTvScreen>
                             active: _numberActive,
                             onTap: _numberTapped,
                           ),
+                        ),
+                        const SizedBox(width: TvMetrics.gutter),
+                        TvIconButton(
+                          key: textTvShareKey,
+                          icon: (Color colour) =>
+                              Icon(Icons.ios_share, color: colour, size: 26),
+                          semanticLabel: Messages.share,
+                          onTap: _result is TextTvShown ? _openShare : null,
                         ),
                         const SizedBox(width: TvMetrics.gutter),
                         TvButton(
