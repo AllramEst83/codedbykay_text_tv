@@ -9,6 +9,7 @@ Personal project, built with Flutter.
 - Every page, 100–899, drawn as the 40-column teletext grid: the eight teletext colours, double-height headlines, the block-graphics logo, underlined page links.
 - Tap a page number in the page to open it. Swipe left/right to move between the parts of a page and then between pages.
 - `<` / `>` arrows (following the site's own neighbouring pages), a number pad for typing a page number, and shortcuts to 100 NYHETER, 101 INRIKES, 104 UTRIKES, 300 SPORT, 400 VÄDER and 700 INNEHÅLL.
+- Portrait only.
 - Back steps through the pages you have read, then leaves the app.
 - Opens where you left off: the page, its part and the pages you came through.
 - Pages read in the last five minutes are reused; REFRESH asks the site again. Failures say why and offer TRY AGAIN.
