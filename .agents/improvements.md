@@ -4,9 +4,19 @@ The backlog for the app beyond the first working viewer, ordered by how much a u
 
 Not verified live when this was written: the API facts come from the code, its tests and the saved fixtures. Before building anything that depends on the API (I-1, I-5, I-9, I-14), re-fetch pages 100, 101, 104, 300, 377, 400, 700, 899 and one multi-part page, diff them against `test/fixtures/`, and read texttv.nu's API page (`https://texttv.nu/blogg/texttv-api`) for its terms, rate limits, attribution rules and any helpful endpoints (a search, "most read" or "last updated" endpoint). Record what you find at the top of this file.
 
-## What texttv.nu's API page says (read 2026-10-05)
+## What texttv.nu's API page says (read 2026-10-05) and what its source shows
 
-From `https://texttv.nu/blogg/texttv-api`: every client must send a unique `app` value (done: `texttv_android`), or risks stopping working. It documents the single-page endpoint `/api/get/{n}`, a range `/api/get/{a}-{b}`, a JSONP form, and `includePlainTextContent=1`. It says **nothing** about rate limits, polling or caching, nothing about terms or attribution, and it has **no** endpoint for "last updated" or "has this page changed": the only hint is a changelog line about being told when a newer version of a page exists. So: be courteous (auto-refresh is off by default and no faster than every 30 s; nothing is read while the app is in the background), and re-read this page before publishing (I-14). Not yet done: re-fetching the live pages and diffing them against `test/fixtures/` (the build sandbox could not reach the site).
+From `https://texttv.nu/blogg/texttv-api`: every client must send a unique `app` value (done: `texttv_android`), or risks stopping working. The page documents the single-page endpoint `/api/get/{n}`, a range `/api/get/{a}-{b}`, a JSONP form, and `includePlainTextContent=1`. It says **nothing** about rate limits, polling, caching, terms or attribution.
+
+**Correction (same day):** the site's source (`github.com/bonny/texttv.nu-website`, PHP/CodeIgniter, `application/controllers/api.php`) has more endpoints than the API page names; I checked each against the live site. They are what the official apps use, and the page does not promise them:
+
+- `GET /api/updated/{pages}/{unix-time}`: `update_available` and the changed pages' titles, a few hundred bytes, for pages (comma list or ranges) changed since the time. **A cheap change check**; the blog says the site uses it for its "a newer version of this page exists" notice.
+- `GET /api/last_updated[/news|/sport]`: the latest changed pages, each with title, page number, time and text.
+- `GET /api/most_read[/news|/sport]`: the most read pages today (the site caches it for 60 s; it was the expensive query behind a server overload, so use it sparingly).
+- Archive and permalinks: `/{page}/arkiv/...` and `/api/getid/{id}`, `/api/get_permalink/{ids}`, `/api/page/{ids}/{type}`: a page as it was at a given time, shareable by id. `/api/share/{ids}`, `/api/screenshot/{ids}`: a picture of a page.
+- Also: multi-page URLs (`/101-103`, `/100,300`), `/feed` (RSS), `/oembed`, `/text-tv-fakta`. Search on the site is a Google Custom Search box, not an API.
+
+So: be courteous as before (the owner is clearly sensitive to load: see its `todos/12`, `14`), but polling can use `api/updated` instead of fetching a whole page (see I-22).
 
 ## Side additions (not on the backlog)
 
@@ -58,3 +68,12 @@ Things built because they were wanted, not because they were planned. They are d
 - [x] **I-19. Breaking-news notification** for page 100 or a chosen page. Done, without a server: texttv.nu has no push, webhook or "changed since" endpoint (see the API notes above), so the app polls from the same WorkManager job as the widget (Android's floor is 15 min; choices are 30 min / 1 h / 3 h, only with a connection, and nothing runs unless the widget or alerts are on). It reads the chosen page, compares its top headline with what it saw last (`breakingHeadline`: new = not among the previous headlines; the first look, or a changed page, announces nothing), and shows a notification; a tap opens the page. With the app open the news is remembered but not announced. Alerts are off by default and turning them on asks for the notification permission. Trade-offs: an alert comes up to one interval late, it costs one request per interval, and a pushed alert would need a server of our own (Firebase + a poller + a privacy statement), which was judged too much. Build-verified only: not run on a device.
 - [ ] **I-20. Dark/amoled/colour-blind options**: teletext is always black, but offer a high-contrast palette and a no-flash mode.
 - [ ] **I-21. Other teletext sources** (the same viewer over another country's service) once the client is behind a small interface; the repository interface already allows it.
+
+## Proposed after comparing with the official site and apps (2026-10-05)
+
+Not started; each only if wanted.
+
+- [ ] **I-22. Cheaper change checks.** Use `api/updated` in the background job (widget and alerts) so a check is one tiny request that says whether anything changed, and fetch the page only when it did.
+- [ ] **I-23. Latest and most read.** A list of the latest changed news and sport pages (`api/last_updated`) and the most read pages (`api/most_read`), as the site shows under every page. Fits a "what's new" sheet; also a better source for alerts than one page's top headline.
+- [ ] **I-24. Breadcrumbs.** From 377 back to 330 or 300 or home, as the official apps do (the page data has `breadcrumbs`).
+- [ ] **I-25. Permalinks and the archive.** Share a link to *this version* of a page (an archive id) rather than the live page, and read older versions.
