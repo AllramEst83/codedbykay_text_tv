@@ -21,6 +21,11 @@ String pageText(TextTvPage page, int part) {
   return rows.sublist(first).join('\n');
 }
 
+/// The link to share for [page]: the one that names this version of it, when
+/// the site gave one (what a page says changes by the hour, and a shared link
+/// should show what was shared), else the page's own address.
+String shareLinkFor(TextTvPage page) => page.permalink ?? pageLink(page.number);
+
 /// The text to send to somebody: the page, and where to find it.
 String shareMessage(TextTvPage page, int part) =>
-    '${pageText(page, part)}\n\n${pageLink(page.number)}';
+    '${pageText(page, part)}\n\n${shareLinkFor(page)}';

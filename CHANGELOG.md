@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Share links name the version (I-25): SHARE LINK, SHARE TEXT and SHARE IMAGE now give the link that names the page as it is now (`texttv.nu/377/malservice-37397964`), so the receiver sees what you shared and not whatever the page says later. A page the site gave no such link for falls back to its live address.
 - Fixed: in a release build the alerts switch could not be turned on, and no alert could be shown. The release build had stripped the notification's small icon (it is only named at runtime), so the notification plugin could not start, and the permission check depended on it. The icon is now kept (`res/raw/keep.xml`), and the permission check no longer waits for the plugin to start.
 - Bedstead now fills the width of the screen like Press Start 2P (its size was capped by font size, which stopped its narrower cells short). The page's width is limited by how wide a cell may get instead.
 - Alerts: the switch no longer sticks off when notifications are already allowed (it asks the phone what is so, not just the permission request), and coming back from the phone's notification settings with them allowed turns alerts on.

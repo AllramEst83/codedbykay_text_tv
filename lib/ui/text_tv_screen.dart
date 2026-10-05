@@ -629,7 +629,7 @@ class _TextTvScreenState extends State<TextTvScreen>
               ),
             );
           case ShareAction.shareLink:
-            unawaited(widget.share?.shareText(pageLink(page.number)));
+            unawaited(widget.share?.shareText(shareLinkFor(page)));
           case ShareAction.shareImage:
             unawaited(_shareImage(page, part));
         }
@@ -650,7 +650,7 @@ class _TextTvScreenState extends State<TextTvScreen>
     await share.shareImage(
       png,
       name: 'texttv-${page.number}.png',
-      text: pageLink(page.number),
+      text: shareLinkFor(page),
     );
   }
 

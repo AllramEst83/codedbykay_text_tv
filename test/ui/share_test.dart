@@ -122,6 +122,31 @@ void main() {
       expect(share.texts.single.$1, 'https://texttv.nu/100');
     });
 
+    testWidgets('a page that has a permalink shares that, not the live link', (
+      WidgetTester tester,
+    ) async {
+      final FakeTextTvRepository repository = FakeTextTvRepository(
+        <int, TextTvPage>{
+          100: const TextTvPage(
+            number: 100,
+            parts: <List<String>>[
+              <String>['100 SVT Text', 'Hej'],
+            ],
+            permalink: 'https://texttv.nu/100/nyheter-1234',
+          ),
+        },
+      );
+      final FakeSharePlatform share = await _open(
+        tester,
+        repository: repository,
+      );
+
+      await tester.tap(find.byKey(textTvShareLinkKey));
+      await tester.pumpAndSettle();
+
+      expect(share.texts.single.$1, 'https://texttv.nu/100/nyheter-1234');
+    });
+
     testWidgets('SHARE IMAGE shares a PNG of the page with its link', (
       WidgetTester tester,
     ) async {
