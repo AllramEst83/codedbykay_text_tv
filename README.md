@@ -11,6 +11,7 @@ Personal project, built with Flutter.
 - `<` / `>` arrows (following the site's own neighbouring pages), a number pad for typing a page number, and shortcuts to 100 NYHETER, 101 INRIKES, 104 UTRIKES, 300 SPORT, 400 VÄDER and 700 INNEHÅLL.
 - Reader mode (the glasses button): the page as text reflowed to the screen, with `A-`/`A+` for the text size and five colour schemes (black, grey, beige, paper, high contrast). Headlines, links and tables are kept.
 - Portrait only.
+- A settings page (the gear button) with an optional CRT look for the teletext page: a slight screen bulge, scanlines and a vignette, each adjustable within safe limits and remembered. Taps still land on what you see.
 - Back steps through the pages you have read, then leaves the app.
 - Opens where you left off: the page, its part and the pages you came through.
 - Pages read in the last five minutes are reused; REFRESH asks the site again. Failures say why and offer TRY AGAIN.

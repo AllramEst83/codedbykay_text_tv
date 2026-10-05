@@ -4,6 +4,14 @@ The backlog for the app beyond the first working viewer, ordered by how much a u
 
 Not verified live when this was written: the API facts come from the code, its tests and the saved fixtures. Before building anything that depends on the API (I-1, I-5, I-9, I-14), re-fetch pages 100, 101, 104, 300, 377, 400, 700, 899 and one multi-part page, diff them against `test/fixtures/`, and read texttv.nu's API page (`https://texttv.nu/blogg/texttv-api`) for its terms, rate limits, attribution rules and any helpful endpoints (a search, "most read" or "last updated" endpoint). Record what you find at the top of this file.
 
+## Side additions (not on the backlog)
+
+Things built because they were wanted, not because they were planned. They are done; listed so the file is the whole story.
+
+- [x] **CRT look.** An optional CRT-tube look for the teletext page (bulge, scanlines, colour fringing, vignette) from our own fragment shader (`shaders/crt.frag`) applied with `flutter_shaders`, switched on and tuned in the settings page with three capped sliders, with touches remapped through the glass (`CrtHitMap`). Reader mode is not affected. Revert by reverting its commit; the settings page it lives in is a separate commit and stays. Decisions and the formula's two homes (shader and `crt_geometry.dart`) are in [architecture.md](architecture.md).
+- [x] **Settings page.** A gear button in the top bar opens it.
+- [x] **Portrait only.**
+
 ## Tier 1
 
 - [x] **I-1. Persistent cache, stale-while-revalidate.** Done: `PageDiskCache`/`FilePageDiskCache` keep the raw answer per page (200 max, in the cache folder), `LiveTextTvRepository` falls back to it offline and `cached()` lets the screen show it at once; the note uses our save time, not `date_updated_unix`. Original description: Today the cache is in memory for 5 min, so a cold start with no network shows an error even for a page read a minute ago. Keep pages on disk (SQLite/drift or files; JSON per page), show the cached page immediately, refresh behind it, and say "offline, updated 14:32" using `date_updated_unix` (the client does not read it today). Evict by age/size.

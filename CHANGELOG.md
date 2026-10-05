@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- CRT look (optional, in settings): the teletext page can be drawn as on a CRT tube, with sliders for the screen curve, scanline darkness and scanline spacing, all capped; touches are remapped so taps land on what is shown.
 - Settings page: a gear button in the top bar opens it (empty for now; settings are added to it as the app gets them).
 - Reader mode (I-3a): a glasses button shows the page as reflowed text with its own size (`A-`/`A+`) and five colour schemes; the choice is remembered.
 - The app is portrait-only.

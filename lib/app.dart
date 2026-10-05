@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
@@ -26,6 +27,8 @@ class TextTvApp extends StatelessWidget {
     this.onSessionChanged,
     this.reader = const ReaderSettings(),
     this.onReaderChanged,
+    this.crt = CrtSettings.defaults,
+    this.onCrtChanged,
   });
 
   final TextTvRepository repository;
@@ -37,6 +40,10 @@ class TextTvApp extends StatelessWidget {
   /// How the reader was set up on the last run.
   final ReaderSettings reader;
   final ValueChanged<ReaderSettings>? onReaderChanged;
+
+  /// The CRT look of the teletext page on the last run.
+  final CrtSettings crt;
+  final ValueChanged<CrtSettings>? onCrtChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +59,8 @@ class TextTvApp extends StatelessWidget {
           onSessionChanged: onSessionChanged,
           reader: reader,
           onReaderChanged: onReaderChanged,
+          crt: crt,
+          onCrtChanged: onCrtChanged,
         ),
       ),
     );

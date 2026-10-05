@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:codedbykay_text_tv/app.dart';
+import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
+import 'package:codedbykay_text_tv/services/crt_settings_store.dart';
 import 'package:codedbykay_text_tv/services/http_fetcher.dart';
 import 'package:codedbykay_text_tv/services/io_http_fetcher.dart';
 import 'package:codedbykay_text_tv/services/live_text_tv_repository.dart';
@@ -24,6 +26,8 @@ Future<void> main() async {
   final TextTvSession session = await store.load();
   final ReaderSettingsStore readerStore = PrefsReaderSettingsStore();
   final ReaderSettings reader = await readerStore.load();
+  final CrtSettingsStore crtStore = PrefsCrtSettingsStore();
+  final CrtSettings crt = await crtStore.load();
   runApp(
     TextTvApp(
       repository: LiveTextTvRepository(
@@ -33,6 +37,8 @@ Future<void> main() async {
       session: session,
       onSessionChanged: (TextTvSession s) => unawaited(store.save(s)),
       reader: reader,
+      crt: crt,
+      onCrtChanged: (CrtSettings c) => unawaited(crtStore.save(c)),
       onReaderChanged: (ReaderSettings r) => unawaited(readerStore.save(r)),
     ),
   );

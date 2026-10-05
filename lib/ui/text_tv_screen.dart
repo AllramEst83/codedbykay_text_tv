@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_time.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
+import 'package:codedbykay_text_tv/ui/crt_screen.dart';
 import 'package:codedbykay_text_tv/ui/reader_bar.dart';
 import 'package:codedbykay_text_tv/ui/reader_view.dart';
 import 'package:codedbykay_text_tv/ui/settings_screen.dart';
@@ -31,6 +33,8 @@ class TextTvScreen extends StatefulWidget {
     this.onSessionChanged,
     this.reader = const ReaderSettings(),
     this.onReaderChanged,
+    this.crt = CrtSettings.defaults,
+    this.onCrtChanged,
     this.clock = _systemNow,
   });
 
@@ -43,6 +47,11 @@ class TextTvScreen extends StatefulWidget {
   final ReaderSettings reader;
   final ValueChanged<ReaderSettings>? onReaderChanged;
 
+  /// The CRT look of the teletext page (not of the reader's text), and the
+  /// listener that hears when the settings page changes it.
+  final CrtSettings crt;
+  final ValueChanged<CrtSettings>? onCrtChanged;
+
   /// Today's date, for saying when a saved copy is from.
   final DateTime Function() clock;
 
@@ -54,6 +63,7 @@ class _TextTvScreenState extends State<TextTvScreen> {
   late int _number = widget.initial.page;
   late int _part = widget.initial.part;
   late ReaderSettings _reader = widget.reader;
+  late CrtSettings _crtSettings = widget.crt;
   TextTvResult? _result;
   bool _loading = true;
 
@@ -73,10 +83,20 @@ class _TextTvScreenState extends State<TextTvScreen> {
     _load(_number, part: _part);
   }
 
+  Widget _crt(Widget page) => _crtSettings.enabled
+      ? CrtScreen(settings: _crtSettings, child: page)
+      : page;
+
+  void _setCrt(CrtSettings crt) {
+    setState(() => _crtSettings = crt);
+    widget.onCrtChanged?.call(crt);
+  }
+
   void _openSettings() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (BuildContext context) => const SettingsScreen(),
+        builder: (BuildContext context) =>
+            SettingsScreen(crt: _crtSettings, onChanged: _setCrt),
       ),
     );
   }
@@ -264,16 +284,18 @@ class _TextTvScreenState extends State<TextTvScreen> {
                                 onLink: _open,
                                 onRetry: () => _load(_number, fresh: true),
                               )
-                            : TvPageArea(
-                                number: _number,
-                                part: _part,
-                                loading: _loading,
-                                result: _result,
-                                onLink: (String command) {
-                                  final int? page = int.tryParse(command);
-                                  if (page != null) _open(page);
-                                },
-                                onRetry: () => _load(_number, fresh: true),
+                            : _crt(
+                                TvPageArea(
+                                  number: _number,
+                                  part: _part,
+                                  loading: _loading,
+                                  result: _result,
+                                  onLink: (String command) {
+                                    final int? page = int.tryParse(command);
+                                    if (page != null) _open(page);
+                                  },
+                                  onRetry: () => _load(_number, fresh: true),
+                                ),
                               ),
                       ),
                     ),

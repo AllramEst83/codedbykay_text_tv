@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_shaders: ^0.1.3
   path_provider: ^2.1.6
   shared_preferences: ^2.5.5
 
@@ -19,6 +20,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  shaders:
+    - shaders/crt.frag
 
   # Bundled (OFL 1.1, see fonts/OFL.txt) so the app works offline.
   fonts:
