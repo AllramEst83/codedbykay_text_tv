@@ -1,8 +1,0 @@
-feat: say what kind of failure it was, and try once more (I-8)
-
-NetworkFailure (offline, timeout, server, changed, other) replaces the one
-message string; the viewer words each. A failure that may pass is retried
-once after a second; read-ahead gives up at once.
-
-Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_01XgDDiYQ76yxLJH3i1bxQFK

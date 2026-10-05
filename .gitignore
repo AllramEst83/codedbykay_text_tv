@@ -49,3 +49,4 @@ app.*.map.json
 
 # Output of `flutter screenshot`
 /flutter_*.png
+.git_msg.txt
