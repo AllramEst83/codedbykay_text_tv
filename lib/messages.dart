@@ -9,6 +9,10 @@ abstract final class Messages {
   static const String part = 'PART';
   static const String settingsTitle = 'SETTINGS';
   static const String sectionFavourites = 'FAVOURITES';
+  static const String recentPages = 'Recent pages';
+  static const String recentsTitle = 'RECENT PAGES';
+  static const String recentsEmpty = 'NO OTHER PAGES READ YET.';
+  static const String clearRecents = 'CLEAR LIST';
   static const String resetFavourites = 'RESET FAVOURITES';
   static const String favouritesHint = 'NO FAVOURITES. TAP THE STAR.';
   static const String addFavourite = 'Add to favourites';

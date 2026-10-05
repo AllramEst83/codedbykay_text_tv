@@ -16,6 +16,7 @@ import 'package:codedbykay_text_tv/ui/crt_screen.dart';
 import 'package:codedbykay_text_tv/ui/page_turn.dart';
 import 'package:codedbykay_text_tv/ui/reader_bar.dart';
 import 'package:codedbykay_text_tv/ui/reader_view.dart';
+import 'package:codedbykay_text_tv/ui/recent_pages_sheet.dart';
 import 'package:codedbykay_text_tv/ui/settings_screen.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
@@ -247,7 +248,12 @@ class _TextTvScreenState extends State<TextTvScreen>
   }
 
   void _show(TextTvResult result, {bool readAhead = false}) {
-    if (readAhead && result is TextTvShown) _scheduleReadAhead(result);
+    if (readAhead && result is TextTvShown) {
+      _scheduleReadAhead(result);
+      // A page read (not a failure, not one that is not in broadcast) is one
+      // worth coming back to.
+      _setSaved(_saved.visited(_number));
+    }
     setState(() {
       _loading = false;
       _result = result;
@@ -482,6 +488,20 @@ class _TextTvScreenState extends State<TextTvScreen>
     });
   }
 
+  void _openRecents() {
+    showRecentPages(
+      context,
+      // Not the page on show: it is not somewhere to go back to.
+      recents: <int>[
+        for (final int page in _saved.recents)
+          if (page != _number) page,
+      ],
+      favourites: _saved.favourites,
+      onOpen: _open,
+      onClear: () => _setSaved(_saved.clearRecents()),
+    );
+  }
+
   void _setSaved(SavedPages saved) {
     if (saved == _saved) return;
     setState(() => _saved = saved);
@@ -665,6 +685,7 @@ class _TextTvScreenState extends State<TextTvScreen>
                         favourites: _saved.favourites,
                         current: _number,
                         onOpen: _open,
+                        onRecents: _openRecents,
                       ),
                     ] else if (_keypad)
                       TvKeypad(
@@ -677,6 +698,7 @@ class _TextTvScreenState extends State<TextTvScreen>
                         favourites: _saved.favourites,
                         current: _number,
                         onOpen: _open,
+                        onRecents: _openRecents,
                       ),
                   ],
                 ),

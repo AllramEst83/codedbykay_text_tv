@@ -183,4 +183,147 @@ void main() {
       );
     });
   });
+
+  group('SavedPages recent pages', () {
+    test('start empty', () {
+      expect(const SavedPages().recents, isEmpty);
+    });
+
+    test('a visit goes first, the latest at the front', () {
+      final SavedPages s = const SavedPages()
+          .visited(300)
+          .visited(377)
+          .visited(450);
+
+      expect(s.recents, <int>[450, 377, 300]);
+    });
+
+    test('a page read again moves to the front, not twice', () {
+      final SavedPages s = const SavedPages()
+          .visited(300)
+          .visited(377)
+          .visited(450)
+          .visited(300);
+
+      expect(s.recents, <int>[300, 450, 377]);
+    });
+
+    test('the same page again changes nothing', () {
+      final SavedPages s = const SavedPages().visited(300);
+
+      expect(identical(s.visited(300), s), isTrue);
+    });
+
+    test('keeps the latest dozen, dropping the oldest', () {
+      SavedPages s = const SavedPages();
+      for (int i = 0; i < SavedPages.maxRecents + 5; i++) {
+        s = s.visited(200 + i);
+      }
+
+      expect(s.recents, hasLength(SavedPages.maxRecents));
+      expect(s.recents.first, 200 + SavedPages.maxRecents + 4);
+      expect(s.recents, isNot(contains(200)));
+    });
+
+    test('a number that is not a page is not remembered', () {
+      final SavedPages s = const SavedPages()
+          .visited(99)
+          .visited(900)
+          .visited(-3);
+
+      expect(s.recents, isEmpty);
+    });
+
+    test('clearing them keeps the favourites', () {
+      final SavedPages s = const SavedPages(
+        favourites: <Favourite>[Favourite(377)],
+      ).visited(300).visited(400);
+
+      final SavedPages cleared = s.clearRecents();
+
+      expect(cleared.recents, isEmpty);
+      expect(cleared.favourites, <Favourite>[const Favourite(377)]);
+    });
+
+    test('starring and resetting leave them alone', () {
+      final SavedPages s = const SavedPages().visited(300).visited(400);
+
+      expect(s.toggleFavourite(377).recents, <int>[400, 300]);
+      expect(s.toggleFavourite(300).recents, <int>[400, 300]);
+      expect(s.resetFavourites().recents, <int>[400, 300]);
+    });
+
+    test('resetting the favourites does not need the recents to match', () {
+      final SavedPages s = const SavedPages().visited(300);
+
+      expect(s.hasDefaultFavourites, isTrue);
+      expect(s == const SavedPages(), isFalse);
+      expect(s.toggleFavourite(377).hasDefaultFavourites, isFalse);
+      expect(s.toggleFavourite(100).hasDefaultFavourites, isFalse);
+    });
+
+    test('are part of what makes two SavedPages equal', () {
+      expect(const SavedPages().visited(300), const SavedPages().visited(300));
+      expect(
+        const SavedPages().visited(300),
+        isNot(const SavedPages().visited(400)),
+      );
+      expect(
+        const SavedPages().visited(300).hashCode,
+        const SavedPages().visited(300).hashCode,
+      );
+    });
+
+    test('survive a round trip, in order', () {
+      final SavedPages s = const SavedPages(
+        favourites: <Favourite>[Favourite(377)],
+      ).visited(300).visited(450);
+
+      expect(SavedPages.decode(s.encode()), s);
+      expect(SavedPages.decode(s.encode()).recents, <int>[450, 300]);
+    });
+
+    test('are read back even when no favourites were saved', () {
+      final SavedPages s = SavedPages.decode('{"recents": [300, 400]}');
+
+      expect(s.recents, <int>[300, 400]);
+      expect(s.favourites, defaultFavourites);
+    });
+
+    test('a saved value from before recents existed has none', () {
+      final SavedPages s = SavedPages.decode('{"favourites": [{"page": 377}]}');
+
+      expect(s.recents, isEmpty);
+      expect(s.favourites, <Favourite>[const Favourite(377)]);
+    });
+
+    test('bad entries are dropped, repeats and extras too', () {
+      final SavedPages s = SavedPages.decode(
+        '{"recents": [300, "x", 99, 900, null, 300, 400, 5.5]}',
+      );
+
+      expect(s.recents, <int>[300, 400]);
+    });
+
+    test('nonsense instead of a list means none', () {
+      for (final String bad in <String>['5', '"x"', '{}', 'null']) {
+        expect(
+          SavedPages.decode('{"recents": $bad}').recents,
+          isEmpty,
+          reason: bad,
+        );
+      }
+    });
+
+    test('no more than the cap are read', () {
+      final String many = <int>[
+        for (int i = 0; i < SavedPages.maxRecents + 8; i++) 200 + i,
+      ].join(',');
+
+      expect(
+        SavedPages.decode('{"recents": [$many]}').recents,
+        hasLength(SavedPages.maxRecents),
+      );
+    });
+  });
 }

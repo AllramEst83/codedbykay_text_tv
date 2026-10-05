@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Recent pages (I-7b): a clock chip at the start of the favourites row lists the last dozen pages you read (latest first, remembered between runs), with a CLEAR LIST button.
 - Favourites (I-7a): a star on the page-number row adds or removes the current page; the chips under the page are your favourites (the six old shortcuts to start with), saved, with a reset in settings.
 - Read-ahead and page turn (I-6): after a page arrives, up to four likely next pages (next, previous, linked) are read quietly in the background, one at a time (switch in settings); new pages slide in from the side they were turned to.
 - The settings page groups (controls, refresh, CRT screen) are now separate framed panels with a blue header bar each, so it is plain where one ends and the next begins.

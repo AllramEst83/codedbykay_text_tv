@@ -275,7 +275,11 @@ class TvShortcuts extends StatelessWidget {
     required this.favourites,
     required this.current,
     required this.onOpen,
+    required this.onRecents,
   });
+
+  /// Opens the list of pages read last: the chip that starts the row.
+  final VoidCallback onRecents;
 
   /// The chips, in order.
   final List<Favourite> favourites;
@@ -284,22 +288,44 @@ class TvShortcuts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (favourites.isEmpty) {
-      return ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 48),
-        child: Center(
-          child: Text(
-            Messages.favouritesHint,
-            key: textTvFavouritesHintKey,
-            style: tvText(8, TvColors.dim),
+    final Widget history = InkWell(
+      key: textTvRecentsKey,
+      onTap: onRecents,
+      child: Semantics(
+        button: true,
+        label: Messages.recentPages,
+        excludeSemantics: true,
+        child: Container(
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            border: Border.all(color: TvColors.border, width: TvMetrics.border),
           ),
+          child: const Icon(Icons.history, color: TvColors.white, size: 26),
         ),
+      ),
+    );
+    if (favourites.isEmpty) {
+      return Row(
+        children: <Widget>[
+          history,
+          const SizedBox(width: TvMetrics.gutter),
+          Expanded(
+            child: Text(
+              Messages.favouritesHint,
+              key: textTvFavouritesHintKey,
+              style: tvText(8, TvColors.dim),
+            ),
+          ),
+        ],
       );
     }
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: <Widget>[
+          history,
+          const SizedBox(width: TvMetrics.gutter),
           for (final Favourite favourite in favourites) ...<Widget>[
             InkWell(
               key: textTvChipKey(favourite.page),

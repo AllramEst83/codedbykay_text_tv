@@ -10,6 +10,10 @@ Key textTvSettingsGroupKey(String id) =>
     ValueKey<String>('text-tv-settings-group-$id');
 Key textTvSettingsHeaderKey(String id) =>
     ValueKey<String>('text-tv-settings-header-$id');
+const Key textTvRecentsKey = ValueKey<String>('text-tv-recents');
+const Key textTvRecentsEmptyKey = ValueKey<String>('text-tv-recents-empty');
+const Key textTvRecentsClearKey = ValueKey<String>('text-tv-recents-clear');
+Key textTvRecentKey(int page) => ValueKey<String>('text-tv-recent-$page');
 const Key textTvStarKey = ValueKey<String>('text-tv-star');
 const Key textTvFavouritesResetKey = ValueKey<String>(
   'text-tv-favourites-reset',

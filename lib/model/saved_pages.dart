@@ -33,16 +33,32 @@ const List<Favourite> defaultFavourites = <Favourite>[
   Favourite(700, 'INNEHÅLL'),
 ];
 
-/// The pages the reader has chosen to keep, in the order they chose them. Read
-/// from disk, so decoding is tolerant: a bad entry is dropped, never the rest.
+/// The pages the reader has chosen to keep, in the order they chose them, and
+/// the ones they read last. Read from disk, so decoding is tolerant: a bad
+/// entry is dropped, never the rest.
 class SavedPages {
-  const SavedPages({this.favourites = defaultFavourites});
+  const SavedPages({
+    this.favourites = defaultFavourites,
+    this.recents = const <int>[],
+  });
 
   /// Room for this many favourites: a row of chips that scrolls sideways is
   /// fine for a couple of dozen and unusable for hundreds.
   static const int maxFavourites = 24;
 
+  /// The most pages remembered as recent.
+  static const int maxRecents = 12;
+
   final List<Favourite> favourites;
+
+  /// The pages read last, the latest first, each once.
+  final List<int> recents;
+
+  /// Whether the favourites are just the built-in six, in their order.
+  bool get hasDefaultFavourites =>
+      favourites.length == defaultFavourites.length &&
+      Iterable<int>.generate(favourites.length)
+          .every((int i) => favourites[i] == defaultFavourites[i]);
 
   bool isFavourite(int page) => favourites.any((Favourite f) => f.page == page);
 
@@ -57,14 +73,37 @@ class SavedPages {
           for (final Favourite f in favourites)
             if (f.page != page) f,
         ],
+        recents: recents,
       );
     }
     if (favourites.length >= maxFavourites) return this;
-    return SavedPages(favourites: <Favourite>[...favourites, Favourite(page)]);
+    return SavedPages(
+      favourites: <Favourite>[...favourites, Favourite(page)],
+      recents: recents,
+    );
   }
 
-  /// The favourites put back to the built-in six.
-  SavedPages resetFavourites() => const SavedPages();
+  /// The favourites put back to the built-in six; the recent pages stay.
+  SavedPages resetFavourites() => SavedPages(recents: recents);
+
+  /// [page] read now: first among the recent pages, wherever it was before,
+  /// and the oldest dropped past [maxRecents]. A number that is not a page is
+  /// ignored.
+  SavedPages visited(int page) {
+    if (page < textTvFirstPage || page > textTvLastPage) return this;
+    if (recents.isNotEmpty && recents.first == page) return this;
+    return SavedPages(
+      favourites: favourites,
+      recents: <int>[
+        page,
+        for (final int r in recents)
+          if (r != page) r,
+      ].take(maxRecents).toList(),
+    );
+  }
+
+  /// No recent pages; the favourites stay.
+  SavedPages clearRecents() => SavedPages(favourites: favourites);
 
   factory SavedPages.decode(String? source) {
     if (source == null) return const SavedPages();
@@ -78,7 +117,20 @@ class SavedPages {
     final Object? list = json['favourites'];
     // Nothing saved is the built-in six; an empty list is a reader who
     // removed them all.
-    if (list is! List) return const SavedPages();
+    final Object? seen = json['recents'];
+    final List<int> recents = <int>[];
+    if (seen is List) {
+      for (final Object? entry in seen) {
+        if (entry is! int ||
+            entry < textTvFirstPage ||
+            entry > textTvLastPage) {
+          continue;
+        }
+        if (!recents.contains(entry)) recents.add(entry);
+        if (recents.length >= maxRecents) break;
+      }
+    }
+    if (list is! List) return SavedPages(recents: recents);
     final List<Favourite> favourites = <Favourite>[];
     for (final Object? entry in list) {
       if (entry is! Map<String, Object?>) continue;
@@ -99,7 +151,7 @@ class SavedPages {
       );
       if (favourites.length >= maxFavourites) break;
     }
-    return SavedPages(favourites: favourites);
+    return SavedPages(favourites: favourites, recents: recents);
   }
 
   String encode() => jsonEncode(<String, Object?>{
@@ -107,6 +159,7 @@ class SavedPages {
       for (final Favourite f in favourites)
         <String, Object?>{'page': f.page, if (f.name != null) 'name': f.name},
     ],
+    'recents': recents,
   });
 
   @override
@@ -114,8 +167,12 @@ class SavedPages {
       other is SavedPages &&
       other.favourites.length == favourites.length &&
       Iterable<int>.generate(favourites.length)
-          .every((int i) => other.favourites[i] == favourites[i]);
+          .every((int i) => other.favourites[i] == favourites[i]) &&
+      other.recents.length == recents.length &&
+      Iterable<int>.generate(recents.length)
+          .every((int i) => other.recents[i] == recents[i]);
 
   @override
-  int get hashCode => Object.hashAll(favourites);
+  int get hashCode =>
+      Object.hash(Object.hashAll(favourites), Object.hashAll(recents));
 }

@@ -146,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       TvButton(
                         key: textTvFavouritesResetKey,
                         label: Messages.resetFavourites,
-                        onTap: _saved == const SavedPages()
+                        onTap: _saved.hasDefaultFavourites
                             ? null
                             : () => _setSaved(_saved.resetFavourites()),
                       ),

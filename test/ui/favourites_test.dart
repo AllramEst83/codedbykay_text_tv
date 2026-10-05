@@ -206,7 +206,11 @@ void main() {
       await tester.tap(find.byKey(textTvStarKey));
       await tester.pumpAndSettle();
 
-      expect(heard, isEmpty);
+      // The visit to the page is reported; nothing is starred.
+      for (final SavedPages reported in heard) {
+        expect(reported.isFavourite(800), isFalse);
+        expect(reported.favourites, hasLength(SavedPages.maxFavourites));
+      }
       expect(find.byKey(textTvChipKey(800)), findsNothing);
     });
 
@@ -273,7 +277,7 @@ void main() {
       await tester.tap(find.byKey(textTvFavouritesResetKey));
       await tester.pumpAndSettle();
 
-      expect(heard.last, const SavedPages());
+      expect(heard.last.favourites, defaultFavourites);
       await tester.tap(find.byKey(textTvSettingsBackKey));
       await tester.pumpAndSettle();
       expect(find.byKey(textTvChipKey(700)), findsOneWidget);
