@@ -1,3 +1,4 @@
+import 'package:codedbykay_text_tv/services/alert_platform.dart';
 import 'package:codedbykay_text_tv/services/background_refresher.dart';
 import 'package:codedbykay_text_tv/services/background_settings_store.dart';
 import 'package:codedbykay_text_tv/services/io_http_fetcher.dart';
@@ -16,6 +17,8 @@ void backgroundDispatcher() {
       textTv: TextTv(fetcher: IoHttpFetcher()),
       settings: PrefsBackgroundSettingsStore(),
       widget: const HomeWidgetPlatform(),
+      alerts: LocalNotificationsAlerts(),
+      watch: PrefsWatchStateStore(),
     ).run();
     return true;
   });

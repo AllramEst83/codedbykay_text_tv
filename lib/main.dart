@@ -12,6 +12,7 @@ import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
+import 'package:codedbykay_text_tv/services/alert_platform.dart';
 import 'package:codedbykay_text_tv/services/background_coordinator.dart';
 import 'package:codedbykay_text_tv/services/background_refresher.dart';
 import 'package:codedbykay_text_tv/services/background_scheduler.dart';
@@ -58,6 +59,8 @@ Future<void> main() async {
   const WidgetPlatform widgetPlatform = HomeWidgetPlatform();
   final OpenPageService openPages = OpenPageService();
   await widgetPlatform.start(openPages.request);
+  final AlertPlatform alertPlatform = LocalNotificationsAlerts();
+  await alertPlatform.start(openPages.request);
   final BackgroundCoordinator coordinator = BackgroundCoordinator(
     scheduler: const WorkmanagerScheduler(),
     widget: widgetPlatform,
@@ -65,6 +68,8 @@ Future<void> main() async {
       textTv: TextTv(fetcher: fetcher),
       settings: backgroundStore,
       widget: widgetPlatform,
+      alerts: alertPlatform,
+      watch: PrefsWatchStateStore(),
     ),
   );
   final PageFontSettingsStore pageFontStore = PrefsPageFontSettingsStore();
@@ -99,6 +104,7 @@ Future<void> main() async {
         unawaited(coordinator.apply(b));
       },
       openPages: openPages,
+      alerts: alertPlatform,
       onResumed: () => unawaited(coordinator.appResumed(background)),
       pageFont: pageFont,
       onPageFontChanged: (PageFontSettings p) =>

@@ -36,6 +36,7 @@ lib/
     background_settings.dart # BackgroundSettings (widgetPage, interval index into backgroundIntervals 30m/1h/3h), tolerant decode
     widget_content.dart      # WidgetContent.of(page, now): page, up to 8 headlines, `HH:mm`
     launch_link.dart         # launchLinkFor(page) / pageOfLaunchLink(uri): `texttv://page/N`, what the widget opens the app with
+    headline_watch.dart      # watchedHeadlines(page), breakingHeadline(previous, current) (the top headline, if new), WatchState (what the alerts last saw, per page)
     page_section.dart        # PageSection (the six built-in favourites' pages), sectionOf(page), legacyDefaultNames (the Swedish names older versions saved)
     page_semantics.dart      # PageSemantics: the page-level node (label, live region) around the rows
     page_share.dart          # pageText(page, part), pageLink(n), shareMessage: what copying and sharing send
@@ -58,6 +59,7 @@ lib/
     background_coordinator.dart # starts/stops the job (only while a widget exists), refreshes at once on resume (not within 5 min)
     open_page_service.dart   # OpenPageService: pages asked for from outside (widget tap), buffered for the viewer
     background_settings_store.dart # PrefsBackgroundSettingsStore (key `background`; reload()s because the job runs in another isolate)
+    alert_platform.dart      # AlertPlatform (start, requestPermission, allowed, show) over flutter_local_notifications; channel/title worded by the phone's language since the job has no localizations
     shortcut_service.dart    # ShortcutPlatform (start/set: the thin plugin side), QuickActionsShortcuts (quick_actions), ShortcutService (keeps the icon's shortcuts in step with the favourites; `opened` stream of pages chosen from them; never throws)
     saved_pages_store.dart   # SavedPagesStore (load/save, never throws) and PrefsSavedPagesStore on shared_preferences (key `pages`)
     controls_settings_store.dart # ControlsSettingsStore (load/save, never throws) and PrefsControlsSettingsStore on shared_preferences (key `controls`)

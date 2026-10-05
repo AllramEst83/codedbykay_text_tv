@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Breaking-news alerts (I-19, settings > WIDGET AND ALERTS): off by default. When on, the app checks a page you choose (page 100 to start with) every 30 min / 1 h / 3 h in the background and shows a notification when its top headline is replaced by a new one; a tap opens the page. Turning it on asks for the notification permission.
 - Home-screen widget (I-18): a black widget with a page's headlines (page 100 to start with; choose another in settings > WIDGET AND ALERTS), refreshed in the background every 30 min / 1 h / 3 h while it is on a home screen, and when the app comes to the front. A tap opens the app on its page.
 - Teletext font (settings > TELETEXT FONT): switch the page between Press Start 2P (the default) and Bedstead, a face drawn after the real 1980s teletext, with a live preview. Bundled, public domain.
 - Cheaper drawing (part of I-12): a row lays out each letter once per paint and the page sits in its own layer; nothing looks different.

@@ -97,6 +97,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'The widget is refreshed in the background at this interval, and only while it is on a home screen. Each check asks texttv.nu for one page.';
 
   @override
+  String get alertsOn => 'BREAKING-NEWS ALERTS';
+
+  @override
+  String get alertPage => 'ALERT PAGE';
+
+  @override
+  String get alertsDenied =>
+      'NOTIFICATIONS ARE OFF FOR THIS APP. TURN THEM ON IN THE PHONE\'S SETTINGS.';
+
+  @override
+  String get alertsNote =>
+      'When the top headline of the alert page changes, a notification shows it. The page is checked at the interval above, so an alert can come up to that long after the news.';
+
+  @override
   String get sectionControls => 'CONTROLS';
 
   @override

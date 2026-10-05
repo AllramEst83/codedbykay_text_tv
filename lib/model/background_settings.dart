@@ -25,6 +25,8 @@ class BackgroundSettings {
   const BackgroundSettings({
     this.widgetPage = backgroundDefaultPage,
     this.interval = backgroundDefaultInterval,
+    this.alerts = false,
+    this.alertPage = backgroundDefaultPage,
   });
 
   /// The page whose headlines the home-screen widget shows.
@@ -33,15 +35,28 @@ class BackgroundSettings {
   /// An index into [backgroundIntervals].
   final int interval;
 
+  /// Whether a notification is shown when the top headline of [alertPage]
+  /// changes. Off until the user turns it on.
+  final bool alerts;
+
+  /// The page the alerts watch.
+  final int alertPage;
+
   static const BackgroundSettings defaults = BackgroundSettings();
 
   Duration get every => backgroundIntervals[interval];
 
-  BackgroundSettings copyWith({int? widgetPage, int? interval}) =>
-      BackgroundSettings(
-        widgetPage: widgetPage ?? this.widgetPage,
-        interval: interval ?? this.interval,
-      );
+  BackgroundSettings copyWith({
+    int? widgetPage,
+    int? interval,
+    bool? alerts,
+    int? alertPage,
+  }) => BackgroundSettings(
+    widgetPage: widgetPage ?? this.widgetPage,
+    interval: interval ?? this.interval,
+    alerts: alerts ?? this.alerts,
+    alertPage: alertPage ?? this.alertPage,
+  );
 
   static int _page(Object? value) =>
       value is int && value >= textTvFirstPage && value <= textTvLastPage
@@ -65,20 +80,26 @@ class BackgroundSettings {
     return BackgroundSettings(
       widgetPage: _page(json['widgetPage']),
       interval: _step(json['interval']),
+      alerts: json['alerts'] == true,
+      alertPage: _page(json['alertPage']),
     );
   }
 
   String encode() => jsonEncode(<String, Object?>{
     'widgetPage': widgetPage,
     'interval': interval,
+    'alerts': alerts,
+    'alertPage': alertPage,
   });
 
   @override
   bool operator ==(Object other) =>
       other is BackgroundSettings &&
       other.widgetPage == widgetPage &&
-      other.interval == interval;
+      other.interval == interval &&
+      other.alerts == alerts &&
+      other.alertPage == alertPage;
 
   @override
-  int get hashCode => Object.hash(widgetPage, interval);
+  int get hashCode => Object.hash(widgetPage, interval, alerts, alertPage);
 }

@@ -8,6 +8,7 @@ import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
+import 'package:codedbykay_text_tv/services/alert_platform.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
 import 'package:codedbykay_text_tv/ui/formats.dart';
 import 'package:codedbykay_text_tv/ui/page_picker_sheet.dart';
@@ -28,6 +29,7 @@ class SettingsScreen extends StatefulWidget {
     required this.background,
     required this.onBackgroundChanged,
     required this.recents,
+    this.alerts,
     required this.pageFont,
     required this.onPageFontChanged,
     required this.language,
@@ -48,6 +50,10 @@ class SettingsScreen extends StatefulWidget {
 
   /// The pages read lately, for the page pickers.
   final List<int> recents;
+
+  /// The phone's notifications, asked for permission when alerts are turned
+  /// on. Without it the switch just switches.
+  final AlertPlatform? alerts;
 
   /// The typeface of the teletext page, and the listener for it.
   final PageFontSettings pageFont;
@@ -94,6 +100,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (background == _background) return;
     setState(() => _background = background);
     widget.onBackgroundChanged(background);
+  }
+
+  /// Turns alerts on or off. Turning them on asks the phone for permission to
+  /// notify first, and stays off (saying why) when it is refused.
+  Future<void> _setAlerts(bool on) async {
+    if (on) {
+      final AlertPlatform? platform = widget.alerts;
+      if (platform != null && !await platform.requestPermission()) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.l10n.alertsDenied,
+              style: tvText(10, TvColors.white),
+            ),
+            backgroundColor: TvColors.black,
+            shape: const Border.fromBorderSide(
+              BorderSide(color: TvColors.border, width: TvMetrics.border),
+            ),
+          ),
+        );
+        return;
+      }
+    }
+    if (mounted) _setBackground(_background.copyWith(alerts: on));
   }
 
   void _setPageFont(PageFontSettings pageFont) {
@@ -292,6 +323,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ],
                       ),
                       const SizedBox(height: TvMetrics.margin),
+                      TvSwitchRow(
+                        switchKey: textTvAlertsKey,
+                        label: context.l10n.alertsOn,
+                        value: _background.alerts,
+                        onChanged: _setAlerts,
+                      ),
+                      const SizedBox(height: TvMetrics.margin),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              context.l10n.alertPage,
+                              style: tvText(
+                                12,
+                                _background.alerts
+                                    ? TvColors.white
+                                    : TvColors.dim,
+                              ),
+                            ),
+                          ),
+                          TvButton(
+                            key: textTvAlertPageKey,
+                            label: context.l10n.chipLabel(
+                              Favourite(_background.alertPage),
+                            ),
+                            onTap: _background.alerts
+                                ? () => showPagePicker(
+                                    context,
+                                    title: context.l10n.pickerTitle,
+                                    selected: _background.alertPage,
+                                    favourites: _saved.favourites,
+                                    recents: widget.recents,
+                                    onPick: (int page) => _setBackground(
+                                      _background.copyWith(alertPage: page),
+                                    ),
+                                  )
+                                : null,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: TvMetrics.margin),
                       Text(
                         context.l10n.backgroundEvery,
                         style: tvText(12, TvColors.white),
@@ -327,6 +399,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Text(
                         context.l10n.backgroundNote,
                         key: textTvBackgroundNoteKey,
+                        style: readerTextStyle(13, TvColors.white),
+                      ),
+                      const SizedBox(height: TvMetrics.gutter),
+                      Text(
+                        context.l10n.alertsNote,
+                        key: textTvAlertsNoteKey,
                         style: readerTextStyle(13, TvColors.white),
                       ),
                     ],

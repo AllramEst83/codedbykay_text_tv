@@ -97,6 +97,20 @@ class AppLocalizationsSv extends AppLocalizations {
       'Widgeten uppdateras i bakgrunden med det här mellanrummet, och bara när den ligger på en startskärm. Varje koll hämtar en sida från texttv.nu.';
 
   @override
+  String get alertsOn => 'AVISERING VID SENASTE NYTT';
+
+  @override
+  String get alertPage => 'SIDA ATT BEVAKA';
+
+  @override
+  String get alertsDenied =>
+      'AVISERINGAR ÄR AVSTÄNGDA FÖR APPEN. SLÅ PÅ DEM I TELEFONENS INSTÄLLNINGAR.';
+
+  @override
+  String get alertsNote =>
+      'När den översta rubriken på den bevakade sidan byts ut visas den i en avisering. Sidan kollas med mellanrummet ovan, så en avisering kan komma så lång tid efter nyheten.';
+
+  @override
   String get sectionControls => 'KNAPPAR';
 
   @override

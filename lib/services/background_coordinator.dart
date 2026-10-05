@@ -29,7 +29,7 @@ class BackgroundCoordinator {
 
   /// Starts or stops the job to suit [settings] and the widgets there are.
   Future<void> apply(BackgroundSettings settings) async {
-    if (await widget.hasWidgets()) {
+    if (settings.alerts || await widget.hasWidgets()) {
       await scheduler.schedule(settings.every);
     } else {
       await scheduler.cancel();
@@ -46,6 +46,6 @@ class BackgroundCoordinator {
     final DateTime? last = _lastRun;
     if (last != null && now.difference(last) < freshFor) return;
     _lastRun = now;
-    await refresher.run();
+    await refresher.run(alert: false);
   }
 }

@@ -15,6 +15,7 @@ import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/saved_time.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
+import 'package:codedbykay_text_tv/services/alert_platform.dart';
 import 'package:codedbykay_text_tv/services/open_page_service.dart';
 import 'package:codedbykay_text_tv/services/share_service.dart';
 import 'package:codedbykay_text_tv/services/shortcut_service.dart';
@@ -62,6 +63,7 @@ class TextTvScreen extends StatefulWidget {
     this.background = BackgroundSettings.defaults,
     this.onBackgroundChanged,
     this.openPages,
+    this.alerts,
     this.onResumed,
     this.pageFont = PageFontSettings.defaults,
     this.onPageFontChanged,
@@ -107,6 +109,9 @@ class TextTvScreen extends StatefulWidget {
 
   /// Pages that something outside asks to be opened (a tap on the widget).
   final OpenPageService? openPages;
+
+  /// The phone's notifications (asked when alerts are turned on).
+  final AlertPlatform? alerts;
 
   /// Called when the app comes back to the front.
   final VoidCallback? onResumed;
@@ -378,6 +383,7 @@ class _TextTvScreenState extends State<TextTvScreen>
           background: _background,
           onBackgroundChanged: _setBackground,
           recents: _saved.recents,
+          alerts: widget.alerts,
           pageFont: _pageFont,
           onPageFontChanged: _setPageFont,
           language: widget.language,

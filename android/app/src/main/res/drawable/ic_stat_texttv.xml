@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The notification's small icon: a teletext screen with rows of text, in
+     one colour, as the status bar wants. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M3,4h18v16H3V4zM5,6v3h14V6H5zM5,11h6v2H5v-2zM13,11h6v2h-6v-2zM5,15h9v2H5v-2zM16,15h3v2h-3v-2z" />
+</vector>

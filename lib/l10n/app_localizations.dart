@@ -266,6 +266,30 @@ abstract class AppLocalizations {
   /// **'The widget is refreshed in the background at this interval, and only while it is on a home screen. Each check asks texttv.nu for one page.'**
   String get backgroundNote;
 
+  /// No description provided for @alertsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'BREAKING-NEWS ALERTS'**
+  String get alertsOn;
+
+  /// No description provided for @alertPage.
+  ///
+  /// In en, this message translates to:
+  /// **'ALERT PAGE'**
+  String get alertPage;
+
+  /// No description provided for @alertsDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'NOTIFICATIONS ARE OFF FOR THIS APP. TURN THEM ON IN THE PHONE\'S SETTINGS.'**
+  String get alertsDenied;
+
+  /// No description provided for @alertsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'When the top headline of the alert page changes, a notification shows it. The page is checked at the interval above, so an alert can come up to that long after the news.'**
+  String get alertsNote;
+
   /// No description provided for @sectionControls.
   ///
   /// In en, this message translates to:

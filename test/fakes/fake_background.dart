@@ -1,5 +1,7 @@
 import 'package:codedbykay_text_tv/model/background_settings.dart';
+import 'package:codedbykay_text_tv/model/headline_watch.dart';
 import 'package:codedbykay_text_tv/model/widget_content.dart';
+import 'package:codedbykay_text_tv/services/alert_platform.dart';
 import 'package:codedbykay_text_tv/services/background_scheduler.dart';
 import 'package:codedbykay_text_tv/services/background_settings_store.dart';
 import 'package:codedbykay_text_tv/services/widget_platform.dart';
@@ -66,4 +68,49 @@ class FakeBackgroundSettingsStore implements BackgroundSettingsStore {
 
   @override
   Future<void> save(BackgroundSettings s) async => settings = s;
+}
+
+/// The phone's notifications, in memory: records what was shown and lets a test
+/// say whether the user allows them.
+class FakeAlertPlatform implements AlertPlatform {
+  /// Every `(page, headline)` shown, in order.
+  final List<(int, String)> shown = <(int, String)>[];
+
+  /// What the user answers when asked for permission.
+  bool permission = true;
+  int asked = 0;
+  void Function(int page)? _onPage;
+
+  @override
+  Future<void> start(void Function(int page) onPage) async {
+    _onPage = onPage;
+  }
+
+  @override
+  Future<bool> requestPermission() async {
+    asked++;
+    return permission;
+  }
+
+  @override
+  Future<bool> allowed() async => permission;
+
+  @override
+  Future<void> show(int page, String headline) async {
+    shown.add((page, headline));
+  }
+
+  /// The user taps a notification for [page].
+  void tap(int page) => _onPage?.call(page);
+}
+
+/// What the alerts last saw, in memory.
+class FakeWatchStateStore implements WatchStateStore {
+  WatchState state = const WatchState();
+
+  @override
+  Future<WatchState> load() async => state;
+
+  @override
+  Future<void> save(WatchState s) async => state = s;
 }

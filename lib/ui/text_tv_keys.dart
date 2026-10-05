@@ -82,3 +82,6 @@ const Key textTvWidgetPageKey = ValueKey<String>('text-tv-widget-page');
 Key textTvIntervalKey(int step) => ValueKey<String>('text-tv-interval-$step');
 const Key textTvBackgroundNoteKey = ValueKey<String>('text-tv-background-note');
 Key textTvPickKey(int page) => ValueKey<String>('text-tv-pick-$page');
+const Key textTvAlertsKey = ValueKey<String>('text-tv-alerts');
+const Key textTvAlertPageKey = ValueKey<String>('text-tv-alert-page');
+const Key textTvAlertsNoteKey = ValueKey<String>('text-tv-alerts-note');
