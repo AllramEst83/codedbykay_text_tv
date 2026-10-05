@@ -281,8 +281,14 @@ abstract class AppLocalizations {
   /// No description provided for @alertsDenied.
   ///
   /// In en, this message translates to:
-  /// **'NOTIFICATIONS ARE OFF FOR THIS APP. TURN THEM ON IN THE PHONE\'S SETTINGS.'**
+  /// **'NOTIFICATIONS ARE OFF FOR THIS APP.'**
   String get alertsDenied;
+
+  /// No description provided for @alertsOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'OPEN SETTINGS'**
+  String get alertsOpenSettings;
 
   /// No description provided for @alertsNote.
   ///

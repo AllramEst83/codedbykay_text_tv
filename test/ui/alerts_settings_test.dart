@@ -104,6 +104,33 @@ void main() {
       expect(find.text(en.alertsDenied), findsOneWidget);
     });
 
+    testWidgets('and the message has a button that opens the phone settings', (
+      WidgetTester tester,
+    ) async {
+      final FakeAlertPlatform alerts = FakeAlertPlatform()..permission = false;
+      await _open(tester, alerts: alerts);
+      await tester.tap(find.byKey(textTvAlertsKey));
+      await tester.pumpAndSettle();
+      expect(alerts.settingsOpened, 0);
+
+      expect(find.text(en.alertsOpenSettings), findsOneWidget);
+      await tester.tap(find.byKey(textTvOpenSettingsKey));
+      await tester.pumpAndSettle();
+
+      expect(alerts.settingsOpened, 1);
+    });
+
+    testWidgets('no button when the permission is given', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester, alerts: FakeAlertPlatform());
+
+      await tester.tap(find.byKey(textTvAlertsKey));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(textTvOpenSettingsKey), findsNothing);
+    });
+
     testWidgets('turning them off asks for nothing', (
       WidgetTester tester,
     ) async {

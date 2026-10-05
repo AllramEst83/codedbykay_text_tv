@@ -103,8 +103,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alertPage => 'ALERT PAGE';
 
   @override
-  String get alertsDenied =>
-      'NOTIFICATIONS ARE OFF FOR THIS APP. TURN THEM ON IN THE PHONE\'S SETTINGS.';
+  String get alertsDenied => 'NOTIFICATIONS ARE OFF FOR THIS APP.';
+
+  @override
+  String get alertsOpenSettings => 'OPEN SETTINGS';
 
   @override
   String get alertsNote =>

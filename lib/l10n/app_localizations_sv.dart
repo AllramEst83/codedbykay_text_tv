@@ -103,8 +103,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get alertPage => 'SIDA ATT BEVAKA';
 
   @override
-  String get alertsDenied =>
-      'AVISERINGAR ÄR AVSTÄNGDA FÖR APPEN. SLÅ PÅ DEM I TELEFONENS INSTÄLLNINGAR.';
+  String get alertsDenied => 'AVISERINGAR ÄR AVSTÄNGDA FÖR APPEN.';
+
+  @override
+  String get alertsOpenSettings => 'ÖPPNA INSTÄLLNINGAR';
 
   @override
   String get alertsNote =>

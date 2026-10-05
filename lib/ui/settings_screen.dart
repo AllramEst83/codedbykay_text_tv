@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/background_settings.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
@@ -118,6 +120,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             backgroundColor: TvColors.black,
             shape: const Border.fromBorderSide(
               BorderSide(color: TvColors.border, width: TvMetrics.border),
+            ),
+            // Straight to where it can be allowed.
+            action: SnackBarAction(
+              key: textTvOpenSettingsKey,
+              label: context.l10n.alertsOpenSettings,
+              textColor: TvColors.highlight,
+              onPressed: () => unawaited(platform.openSettings()),
             ),
           ),
         );

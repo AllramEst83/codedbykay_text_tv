@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /// The phone's notifications, as little as it can be: [LocalNotificationsAlerts]
@@ -17,6 +18,11 @@ abstract interface class AlertPlatform {
   /// Whether notifications may be shown now.
   Future<bool> allowed();
 
+  /// Opens the phone's notification settings for this app, where the user can
+  /// allow notifications after having refused them. False if it could not be
+  /// opened.
+  Future<bool> openSettings();
+
   /// Shows a notification that [headline] is new on [page].
   Future<void> show(int page, String headline);
 }
@@ -27,6 +33,11 @@ class LocalNotificationsAlerts implements AlertPlatform {
 
   static const String _channelId = 'breaking';
   static const String _icon = 'ic_stat_texttv';
+
+  // `MainActivity.kt` answers this channel.
+  static const MethodChannel _system = MethodChannel(
+    'com.codedbykay.texttv/system',
+  );
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
@@ -95,6 +106,16 @@ class LocalNotificationsAlerts implements AlertPlatform {
     try {
       await _init();
       return await _android?.areNotificationsEnabled() ?? false;
+    } on Object {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> openSettings() async {
+    try {
+      return await _system.invokeMethod<bool>('openNotificationSettings') ??
+          false;
     } on Object {
       return false;
     }

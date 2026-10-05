@@ -85,3 +85,4 @@ Key textTvPickKey(int page) => ValueKey<String>('text-tv-pick-$page');
 const Key textTvAlertsKey = ValueKey<String>('text-tv-alerts');
 const Key textTvAlertPageKey = ValueKey<String>('text-tv-alert-page');
 const Key textTvAlertsNoteKey = ValueKey<String>('text-tv-alerts-note');
+const Key textTvOpenSettingsKey = ValueKey<String>('text-tv-open-settings');

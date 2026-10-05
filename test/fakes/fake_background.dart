@@ -95,6 +95,15 @@ class FakeAlertPlatform implements AlertPlatform {
   @override
   Future<bool> allowed() async => permission;
 
+  /// How many times the phone's notification settings were opened.
+  int settingsOpened = 0;
+
+  @override
+  Future<bool> openSettings() async {
+    settingsOpened++;
+    return true;
+  }
+
   @override
   Future<void> show(int page, String headline) async {
     shown.add((page, headline));

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- When notifications are refused, turning on alerts now says so with an OPEN SETTINGS button that goes straight to this app's notification settings on the phone.
 - Fixed the big lettering under a page title ("inrikes", "vädret"): its last row, which sits on black below the blue banner, was centred like body text and so drawn a cell to the left of the rows above it. Rows of block graphics now share the margin of the colour bars.
 - Breaking-news alerts (I-19, settings > WIDGET AND ALERTS): off by default. When on, the app checks a page you choose (page 100 to start with) every 30 min / 1 h / 3 h in the background and shows a notification when its top headline is replaced by a new one; a tap opens the page. Turning it on asks for the notification permission.
 - Home-screen widget (I-18): a black widget with a page's headlines (page 100 to start with; choose another in settings > WIDGET AND ALERTS), refreshed in the background every 30 min / 1 h / 3 h while it is on a home screen, and when the app comes to the front. A tap opens the app on its page.
