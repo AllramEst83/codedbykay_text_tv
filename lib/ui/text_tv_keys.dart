@@ -62,3 +62,4 @@ const Key textTvShareKey = ValueKey<String>('text-tv-share');
 const Key textTvCopyTextKey = ValueKey<String>('text-tv-copy-text');
 const Key textTvShareTextKey = ValueKey<String>('text-tv-share-text');
 const Key textTvShareLinkKey = ValueKey<String>('text-tv-share-link');
+const Key textTvShareImageKey = ValueKey<String>('text-tv-share-image');

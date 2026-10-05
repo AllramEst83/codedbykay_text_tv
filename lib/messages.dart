@@ -30,6 +30,7 @@ abstract final class Messages {
   static const String copyText = 'COPY TEXT';
   static const String shareText = 'SHARE TEXT';
   static const String shareLink = 'SHARE LINK';
+  static const String shareImage = 'SHARE IMAGE';
   static const String copied = 'COPIED';
   static const String sectionControls = 'CONTROLS';
   static const String quickEntry = 'ALWAYS-ON NUMBER PAD AND COLOUR KEYS';

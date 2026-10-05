@@ -55,6 +55,7 @@ lib/
     settings_screen.dart     # SettingsScreen: the page the gear button opens, as framed panels each under a blue header bar: CONTROLS (the quick-pad switch), FAVOURITES (count, RESET), REFRESH (auto-refresh step slider, read-ahead switch), CRT SCREEN (switch, live preview, three capped sliders, RESET)
     crt_screen.dart          # CrtScreen: draws its child through shaders/crt.frag (flutter_shaders AnimatedSampler) and routes touches through CrtHitMap
     crt_hit_map.dart         # CrtHitMap: a render object that remaps a touch through the CRT glass so a tap reaches what is shown
+    page_snapshot.dart       # capturePageImage(context, page, part): a PNG of the page as teletext, drawn off-screen in the overlay
     share_sheet.dart         # showShareSheet(onChosen): COPY TEXT / SHARE TEXT / SHARE LINK
     search_sheet.dart        # showSearchSheet: the search field, a go-to-page row and the hits; debounced, stale answers dropped
     page_turn.dart           # PageTurn: the 180 ms slide-and-fade a new page comes in with (from the side it was turned to); keyed per page, so the old page is already gone

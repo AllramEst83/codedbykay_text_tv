@@ -122,6 +122,41 @@ void main() {
       expect(share.texts.single.$1, 'https://texttv.nu/100');
     });
 
+    testWidgets('SHARE IMAGE shares a PNG of the page with its link', (
+      WidgetTester tester,
+    ) async {
+      final FakeSharePlatform share = await _open(tester);
+
+      await tester.tap(find.byKey(textTvShareImageKey));
+      await tester.pump();
+      // Taking the picture is real work (the engine, not the test clock).
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(seconds: 1)),
+      );
+      await tester.pump();
+
+      expect(share.images, hasLength(1));
+      final (Uint8List png, String name, String? text) = share.images.single;
+      expect(png.sublist(0, 8), <int>[137, 80, 78, 71, 13, 10, 26, 10]);
+      expect(name, 'texttv-100.png');
+      expect(text, 'https://texttv.nu/100');
+    });
+
+    testWidgets('the picture leaves nothing behind on the screen', (
+      WidgetTester tester,
+    ) async {
+      await _open(tester);
+
+      await tester.tap(find.byKey(textTvShareImageKey));
+      await tester.pump();
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(seconds: 1)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('texttv.nu/100'), findsNothing);
+    });
+
     testWidgets('with no share sheet on the phone, sharing does nothing', (
       WidgetTester tester,
     ) async {

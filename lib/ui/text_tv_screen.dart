@@ -16,6 +16,7 @@ import 'package:codedbykay_text_tv/services/share_service.dart';
 import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
+import 'package:codedbykay_text_tv/ui/page_snapshot.dart';
 import 'package:codedbykay_text_tv/ui/page_turn.dart';
 import 'package:codedbykay_text_tv/ui/reader_bar.dart';
 import 'package:codedbykay_text_tv/ui/reader_view.dart';
@@ -547,8 +548,22 @@ class _TextTvScreenState extends State<TextTvScreen>
             );
           case ShareAction.shareLink:
             unawaited(widget.share?.shareText(pageLink(page.number)));
+          case ShareAction.shareImage:
+            unawaited(_shareImage(page, part));
         }
       },
+    );
+  }
+
+  Future<void> _shareImage(TextTvPage page, int part) async {
+    final SharePlatform? share = widget.share;
+    if (share == null) return;
+    final Uint8List? png = await capturePageImage(context, page, part);
+    if (png == null) return;
+    await share.shareImage(
+      png,
+      name: 'texttv-${page.number}.png',
+      text: pageLink(page.number),
     );
   }
 

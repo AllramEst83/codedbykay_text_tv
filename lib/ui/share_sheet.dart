@@ -5,7 +5,7 @@ import 'package:codedbykay_text_tv/ui/theme.dart';
 import 'package:flutter/material.dart';
 
 /// What can be done with the page on show.
-enum ShareAction { copyText, shareText, shareLink }
+enum ShareAction { copyText, shareText, shareLink, shareImage }
 
 /// Opens the ways to copy or share the page over it. The sheet closes itself
 /// when one is chosen, and then [onChosen] is told which.
@@ -54,6 +54,12 @@ Future<void> showShareSheet(
                 key: textTvShareLinkKey,
                 label: Messages.shareLink,
                 onTap: () => choose(ShareAction.shareLink),
+              ),
+              const SizedBox(height: TvMetrics.gutter),
+              TvButton(
+                key: textTvShareImageKey,
+                label: Messages.shareImage,
+                onTap: () => choose(ShareAction.shareImage),
               ),
             ],
           ),
