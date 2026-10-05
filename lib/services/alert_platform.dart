@@ -95,7 +95,14 @@ class LocalNotificationsAlerts implements AlertPlatform {
   Future<bool> requestPermission() async {
     try {
       await _init();
-      return await _android?.requestNotificationsPermission() ?? false;
+      // Ask the phone what is so first: a request for a permission that is
+      // already given (or one that Android will not put up a dialog for any
+      // more) can answer "no", and the switch would never turn on.
+      if (await allowed()) return true;
+      await _android?.requestNotificationsPermission();
+      // The answer to the request is not trusted either; the phone's own
+      // state is the truth.
+      return await allowed();
     } on Object {
       return false;
     }

@@ -10,6 +10,11 @@ import 'package:flutter/rendering.dart';
 /// needs, the same limit plain grids use.
 const tvUpscaleLimit = 1.75;
 
+/// The font size the page styles are written at (see `pageTextStyle`): the cell
+/// width the upscale limit is counted from, for a face a cell of which is one
+/// em wide.
+const double _nominalFontSize = 8;
+
 /// Blank cells of the black screen either side of the page, so text in the
 /// last column is not pressed against the edge (a real teletext set has this
 /// margin as overscan). How many go on each side is chosen per page
@@ -257,9 +262,14 @@ double _fittingFontSize(
   probe.dispose();
   if (needed <= 0) return size;
   // A hair under, so rounding never pushes the last column past the edge.
+  // The limit is on how wide a cell may get, not on the font size: faces
+  // differ in how wide a cell is for their size (Press Start 2P is one em,
+  // Bedstead 0.6), and a limit on the size would stop the narrow one short of
+  // the screen.
+  final cellAtBase = needed / columns;
   final scale = (constraints.maxWidth / needed * 0.995).clamp(
     0.0,
-    tvUpscaleLimit,
+    _nominalFontSize * tvUpscaleLimit / cellAtBase,
   );
   return size * scale;
 }

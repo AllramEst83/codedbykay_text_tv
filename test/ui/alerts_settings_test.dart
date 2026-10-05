@@ -120,6 +120,75 @@ void main() {
       expect(alerts.settingsOpened, 1);
     });
 
+    testWidgets(
+      'coming back from the phone settings with it allowed turns alerts on',
+      (WidgetTester tester) async {
+        final FakeAlertPlatform alerts = FakeAlertPlatform()
+          ..permission = false;
+        final List<BackgroundSettings> heard = await _open(
+          tester,
+          alerts: alerts,
+        );
+        await tester.tap(find.byKey(textTvAlertsKey));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(textTvOpenSettingsKey));
+        await tester.pumpAndSettle();
+
+        // The reader allows them there and returns.
+        alerts.permission = true;
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await tester.pumpAndSettle();
+
+        expect(heard.last.alerts, isTrue);
+        expect(
+          tester.widget<Switch>(find.byKey(textTvAlertsKey)).value,
+          isTrue,
+        );
+      },
+    );
+
+    testWidgets('coming back with it still refused leaves alerts off', (
+      WidgetTester tester,
+    ) async {
+      final FakeAlertPlatform alerts = FakeAlertPlatform()..permission = false;
+      final List<BackgroundSettings> heard = await _open(
+        tester,
+        alerts: alerts,
+      );
+      await tester.tap(find.byKey(textTvAlertsKey));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(textTvOpenSettingsKey));
+      await tester.pumpAndSettle();
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+
+      expect(heard, isEmpty);
+    });
+
+    testWidgets(
+      'returning to the app without having gone to the settings does nothing',
+      (WidgetTester tester) async {
+        final FakeAlertPlatform alerts = FakeAlertPlatform();
+        final List<BackgroundSettings> heard = await _open(
+          tester,
+          alerts: alerts,
+        );
+
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await tester.pumpAndSettle();
+
+        expect(heard, isEmpty);
+      },
+    );
+
     testWidgets('no button when the permission is given', (
       WidgetTester tester,
     ) async {

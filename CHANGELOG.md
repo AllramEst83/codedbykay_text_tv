@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Bedstead now fills the width of the screen like Press Start 2P (its size was capped by font size, which stopped its narrower cells short). The page's width is limited by how wide a cell may get instead.
+- Alerts: the switch no longer sticks off when notifications are already allowed (it asks the phone what is so, not just the permission request), and coming back from the phone's notification settings with them allowed turns alerts on.
 - When notifications are refused, turning on alerts now says so with an OPEN SETTINGS button that goes straight to this app's notification settings on the phone.
 - Fixed the big lettering under a page title ("inrikes", "vädret"): its last row, which sits on black below the blue banner, was centred like body text and so drawn a cell to the left of the rows above it. Rows of block graphics now share the margin of the colour bars.
 - Breaking-news alerts (I-19, settings > WIDGET AND ALERTS): off by default. When on, the app checks a page you choose (page 100 to start with) every 30 min / 1 h / 3 h in the background and shows a notification when its top headline is replaced by a new one; a tap opens the page. Turning it on asks for the notification permission.

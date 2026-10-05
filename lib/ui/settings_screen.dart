@@ -84,7 +84,39 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends State<SettingsScreen>
+    with WidgetsBindingObserver {
+  // Set when the reader was sent to the phone's notification settings to
+  // allow them: on coming back, alerts are turned on if they did.
+  bool _waitingForPermission = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || !_waitingForPermission) return;
+    _waitingForPermission = false;
+    unawaited(_turnOnIfAllowed());
+  }
+
+  Future<void> _turnOnIfAllowed() async {
+    final AlertPlatform? platform = widget.alerts;
+    if (platform == null || _background.alerts) return;
+    if (await platform.allowed() && mounted) {
+      _setBackground(_background.copyWith(alerts: true));
+    }
+  }
+
   late BackgroundSettings _background = widget.background;
   late PageFontSettings _pageFont = widget.pageFont;
   late LanguageSettings _language = widget.language;
@@ -126,7 +158,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               key: textTvOpenSettingsKey,
               label: context.l10n.alertsOpenSettings,
               textColor: TvColors.highlight,
-              onPressed: () => unawaited(platform.openSettings()),
+              onPressed: () {
+                _waitingForPermission = true;
+                unawaited(platform.openSettings());
+              },
             ),
           ),
         );
