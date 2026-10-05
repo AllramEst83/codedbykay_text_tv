@@ -7,25 +7,21 @@ Personal project, built with Flutter.
 ## Screenshots and video
 
 <details>
-<summary><b>Show screenshots</b> (7)</summary>
+<summary><b>Show screenshots</b> (5)</summary>
 
 <p>
   <img src="images/01-contents-page-700.jpeg" width="220" alt="The contents page, 700, with the CRT look" />
   <img src="images/02-news-page-101.jpeg" width="220" alt="Domestic news, page 101" />
-  <img src="images/03-weather-page-400.jpeg" width="220" alt="Weather, page 400, with favourites under the page" />
-  <img src="images/04-number-pad.jpeg" width="220" alt="The number pad" />
-  <img src="images/05-typing-a-page-number.jpeg" width="220" alt="Typing a page number: 40-" />
-  <img src="images/06-settings.jpeg" width="220" alt="Settings: language, controls, favourites, refresh and the CRT screen" />
-  <img src="images/07-reader-mode.jpeg" width="220" alt="Reader mode on the beige colour scheme" />
+  <img src="images/03-number-pad.jpeg" width="220" alt="The number pad, a page number half typed: 40-" />
+  <img src="images/04-settings.jpeg" width="220" alt="Settings: language, controls, favourites, refresh and the CRT screen" />
+  <img src="images/05-reader-mode.jpeg" width="220" alt="Reader mode on the beige colour scheme" />
 </p>
 
-1. The contents page (700), with the optional CRT look.
+1. The contents page (700), with the optional CRT look; the chips under the page are the favourites, the clock chip lists recent pages.
 2. Domestic news (101).
-3. Weather (400); the chips under the page are the favourites, the clock chip lists recent pages.
-4. The number pad.
-5. A page number half typed.
-6. Settings, here in Swedish.
-7. Reader mode, on the beige scheme.
+3. The number pad, with a page number half typed.
+4. Settings, here in Swedish.
+5. Reader mode, on the beige scheme.
 
 </details>
 
