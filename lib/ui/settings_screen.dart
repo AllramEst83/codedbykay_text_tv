@@ -1,5 +1,6 @@
 import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
+import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
@@ -10,14 +11,25 @@ import 'package:codedbykay_text_tv/ui/tv_option_rows.dart';
 import 'package:codedbykay_text_tv/ui/tv_row.dart';
 import 'package:flutter/material.dart';
 
-/// The settings page: for now the CRT look of the teletext page. Changes apply
+/// The settings page: how the page refreshes, and the CRT look of the
+/// teletext page. Changes apply
 /// at once (the page behind keeps up through [onChanged]) and every slider is
 /// held inside the range in `crt_settings.dart`.
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key, required this.crt, required this.onChanged});
+  const SettingsScreen({
+    super.key,
+    required this.crt,
+    required this.onChanged,
+    required this.refresh,
+    required this.onRefreshChanged,
+  });
 
   final CrtSettings crt;
   final ValueChanged<CrtSettings> onChanged;
+
+  /// How often the page refreshes by itself, and the listener for it.
+  final RefreshSettings refresh;
+  final ValueChanged<RefreshSettings> onRefreshChanged;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -25,8 +37,16 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   late CrtSettings _crt = widget.crt;
+  late RefreshSettings _refresh = widget.refresh;
+
+  void _setRefresh(RefreshSettings refresh) {
+    if (refresh == _refresh) return;
+    setState(() => _refresh = refresh);
+    widget.onRefreshChanged(refresh);
+  }
 
   void _set(CrtSettings crt) {
+    if (crt == _crt) return;
     setState(() => _crt = crt);
     widget.onChanged(crt);
   }
@@ -68,6 +88,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   TvMetrics.margin * 2,
                 ),
                 children: <Widget>[
+                  _SectionTitle(Messages.sectionRefresh),
+                  TvSliderRow(
+                    sliderKey: textTvAutoRefreshKey,
+                    label: Messages.autoRefresh,
+                    value: _refresh.auto.toDouble(),
+                    max: (autoRefreshIntervals.length - 1).toDouble(),
+                    divisions: autoRefreshIntervals.length - 1,
+                    text: Messages.autoRefreshValue(_refresh.interval),
+                    onChanged: (double v) =>
+                        _setRefresh(_refresh.copyWith(auto: v.round())),
+                  ),
+                  const SizedBox(height: TvMetrics.margin * 2),
+                  _SectionTitle(Messages.sectionCrt),
                   TvSwitchRow(
                     switchKey: textTvCrtSwitchKey,
                     label: Messages.crtEffect,
@@ -193,6 +226,20 @@ class _Preview extends StatelessWidget {
             ? CrtScreen(settings: settings, child: page)
             : page,
       ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: TvMetrics.gutter),
+      child: Text(text, style: tvText(10, TvColors.highlight)),
     );
   }
 }

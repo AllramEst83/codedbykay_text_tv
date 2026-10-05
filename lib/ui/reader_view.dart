@@ -21,7 +21,11 @@ class ReaderView extends StatelessWidget {
     required this.settings,
     required this.onLink,
     required this.onRetry,
+    this.onPull,
   });
+
+  /// Called when the page is pulled down past its top; see [TvPageArea].
+  final Future<void> Function()? onPull;
 
   final int number;
   final int part;
@@ -58,6 +62,7 @@ class ReaderView extends StatelessWidget {
           settings: settings,
           palette: palette,
           onLink: onLink,
+          onPull: onPull,
         ),
         TextTvNotBroadcast(:final int number) => _Message(
           lines: <String>[Messages.readerNotBroadcast(number)],
@@ -90,8 +95,10 @@ class _Page extends StatelessWidget {
     required this.settings,
     required this.palette,
     required this.onLink,
+    required this.onPull,
   });
 
+  final Future<void> Function()? onPull;
   final List<ReaderBlock> blocks;
   final ReaderSettings settings;
   final ReaderPalette palette;
@@ -207,7 +214,8 @@ class _Page extends StatelessWidget {
         ),
       });
     }
-    return ListView(
+    final Widget list = ListView(
+      physics: onPull == null ? null : const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.fromLTRB(
         settings.marginWidth,
         16,
@@ -216,6 +224,15 @@ class _Page extends StatelessWidget {
       ),
       children: children,
     );
+    final Future<void> Function()? pull = onPull;
+    return pull == null
+        ? list
+        : RefreshIndicator(
+            color: palette.link,
+            backgroundColor: palette.background,
+            onRefresh: pull,
+            child: list,
+          );
   }
 }
 

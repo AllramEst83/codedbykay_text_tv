@@ -4,8 +4,14 @@ import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 /// Serves pages from [pages] (anything else is [TextTvNotBroadcast]), or
 /// [failure] for every request while it is set, and records what was asked.
 class FakeTextTvRepository implements TextTvRepository {
-  FakeTextTvRepository([Map<int, TextTvPage>? pages])
-    : pages = pages ?? <int, TextTvPage>{};
+  FakeTextTvRepository([
+    Map<int, TextTvPage>? pages,
+    DateTime Function()? clock,
+  ]) : pages = pages ?? <int, TextTvPage>{},
+       clock = clock ?? DateTime.now;
+
+  /// What time a page read now is said to have been read.
+  final DateTime Function() clock;
 
   final Map<int, TextTvPage> pages;
   TextTvResult? failure;
@@ -22,7 +28,9 @@ class FakeTextTvRepository implements TextTvRepository {
     final TextTvResult? failed = failure;
     if (failed != null) return failed;
     final TextTvPage? page = pages[number];
-    return page == null ? TextTvNotBroadcast(number) : TextTvShown(page);
+    return page == null
+        ? TextTvNotBroadcast(number)
+        : TextTvShown(page, readAt: clock());
   }
 
   @override

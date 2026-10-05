@@ -41,9 +41,13 @@ sealed class TextTvResult {
 }
 
 class TextTvShown extends TextTvResult {
-  const TextTvShown(this.page, {this.cachedAt});
+  const TextTvShown(this.page, {this.cachedAt, this.readAt});
 
   final TextTvPage page;
+
+  /// When this copy of the page was read from the site, if known: just now for
+  /// a page read, the earlier time for one kept in memory or saved on disk.
+  final DateTime? readAt;
 
   /// Set when the site could not be reached and this is the copy saved at that
   /// time instead. Null for a page just read.

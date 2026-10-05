@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:codedbykay_text_tv/app.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
+import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
 import 'package:codedbykay_text_tv/services/crt_settings_store.dart';
 import 'package:codedbykay_text_tv/services/http_fetcher.dart';
@@ -11,6 +12,7 @@ import 'package:codedbykay_text_tv/services/io_http_fetcher.dart';
 import 'package:codedbykay_text_tv/services/live_text_tv_repository.dart';
 import 'package:codedbykay_text_tv/services/page_disk_cache.dart';
 import 'package:codedbykay_text_tv/services/reader_settings_store.dart';
+import 'package:codedbykay_text_tv/services/refresh_settings_store.dart';
 import 'package:codedbykay_text_tv/services/session_store.dart';
 import 'package:codedbykay_text_tv/services/text_tv.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +30,8 @@ Future<void> main() async {
   final ReaderSettings reader = await readerStore.load();
   final CrtSettingsStore crtStore = PrefsCrtSettingsStore();
   final CrtSettings crt = await crtStore.load();
+  final RefreshSettingsStore refreshStore = PrefsRefreshSettingsStore();
+  final RefreshSettings refresh = await refreshStore.load();
   runApp(
     TextTvApp(
       repository: LiveTextTvRepository(
@@ -39,6 +43,8 @@ Future<void> main() async {
       reader: reader,
       crt: crt,
       onCrtChanged: (CrtSettings c) => unawaited(crtStore.save(c)),
+      refresh: refresh,
+      onRefreshChanged: (RefreshSettings r) => unawaited(refreshStore.save(r)),
       onReaderChanged: (ReaderSettings r) => unawaited(readerStore.save(r)),
     ),
   );

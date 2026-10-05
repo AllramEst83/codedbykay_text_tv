@@ -4,6 +4,7 @@ import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/fastext.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
+import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_time.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
@@ -18,14 +19,18 @@ import 'package:codedbykay_text_tv/ui/text_tv_page_area.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
 import 'package:flutter/material.dart';
 
+DateTime _systemNow() => DateTime.now();
+
 /// The Text TV viewer, the app's only screen: the page in [initial] under a
 /// title bar, with previous/next page, a number pad, shortcuts to the pages people
 /// read, tappable page links, and swipes between the parts of a page. The
 /// system back button steps back through the pages read, then leaves the app.
 /// [onSessionChanged] hears where the reader is after every move, so a later
 /// run can start there.
-DateTime _systemNow() => DateTime.now();
-
+///
+/// The page on show can be read again quietly (the old one stays until the new
+/// one is here): by pulling it down, when the app comes back after a while,
+/// and, if the settings say so, every so often.
 class TextTvScreen extends StatefulWidget {
   const TextTvScreen({
     super.key,
@@ -36,6 +41,8 @@ class TextTvScreen extends StatefulWidget {
     this.onReaderChanged,
     this.crt = CrtSettings.defaults,
     this.onCrtChanged,
+    this.refresh = const RefreshSettings(),
+    this.onRefreshChanged,
     this.clock = _systemNow,
   });
 
@@ -53,6 +60,11 @@ class TextTvScreen extends StatefulWidget {
   final CrtSettings crt;
   final ValueChanged<CrtSettings>? onCrtChanged;
 
+  /// Whether the page refreshes by itself, and the listener for the settings
+  /// page changing it.
+  final RefreshSettings refresh;
+  final ValueChanged<RefreshSettings>? onRefreshChanged;
+
   /// Today's date, for saying when a saved copy is from.
   final DateTime Function() clock;
 
@@ -60,11 +72,13 @@ class TextTvScreen extends StatefulWidget {
   State<TextTvScreen> createState() => _TextTvScreenState();
 }
 
-class _TextTvScreenState extends State<TextTvScreen> {
+class _TextTvScreenState extends State<TextTvScreen>
+    with WidgetsBindingObserver {
   late int _number = widget.initial.page;
   late int _part = widget.initial.part;
   late ReaderSettings _reader = widget.reader;
   late CrtSettings _crtSettings = widget.crt;
+  late RefreshSettings _refresh = widget.refresh;
   TextTvResult? _result;
   bool _loading = true;
 
@@ -81,10 +95,112 @@ class _TextTvScreenState extends State<TextTvScreen> {
   // overtaken by a newer tap must not replace it.
   int _request = 0;
 
+  // Quiet refreshes: one at a time, on a timer if the settings ask for it.
+  bool _refreshing = false;
+  Timer? _autoTimer;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _load(_number, part: _part);
+    _startAuto();
+  }
+
+  /// Whether the page on show may be read again without being asked: it is
+  /// there, nothing else is being read, and this screen is the one in front
+  /// (not the settings page over it).
+  bool get _canRefreshQuietly =>
+      mounted &&
+      !_loading &&
+      !_refreshing &&
+      (ModalRoute.of(context)?.isCurrent ?? true);
+
+  void _startAuto() {
+    _autoTimer?.cancel();
+    final Duration? every = _refresh.interval;
+    if (every == null) return;
+    _autoTimer = Timer.periodic(every, (Timer _) {
+      if (_canRefreshQuietly) unawaited(_refreshQuietly());
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) {
+      // Nothing is read while the app is out of sight.
+      _autoTimer?.cancel();
+      return;
+    }
+    _startAuto();
+    final DateTime? at = _readAt;
+    if (_canRefreshQuietly &&
+        at != null &&
+        widget.clock().difference(at) >= refreshAfterResume) {
+      unawaited(_refreshQuietly());
+    }
+  }
+
+  /// Reads page [_number] again from the site, for a refresh nobody is
+  /// waiting at the screen for. Null when the answer is no longer wanted: the
+  /// reader has moved on, or the screen is gone.
+  Future<TextTvResult?> _fetchQuietly() async {
+    final int request = _request;
+    _refreshing = true;
+    final TextTvResult result = await widget.repository.page(
+      _number,
+      fresh: true,
+    );
+    _refreshing = false;
+    return mounted && request == _request ? result : null;
+  }
+
+  /// Only a page just read from the site replaces the one on show: an old
+  /// saved copy or a failure must not take a good page's place.
+  Future<void> _refreshQuietly() async {
+    final TextTvResult? result = await _fetchQuietly();
+    if (result is TextTvShown && result.cachedAt == null) _show(result);
+  }
+
+  /// A pull is asked for, so its answer is shown, with one exception: a
+  /// failure does not wipe the page on show, it says why in a message.
+  Future<void> _pullRefresh() async {
+    final TextTvResult? result = await _fetchQuietly();
+    if (result == null || !mounted) return;
+    if (result is TextTvFailed && _result is TextTvShown) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            result.reason.toUpperCase(),
+            style: tvText(10, TvColors.white),
+          ),
+          backgroundColor: TvColors.black,
+          shape: const Border.fromBorderSide(
+            BorderSide(color: TvColors.border, width: TvMetrics.border),
+          ),
+        ),
+      );
+      return;
+    }
+    _show(result);
+  }
+
+  void _show(TextTvResult result) {
+    setState(() {
+      _loading = false;
+      _result = result;
+      // A part remembered from an earlier run may no longer exist.
+      _part = result is TextTvShown
+          ? _part.clamp(0, result.page.parts.length - 1)
+          : 0;
+    });
+    _report();
+  }
+
+  void _setRefresh(RefreshSettings refresh) {
+    setState(() => _refresh = refresh);
+    _startAuto();
+    widget.onRefreshChanged?.call(refresh);
   }
 
   Widget _crt(Widget page) => _crtSettings.enabled
@@ -99,8 +215,12 @@ class _TextTvScreenState extends State<TextTvScreen> {
   void _openSettings() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (BuildContext context) =>
-            SettingsScreen(crt: _crtSettings, onChanged: _setCrt),
+        builder: (BuildContext context) => SettingsScreen(
+          crt: _crtSettings,
+          onChanged: _setCrt,
+          refresh: _refresh,
+          onRefreshChanged: _setRefresh,
+        ),
       ),
     );
   }
@@ -146,15 +266,7 @@ class _TextTvScreenState extends State<TextTvScreen> {
     }
     final TextTvResult result = await reading;
     if (!mounted || request != _request) return;
-    setState(() {
-      _loading = false;
-      _result = result;
-      // A part remembered from an earlier run may no longer exist.
-      _part = result is TextTvShown
-          ? _part.clamp(0, result.page.parts.length - 1)
-          : 0;
-    });
-    _report();
+    _show(result);
   }
 
   /// Goes to [number], remembering the page it leaves so back can return.
@@ -200,6 +312,21 @@ class _TextTvScreenState extends State<TextTvScreen> {
   DateTime? get _savedAt {
     final TextTvResult? result = _result;
     return !_loading && result is TextTvShown ? result.cachedAt : null;
+  }
+
+  /// When the page on show was read from the site, if it is known.
+  DateTime? get _readAt {
+    final TextTvResult? result = _result;
+    return result is TextTvShown ? result.readAt : null;
+  }
+
+  /// [_readAt] for a page that is up to date as far as the app knows: not an
+  /// old saved copy shown because the site could not be reached.
+  DateTime? get _updatedAt {
+    final TextTvResult? result = _result;
+    return !_loading && result is TextTvShown && result.cachedAt == null
+        ? result.readAt
+        : null;
   }
 
   /// The coloured keys of the page on screen; none while it is loading.
@@ -257,6 +384,8 @@ class _TextTvScreenState extends State<TextTvScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _autoTimer?.cancel();
     _typedTimer?.cancel();
     super.dispose();
   }
@@ -300,6 +429,7 @@ class _TextTvScreenState extends State<TextTvScreen> {
                                 settings: _reader,
                                 onLink: _open,
                                 onRetry: () => _load(_number, fresh: true),
+                                onPull: _pullRefresh,
                               )
                             : _crt(
                                 TvPageArea(
@@ -312,6 +442,7 @@ class _TextTvScreenState extends State<TextTvScreen> {
                                     if (page != null) _open(page);
                                   },
                                   onRetry: () => _load(_number, fresh: true),
+                                  onPull: _pullRefresh,
                                 ),
                               ),
                       ),
@@ -320,6 +451,12 @@ class _TextTvScreenState extends State<TextTvScreen> {
                       TvOfflineNote(
                         text: Messages.offlineSaved(
                           formatSavedAt(savedAt, widget.clock()),
+                        ),
+                      )
+                    else if (_updatedAt case final DateTime updatedAt)
+                      TvUpdatedNote(
+                        text: Messages.updated(
+                          formatSavedAt(updatedAt, widget.clock()),
                         ),
                       ),
                     if (_parts > 1)

@@ -103,6 +103,26 @@ class TvOfflineNote extends StatelessWidget {
   }
 }
 
+/// One dim line under the page saying when it was last read from the site.
+class TvUpdatedNote extends StatelessWidget {
+  const TvUpdatedNote({super.key, required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: TvMetrics.gutter),
+      child: Text(
+        text,
+        key: textTvUpdatedKey,
+        style: tvText(8, TvColors.dim),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
 /// `[<] PART 2/3 [>]` under a page that has several.
 class TvPartBar extends StatelessWidget {
   const TvPartBar({

@@ -14,6 +14,7 @@ Personal project, built with Flutter.
 - A settings page (the gear button) with an optional CRT look for the teletext page: a slight screen bulge, scanlines and a vignette, each adjustable within safe limits and remembered. Taps still land on what you see.
 - Back steps through the pages you have read, then leaves the app.
 - Opens where you left off: the page, its part and the pages you came through.
+- Pull the page down to read it again. It also refreshes itself when you come back to the app after a couple of minutes, and, if you turn it on in settings, every 30 seconds, minute or two minutes while you read. A dim line shows when it was last updated.
 - Pages read in the last five minutes are reused; REFRESH asks the site again. Failures say why and offer TRY AGAIN.
 - Works offline for pages you have read: they are saved on the phone, shown at once, refreshed behind, and marked "OFFLINE. SAVED 14:32" when the site cannot be reached.
 - Bundled pixel font; the only permission is `INTERNET`.

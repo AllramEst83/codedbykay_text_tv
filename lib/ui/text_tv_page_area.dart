@@ -19,7 +19,12 @@ class TvPageArea extends StatelessWidget {
     required this.result,
     required this.onLink,
     required this.onRetry,
+    this.onPull,
   });
+
+  /// Called when the page is pulled down past its top; the future ends when
+  /// the page has been read again. Without it pulling does nothing.
+  final Future<void> Function()? onPull;
 
   final int number;
   final int part;
@@ -57,7 +62,11 @@ class TvPageArea extends StatelessWidget {
             ),
           };
         }
-        return SingleChildScrollView(
+        final Widget scroll = SingleChildScrollView(
+          // A page that fits still has to be pullable.
+          physics: onPull == null
+              ? null
+              : const AlwaysScrollableScrollPhysics(),
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Padding(
@@ -68,6 +77,15 @@ class TvPageArea extends StatelessWidget {
             ),
           ),
         );
+        final Future<void> Function()? pull = onPull;
+        return pull == null
+            ? scroll
+            : RefreshIndicator(
+                color: TvColors.highlight,
+                backgroundColor: TvColors.black,
+                onRefresh: pull,
+                child: scroll,
+              );
       },
     );
   }

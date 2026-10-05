@@ -39,7 +39,7 @@ class LiveTextTvRepository implements TextTvRepository {
   Future<TextTvResult> page(int number, {bool fresh = false}) async {
     final (TextTvPage, DateTime)? kept = _kept[number];
     if (!fresh && kept != null && clock().difference(kept.$2) < maxAge) {
-      return TextTvShown(kept.$1);
+      return TextTvShown(kept.$1, readAt: kept.$2);
     }
     try {
       final String body = await textTv.fetchBody(number);
@@ -56,20 +56,26 @@ class LiveTextTvRepository implements TextTvRepository {
         _kept.remove(_kept.keys.first);
       }
       await disk?.write(number, body, now);
-      return TextTvShown(page);
+      return TextTvShown(page, readAt: now);
     } on NetworkException catch (error) {
       final TextTvShown? saved = await _saved(number);
       if (saved == null) return TextTvFailed(error.message);
-      return TextTvShown(saved.page, cachedAt: saved.cachedAt);
+      return TextTvShown(
+        saved.page,
+        cachedAt: saved.cachedAt,
+        readAt: saved.cachedAt,
+      );
     }
   }
 
   @override
   Future<TextTvShown?> cached(int number) async {
     final (TextTvPage, DateTime)? kept = _kept[number];
-    if (kept != null) return TextTvShown(kept.$1);
+    if (kept != null) return TextTvShown(kept.$1, readAt: kept.$2);
     final TextTvShown? saved = await _saved(number);
-    return saved == null ? null : TextTvShown(saved.page);
+    return saved == null
+        ? null
+        : TextTvShown(saved.page, readAt: saved.cachedAt);
   }
 
   /// The copy on disk, with when it was saved, or null if there is none or it

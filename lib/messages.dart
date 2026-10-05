@@ -8,6 +8,15 @@ abstract final class Messages {
   static const String refresh = 'REFRESH';
   static const String part = 'PART';
   static const String settingsTitle = 'SETTINGS';
+  static const String sectionRefresh = 'REFRESH';
+  static const String sectionCrt = 'CRT SCREEN';
+  static const String autoRefresh = 'AUTO REFRESH';
+  static String autoRefreshValue(Duration? every) => every == null
+      ? 'OFF'
+      : every.inSeconds < 120
+      ? '${every.inSeconds} S'
+      : '${every.inMinutes} MIN';
+  static String updated(String when) => 'UPDATED $when';
   static const String settings = 'Settings';
   static const String back = 'Back';
   static const String crtEffect = 'CRT EFFECT';
