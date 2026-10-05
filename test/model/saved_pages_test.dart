@@ -15,14 +15,8 @@ void main() {
   group('SavedPages', () {
     test('starts with the six built-in favourites', () {
       expect(_pages(const SavedPages()), <int>[100, 101, 104, 300, 400, 700]);
-      expect(defaultFavourites.map((Favourite f) => f.label), <String>[
-        '100 NYHETER',
-        '101 INRIKES',
-        '104 UTRIKES',
-        '300 SPORT',
-        '400 VÄDER',
-        '700 INNEHÅLL',
-      ]);
+      // They carry no name: the language names them (see chipLabel).
+      expect(defaultFavourites.every((Favourite f) => f.name == null), isTrue);
     });
 
     test('knows which pages are favourites', () {
@@ -105,7 +99,7 @@ void main() {
       const SavedPages s = SavedPages(
         favourites: <Favourite>[
           Favourite(377),
-          Favourite(100, 'NYHETER'),
+          Favourite(100, 'MINA'),
           Favourite(450),
         ],
       );
@@ -138,13 +132,39 @@ void main() {
     test('a bad entry is dropped and the good ones kept', () {
       final SavedPages s = SavedPages.decode(
         '{"favourites": [{"page": 377}, 5, {"page": "x"}, {"page": 99}, '
-        '{"page": 900}, null, {"name": "A"}, {"page": 400, "name": "VÄDER"}]}',
+        '{"page": 900}, null, {"name": "A"}, {"page": 400, "name": "REGN"}]}',
       );
 
       expect(s.favourites, <Favourite>[
         const Favourite(377),
-        const Favourite(400, 'VÄDER'),
+        const Favourite(400, 'REGN'),
       ]);
+    });
+
+    test('the Swedish names an earlier version saved are not names', () {
+      final SavedPages s = SavedPages.decode(
+        '{"favourites": [{"page": 100, "name": "NYHETER"}, '
+        '{"page": 300, "name": "SPORT"}, {"page": 377, "name": "SPORT"}, '
+        '{"page": 101, "name": "MINA"}]}',
+      );
+
+      expect(s.favourites, const <Favourite>[
+        Favourite(100),
+        Favourite(300),
+        Favourite(377, 'SPORT'),
+        Favourite(101, 'MINA'),
+      ]);
+    });
+
+    test('a list saved by an earlier version is the built-in six again', () {
+      final SavedPages s = SavedPages.decode(
+        '{"favourites": ['
+        '{"page": 100, "name": "NYHETER"}, {"page": 101, "name": "INRIKES"}, '
+        '{"page": 104, "name": "UTRIKES"}, {"page": 300, "name": "SPORT"}, '
+        '{"page": 400, "name": "VÄDER"}, {"page": 700, "name": "INNEHÅLL"}]}',
+      );
+
+      expect(s.hasDefaultFavourites, isTrue);
     });
 
     test('a page twice is kept once', () {

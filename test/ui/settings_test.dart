@@ -1,4 +1,3 @@
-import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
@@ -10,6 +9,7 @@ import 'package:codedbykay_text_tv/ui/tv_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../fakes/english.dart';
 import '../fakes/fake_text_tv_repository.dart';
 
 Future<void> _open(
@@ -65,15 +65,15 @@ void main() {
       WidgetTester tester,
     ) async {
       await _open(tester);
-      expect(find.text(Messages.settingsTitle), findsNothing);
+      expect(find.text(en.settingsTitle), findsNothing);
 
       await _openSettings(tester);
-      expect(find.text(Messages.settingsTitle), findsOneWidget);
-      expect(find.text(Messages.crtEffect), findsOneWidget);
+      expect(find.text(en.settingsTitle), findsOneWidget);
+      expect(find.text(en.crtEffect), findsOneWidget);
 
       await tester.tap(find.byKey(textTvSettingsBackKey));
       await tester.pumpAndSettle();
-      expect(find.text(Messages.settingsTitle), findsNothing);
+      expect(find.text(en.settingsTitle), findsNothing);
       expect(find.byKey(textTvSettingsKey), findsOneWidget);
     });
 
@@ -86,7 +86,7 @@ void main() {
       await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
 
-      expect(find.text(Messages.settingsTitle), findsNothing);
+      expect(find.text(en.settingsTitle), findsNothing);
       expect(find.byKey(textTvNumberKey), findsOneWidget);
     });
 
@@ -95,7 +95,7 @@ void main() {
     ) async {
       await _open(tester);
 
-      expect(find.bySemanticsLabel(Messages.settings), findsOneWidget);
+      expect(find.bySemanticsLabel(en.settings), findsOneWidget);
     });
 
     testWidgets('shows the switch off by default, sliders greyed', (
@@ -353,10 +353,10 @@ void main() {
         );
       }
       for (final (String id, String title) in <(String, String)>[
-        ('controls', Messages.sectionControls),
-        ('favourites', Messages.sectionFavourites),
-        ('refresh', Messages.sectionRefresh),
-        ('crt', Messages.sectionCrt),
+        ('controls', en.sectionControls),
+        ('favourites', en.sectionFavourites),
+        ('refresh', en.sectionRefresh),
+        ('crt', en.sectionCrt),
       ]) {
         expect(
           find.descendant(
@@ -475,8 +475,8 @@ void main() {
 }
 
 String _title(String id) => switch (id) {
-  'controls' => Messages.sectionControls,
-  'favourites' => Messages.sectionFavourites,
-  'refresh' => Messages.sectionRefresh,
-  _ => Messages.sectionCrt,
+  'controls' => en.sectionControls,
+  'favourites' => en.sectionFavourites,
+  'refresh' => en.sectionRefresh,
+  _ => en.sectionCrt,
 };

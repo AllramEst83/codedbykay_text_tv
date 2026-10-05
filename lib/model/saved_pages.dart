@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:codedbykay_text_tv/model/page_section.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 
 /// A page the reader keeps close at hand: its number, and a short name when it
@@ -23,14 +24,15 @@ class Favourite {
 }
 
 /// What a fresh install has: the six pages most people open, which used to be
-/// the fixed row of shortcuts.
+/// the fixed row of shortcuts. They carry no name: what a chip says for them
+/// follows the language (see `chipLabel`).
 const List<Favourite> defaultFavourites = <Favourite>[
-  Favourite(100, 'NYHETER'),
-  Favourite(101, 'INRIKES'),
-  Favourite(104, 'UTRIKES'),
-  Favourite(300, 'SPORT'),
-  Favourite(400, 'VÄDER'),
-  Favourite(700, 'INNEHÅLL'),
+  Favourite(100),
+  Favourite(101),
+  Favourite(104),
+  Favourite(300),
+  Favourite(400),
+  Favourite(700),
 ];
 
 /// The pages the reader has chosen to keep, in the order they chose them, and
@@ -141,10 +143,14 @@ class SavedPages {
       if (favourites.any((Favourite f) => f.page == page)) continue;
       final Object? name = entry['name'];
       final String? trimmed = name is String ? name.trim() : null;
+      // The Swedish names an earlier version saved for the built-in pages are
+      // not a choice of the reader's: drop them so the chip follows the
+      // language.
+      final bool legacy = legacyDefaultNames[page] == trimmed;
       favourites.add(
         Favourite(
           page,
-          trimmed == null || trimmed.isEmpty
+          trimmed == null || trimmed.isEmpty || legacy
               ? null
               : trimmed.substring(0, trimmed.length.clamp(0, 16)),
         ),

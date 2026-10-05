@@ -66,10 +66,18 @@ class ShortcutService {
     }
   }
 
-  /// Makes the first favourites the shortcuts (see [shortcutsFor]).
-  Future<void> update(List<Favourite> favourites) async {
+  /// Makes the first favourites the shortcuts (see [shortcutsFor]), each
+  /// titled by [title] when given.
+  Future<void> update(
+    List<Favourite> favourites, {
+    String Function(Favourite favourite)? title,
+  }) async {
     try {
-      await _platform.set(shortcutsFor(favourites));
+      await _platform.set(
+        title == null
+            ? shortcutsFor(favourites)
+            : shortcutsFor(favourites, title: title),
+      );
     } on Object {
       // As in [start].
     }

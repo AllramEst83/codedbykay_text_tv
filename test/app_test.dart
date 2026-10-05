@@ -1,9 +1,9 @@
 import 'package:codedbykay_text_tv/app.dart';
-import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'fakes/english.dart';
 import 'fakes/fake_text_tv_repository.dart';
 
 void main() {
@@ -25,7 +25,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(TextTvScreen), findsOneWidget);
-    expect(find.text(Messages.title), findsOneWidget);
+    expect(find.text(en.title), findsOneWidget);
     expect(repository.requests, <(int, bool)>[(100, false)]);
   });
 }

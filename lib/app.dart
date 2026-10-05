@@ -1,4 +1,4 @@
-import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
@@ -81,7 +81,9 @@ class TextTvApp extends StatelessWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: textTvSystemUi,
       child: MaterialApp(
-        title: Messages.title,
+        onGenerateTitle: (BuildContext context) => context.l10n.title,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         debugShowCheckedModeBanner: false,
         theme: textTvTheme(),
         home: TextTvScreen(

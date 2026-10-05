@@ -1,4 +1,4 @@
-import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
@@ -44,7 +44,7 @@ class TvPageArea extends StatelessWidget {
         final TextTvResult? shown = result;
         final Widget content;
         if (loading || shown == null) {
-          content = TvMessage(lines: const <String>[Messages.loading]);
+          content = TvMessage(lines: <String>[context.l10n.loading]);
         } else {
           content = switch (shown) {
             TextTvShown(:final TextTvPage page) => TvGrid(
@@ -55,10 +55,10 @@ class TvPageArea extends StatelessWidget {
               height: constraints.maxHeight - 2 * _airAbove,
             ),
             TextTvNotBroadcast(:final int number) => TvMessage(
-              lines: <String>[Messages.pageNotBroadcast(number)],
+              lines: <String>[context.l10n.pageNotBroadcast(number)],
             ),
             TextTvFailed(:final NetworkFailure failure) => TvMessage(
-              lines: <String>[Messages.failure(failure).toUpperCase()],
+              lines: <String>[context.l10n.failure(failure).toUpperCase()],
               retry: onRetry,
             ),
           };
@@ -115,7 +115,7 @@ class TvMessage extends StatelessWidget {
             const SizedBox(height: TvMetrics.margin),
             TvButton(
               key: textTvRetryKey,
-              label: Messages.tryAgain,
+              label: context.l10n.tryAgain,
               onTap: retry,
             ),
           ],

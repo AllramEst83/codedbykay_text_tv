@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
@@ -13,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../fakes/english.dart';
 import '../fakes/fake_http_fetcher.dart';
 import '../fakes/fake_text_tv_repository.dart';
 
@@ -116,12 +116,12 @@ void main() {
       WidgetTester tester,
     ) async {
       await _open(tester, _repository(), reader: const ReaderSettings());
-      expect(find.bySemanticsLabel(Messages.readerOn), findsOneWidget);
+      expect(find.bySemanticsLabel(en.readerOn), findsOneWidget);
 
       await tester.tap(find.byKey(textTvReaderKey));
       await tester.pumpAndSettle();
 
-      expect(find.bySemanticsLabel(Messages.readerOff), findsOneWidget);
+      expect(find.bySemanticsLabel(en.readerOff), findsOneWidget);
     });
   });
 
@@ -256,7 +256,7 @@ void main() {
       await tester.tap(find.byKey(textTvNextKey));
       await tester.pumpAndSettle();
 
-      expect(_text(Messages.readerNotBroadcast(101)), findsOneWidget);
+      expect(_text(en.readerNotBroadcast(101)), findsOneWidget);
       expect(find.byKey(textTvReaderViewKey), findsOneWidget);
     });
 

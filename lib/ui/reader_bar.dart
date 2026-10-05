@@ -1,4 +1,4 @@
-import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/ui/reader_options_sheet.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
@@ -27,7 +27,7 @@ class ReaderBar extends StatelessWidget {
             TvIconButton(
               key: textTvReaderSmallerKey,
               icon: (Color colour) => Text('A-', style: tvText(12, colour)),
-              semanticLabel: Messages.smallerText,
+              semanticLabel: context.l10n.smallerText,
               onTap: settings.size > 0
                   ? () => onChanged(settings.copyWith(size: settings.size - 1))
                   : null,
@@ -36,7 +36,7 @@ class ReaderBar extends StatelessWidget {
             TvIconButton(
               key: textTvReaderLargerKey,
               icon: (Color colour) => Text('A+', style: tvText(12, colour)),
-              semanticLabel: Messages.largerText,
+              semanticLabel: context.l10n.largerText,
               onTap: settings.size < readerTextSizes.length - 1
                   ? () => onChanged(settings.copyWith(size: settings.size + 1))
                   : null,
@@ -45,7 +45,7 @@ class ReaderBar extends StatelessWidget {
             TvIconButton(
               key: textTvReaderOptionsKey,
               icon: (Color colour) => Icon(Icons.tune, color: colour, size: 26),
-              semanticLabel: Messages.readerOptions,
+              semanticLabel: context.l10n.readerOptions,
               onTap: () => showReaderOptions(
                 context,
                 settings: settings,
@@ -83,7 +83,7 @@ class _Swatch extends StatelessWidget {
     return Semantics(
       button: true,
       selected: selected,
-      label: Messages.themeName(theme),
+      label: context.l10n.themeName(theme),
       excludeSemantics: true,
       child: InkWell(
         key: textTvReaderThemeKey(theme),

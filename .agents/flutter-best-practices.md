@@ -49,4 +49,4 @@ Toolchain: Flutter 3.47 / Dart ^3.13 (see `pubspec.yaml`). Dot shorthands
 ## Accessibility & i18n
 - Give interactive/visual elements `Semantics` where the default is insufficient: a page row is announced as its trimmed plain text, because its colours and cell painting carry no meaning for a screen reader. Keep touch targets at least 48 dp.
 - Keep contrast high: the page is always on black, and the chrome is white or yellow on black.
-- User-facing strings are part of the product's voice; keep them in `messages.dart` so wording stays consistent and testable.
+- User-facing strings live in the ARB files (`lib/l10n/app_en.arb` is the template, `app_sv.arb` the Swedish), read as `context.l10n.name`; add a key to **both** (a test fails if they differ) and write the Swedish as a Swede would say it, not as a word-for-word translation. A choice between strings by a model type (a failure kind, a theme) goes in the `AppWording` extension. Units (`PX`, `x1.25`) are in `ui/formats.dart`, not translated. Tests say what they expect through `en` (`test/fakes/english.dart`), not by repeating the English.

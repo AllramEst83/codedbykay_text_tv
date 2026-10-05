@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/services/text_tv.dart';
+import 'package:codedbykay_text_tv/ui/formats.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_screen.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../fakes/english.dart';
 import '../fakes/fake_http_fetcher.dart';
 import '../fakes/fake_text_tv_repository.dart';
 
@@ -65,11 +66,11 @@ void main() {
   group('the options button', () {
     testWidgets('opens the options over the page', (WidgetTester tester) async {
       await _open(tester);
-      expect(find.text(Messages.readerOptionsTitle), findsNothing);
+      expect(find.text(en.readerOptionsTitle), findsNothing);
 
       await _openOptions(tester);
 
-      expect(find.text(Messages.readerOptionsTitle), findsOneWidget);
+      expect(find.text(en.readerOptionsTitle), findsOneWidget);
       expect(find.byKey(textTvReaderLineKey), findsOneWidget);
       expect(find.byKey(textTvReaderLetterKey), findsOneWidget);
       expect(find.byKey(textTvReaderMarginKey), findsOneWidget);
@@ -79,7 +80,7 @@ void main() {
     testWidgets('has a name for a screen reader', (WidgetTester tester) async {
       await _open(tester);
 
-      expect(find.bySemanticsLabel(Messages.readerOptions), findsOneWidget);
+      expect(find.bySemanticsLabel(en.readerOptions), findsOneWidget);
     });
 
     testWidgets('is only there in reader mode', (WidgetTester tester) async {
@@ -101,9 +102,9 @@ void main() {
       );
       await _openOptions(tester);
 
-      expect(find.text(Messages.times(2.0)), findsOneWidget);
-      expect(find.text(Messages.percent(0.1)), findsOneWidget);
-      expect(find.text(Messages.logicalPixels(12)), findsOneWidget);
+      expect(find.text(Formats.times(2.0)), findsOneWidget);
+      expect(find.text(Formats.percent(0.1)), findsOneWidget);
+      expect(find.text(Formats.logicalPixels(12)), findsOneWidget);
       expect(
         tester.widget<Switch>(find.byKey(textTvReaderBoldKey)).value,
         isTrue,

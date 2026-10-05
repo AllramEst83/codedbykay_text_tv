@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/page_search.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
@@ -13,6 +12,7 @@ import 'package:codedbykay_text_tv/ui/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../fakes/english.dart';
 import '../fakes/fake_text_tv_repository.dart';
 
 TextTvPage _page(int number, String text, {List<List<String>>? parts}) =>
@@ -131,7 +131,7 @@ void main() {
 
       expect(
         tester.widget<Text>(find.byKey(textTvUpdatedKey)).data,
-        Messages.updated('14:30'),
+        en.updated('14:30'),
       );
     });
 
@@ -167,7 +167,7 @@ void main() {
 
       expect(
         tester.widget<Text>(find.byKey(textTvUpdatedKey)).data,
-        Messages.updated('14:41'),
+        en.updated('14:41'),
       );
     });
   });
@@ -209,14 +209,14 @@ void main() {
         ),
       );
       await _open(tester, repository, size: _phone);
-      expect(find.text(Messages.loading), findsNothing);
+      expect(find.text(en.loading), findsNothing);
 
       await pull(tester);
 
       // Asked for, not yet answered: the old page is still there, with no
       // LOADING screen in its place.
       expect(repository.requests.last, (100, true));
-      expect(find.text(Messages.loading), findsNothing);
+      expect(find.text(en.loading), findsNothing);
       expect(find.byType(RefreshProgressIndicator), findsOneWidget);
 
       repository.answer(
@@ -355,7 +355,7 @@ void main() {
       await tester.pump(const Duration(seconds: 31));
 
       expect(_text('Ny text'), findsOneWidget);
-      expect(find.text(Messages.readerLoading), findsNothing);
+      expect(find.text(en.readerLoading), findsNothing);
     });
 
     testWidgets('keeps the part you were reading', (WidgetTester tester) async {
@@ -384,7 +384,7 @@ void main() {
       await tester.pump(const Duration(seconds: 31));
 
       expect(_text('Del två'), findsOneWidget);
-      expect(find.text('${Messages.part} 2/2'), findsOneWidget);
+      expect(find.text('${en.part} 2/2'), findsOneWidget);
     });
 
     testWidgets('brings the part back in range if the page got shorter', (
@@ -590,9 +590,9 @@ void main() {
       await tester.tap(find.byKey(textTvSettingsKey));
       await tester.pumpAndSettle();
 
-      expect(find.text(Messages.autoRefresh), findsOneWidget);
+      expect(find.text(en.autoRefresh), findsOneWidget);
       expect(
-        find.text(Messages.autoRefreshValue(const Duration(seconds: 60))),
+        find.text(en.autoRefreshValue(const Duration(seconds: 60))),
         findsOneWidget,
       );
       expect(tester.widget<Slider>(find.byKey(textTvAutoRefreshKey)).value, 2);

@@ -1,6 +1,6 @@
 # Text TV
 
-An Android viewer for **SVT Text**, Swedish teletext (pages 100–899), in its own colours and block graphics. It reads the public [texttv.nu](https://texttv.nu) API.
+An Android viewer (in Swedish and English) for **SVT Text**, Swedish teletext (pages 100–899), in its own colours and block graphics. It reads the public [texttv.nu](https://texttv.nu) API.
 
 Personal project, built with Flutter.
 

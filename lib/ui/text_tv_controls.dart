@@ -1,4 +1,4 @@
-import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/fastext.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
@@ -49,7 +49,7 @@ class TvTopBar extends StatelessWidget {
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  Messages.title,
+                  context.l10n.title,
                   style: tvText(14, TvColors.white),
                   maxLines: 1,
                 ),
@@ -60,7 +60,7 @@ class TvTopBar extends StatelessWidget {
               key: textTvSearchKey,
               icon: (Color colour) =>
                   Icon(Icons.search, color: colour, size: 26),
-              semanticLabel: Messages.search,
+              semanticLabel: context.l10n.search,
               onTap: onSearch,
             ),
             const SizedBox(width: TvMetrics.gutter),
@@ -68,7 +68,9 @@ class TvTopBar extends StatelessWidget {
               key: textTvReaderKey,
               icon: (Color colour) => GlassesIcon(colour: colour),
               selected: readerOn,
-              semanticLabel: readerOn ? Messages.readerOff : Messages.readerOn,
+              semanticLabel: readerOn
+                  ? context.l10n.readerOff
+                  : context.l10n.readerOn,
               onTap: onReader,
             ),
             const SizedBox(width: TvMetrics.gutter),
@@ -76,7 +78,7 @@ class TvTopBar extends StatelessWidget {
               key: textTvSettingsKey,
               icon: (Color colour) =>
                   Icon(Icons.settings, color: colour, size: 26),
-              semanticLabel: Messages.settings,
+              semanticLabel: context.l10n.settings,
               onTap: onSettings,
             ),
             const SizedBox(width: TvMetrics.gutter),
@@ -84,7 +86,7 @@ class TvTopBar extends StatelessWidget {
               key: textTvRefreshKey,
               icon: (Color colour) =>
                   Icon(Icons.refresh, color: colour, size: 26),
-              semanticLabel: Messages.refreshPage,
+              semanticLabel: context.l10n.refreshPage,
               onTap: onRefresh,
             ),
           ],
@@ -159,7 +161,7 @@ class TvPartBar extends StatelessWidget {
           TvButton(key: textTvPartPrevKey, label: '<', onTap: onPrevious),
           const SizedBox(width: TvMetrics.margin),
           Text(
-            '${Messages.part} ${part + 1}/$parts',
+            '${context.l10n.part} ${part + 1}/$parts',
             style: tvText(10, TvColors.white),
           ),
           const SizedBox(width: TvMetrics.margin),
@@ -313,7 +315,7 @@ class TvShortcuts extends StatelessWidget {
       onTap: onRecents,
       child: Semantics(
         button: true,
-        label: Messages.recentPages,
+        label: context.l10n.recentPages,
         excludeSemantics: true,
         child: Container(
           constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
@@ -332,7 +334,7 @@ class TvShortcuts extends StatelessWidget {
           const SizedBox(width: TvMetrics.gutter),
           Expanded(
             child: Text(
-              Messages.favouritesHint,
+              context.l10n.favouritesHint,
               key: textTvFavouritesHintKey,
               style: tvText(8, TvColors.dim),
             ),
@@ -363,7 +365,7 @@ class TvShortcuts extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  favourite.label,
+                  context.l10n.chipLabel(favourite),
                   style: tvText(
                     10,
                     favourite.page == current
@@ -475,7 +477,7 @@ class _FastextKey extends StatelessWidget {
         : TvColors.white;
     return Semantics(
       button: true,
-      label: '${link.label}. ${Messages.pageLabel(link.page)}',
+      label: '${link.label}. ${context.l10n.pageLabel(link.page)}',
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,

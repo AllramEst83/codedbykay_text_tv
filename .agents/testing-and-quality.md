@@ -31,6 +31,6 @@ All must pass (CI runs the same, plus `flutter build apk --debug`). If something
 - [ ] Every controller/focus node/timer disposed; `mounted` checked after awaits
 - [ ] Only the newest page request may update the screen
 - [ ] Works with no network: a clear failure and TRY AGAIN, never a crash
-- [ ] Chrome colours from `ui/theme.dart`; strings in `messages.dart`; the grid width is `textTvColumns`
+- [ ] Chrome colours from `ui/theme.dart`; strings in the ARB files (en + sv); the grid width is `textTvColumns`
 - [ ] No new dependency without checking it's maintained
 - [ ] Analyze clean, formatted, tests pass

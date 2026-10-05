@@ -1,4 +1,3 @@
-import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
@@ -10,6 +9,7 @@ import 'package:codedbykay_text_tv/ui/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../fakes/english.dart';
 import '../fakes/fake_text_tv_repository.dart';
 
 FakeTextTvRepository _repository() => FakeTextTvRepository(<int, TextTvPage>{
@@ -118,7 +118,7 @@ void main() {
       }
       await tester.pumpAndSettle();
 
-      expect(find.text(Messages.pageNotBroadcast(855)), findsOneWidget);
+      expect(find.text(en.pageNotBroadcast(855)), findsOneWidget);
       expect(heard.last.recents, isNot(contains(855)));
     });
 
@@ -176,7 +176,7 @@ void main() {
         tester.getTopLeft(find.byKey(textTvRecentsKey)).dx,
         lessThan(tester.getTopLeft(find.byKey(textTvChipKey(100))).dx),
       );
-      expect(find.bySemanticsLabel(Messages.recentPages), findsOneWidget);
+      expect(find.bySemanticsLabel(en.recentPages), findsOneWidget);
     });
 
     testWidgets('is there with no favourites too, beside the hint', (
@@ -197,7 +197,7 @@ void main() {
 
       await _openRecents(tester);
 
-      expect(find.text(Messages.recentsTitle), findsOneWidget);
+      expect(find.text(en.recentsTitle), findsOneWidget);
       final double top200 = tester
           .getTopLeft(find.byKey(textTvRecentKey(300)))
           .dy;
@@ -241,10 +241,10 @@ void main() {
       expect(
         find.descendant(
           of: find.byKey(textTvRecentKey(400)),
-          matching: find.text('400'),
+          matching: find.text('400 WEATHER'),
         ),
         findsOneWidget,
-        reason: 'starred again, so no longer named',
+        reason: 'a section is named in the language, starred or not',
       );
     });
 
@@ -260,7 +260,7 @@ void main() {
       await tester.tap(find.byKey(textTvRecentKey(300)));
       await tester.pumpAndSettle();
 
-      expect(find.text(Messages.recentsTitle), findsNothing);
+      expect(find.text(en.recentsTitle), findsNothing);
       expect(repository.requests.last, (300, false));
       expect(
         find.descendant(
@@ -279,7 +279,7 @@ void main() {
       await _openRecents(tester);
 
       expect(find.byKey(textTvRecentsEmptyKey), findsOneWidget);
-      expect(find.text(Messages.recentsEmpty), findsOneWidget);
+      expect(find.text(en.recentsEmpty), findsOneWidget);
     });
 
     testWidgets(
@@ -294,7 +294,7 @@ void main() {
         await tester.tap(find.byKey(textTvRecentsClearKey));
         await tester.pumpAndSettle();
 
-        expect(find.text(Messages.recentsTitle), findsNothing);
+        expect(find.text(en.recentsTitle), findsNothing);
         expect(heard.last.recents, isEmpty);
         expect(heard.last.favourites, defaultFavourites);
 

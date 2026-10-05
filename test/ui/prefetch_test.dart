@@ -1,4 +1,3 @@
-import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
@@ -8,6 +7,7 @@ import 'package:codedbykay_text_tv/ui/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../fakes/english.dart';
 import '../fakes/fake_text_tv_repository.dart';
 
 /// A page with neighbours and a bottom row of two links: its read-ahead is
@@ -272,7 +272,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.text(Messages.prefetch), findsOneWidget);
+      expect(find.text(en.prefetch), findsOneWidget);
     });
 
     testWidgets('shows what was saved', (WidgetTester tester) async {

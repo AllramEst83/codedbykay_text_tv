@@ -1,5 +1,6 @@
-import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
+import 'package:codedbykay_text_tv/ui/formats.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
@@ -64,51 +65,51 @@ class _ReaderOptionsSheetState extends State<ReaderOptionsSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              Messages.readerOptionsTitle,
+              context.l10n.readerOptionsTitle,
               style: tvText(12, TvColors.white),
             ),
             const SizedBox(height: TvMetrics.margin),
             TvSliderRow(
               sliderKey: textTvReaderLineKey,
-              label: Messages.lineSpacing,
+              label: context.l10n.lineSpacing,
               value: _settings.lineSpacing.toDouble(),
               max: (readerLineHeights.length - 1).toDouble(),
               divisions: readerLineHeights.length - 1,
-              text: Messages.times(_settings.lineHeight),
+              text: Formats.times(_settings.lineHeight),
               onChanged: (double v) =>
                   _set(_settings.copyWith(lineSpacing: v.round())),
             ),
             TvSliderRow(
               sliderKey: textTvReaderLetterKey,
-              label: Messages.letterSpacing,
+              label: context.l10n.letterSpacing,
               value: _settings.letterSpacing.toDouble(),
               max: (readerLetterSpacings.length - 1).toDouble(),
               divisions: readerLetterSpacings.length - 1,
-              text: Messages.percent(_settings.letterSpacingEm),
+              text: Formats.percent(_settings.letterSpacingEm),
               onChanged: (double v) =>
                   _set(_settings.copyWith(letterSpacing: v.round())),
             ),
             TvSliderRow(
               sliderKey: textTvReaderMarginKey,
-              label: Messages.margins,
+              label: context.l10n.margins,
               value: _settings.margin.toDouble(),
               max: (readerMargins.length - 1).toDouble(),
               divisions: readerMargins.length - 1,
-              text: Messages.logicalPixels(_settings.marginWidth),
+              text: Formats.logicalPixels(_settings.marginWidth),
               onChanged: (double v) =>
                   _set(_settings.copyWith(margin: v.round())),
             ),
             const SizedBox(height: TvMetrics.gutter),
             TvSwitchRow(
               switchKey: textTvReaderBoldKey,
-              label: Messages.boldText,
+              label: context.l10n.boldText,
               value: _settings.bold,
               onChanged: (bool v) => _set(_settings.copyWith(bold: v)),
             ),
             const SizedBox(height: TvMetrics.margin),
             TvButton(
               key: textTvReaderResetKey,
-              label: Messages.reset,
+              label: context.l10n.reset,
               onTap: () => _set(_settings.resetLayout()),
             ),
           ],

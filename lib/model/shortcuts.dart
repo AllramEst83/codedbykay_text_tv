@@ -24,15 +24,19 @@ class ShortcutEntry {
 
 const String _prefix = 'page:';
 
-/// The entries for the first [maxShortcuts] of [favourites], in order. A named
-/// favourite reads `100 NYHETER`; one with only a number reads `Page 377`.
-List<ShortcutEntry> shortcutsFor(List<Favourite> favourites) => <ShortcutEntry>[
+/// The entries for the first [maxShortcuts] of [favourites], in order, each
+/// saying what [title] makes of the favourite (by default `100 NYHETER` for a
+/// named one, `Page 377` for one with only a number: the app says it in the
+/// language of the phone, see `shortcutTitle`).
+List<ShortcutEntry> shortcutsFor(
+  List<Favourite> favourites, {
+  String Function(Favourite favourite) title = _plainTitle,
+}) => <ShortcutEntry>[
   for (final Favourite f in favourites.take(maxShortcuts))
-    ShortcutEntry(
-      '$_prefix${f.page}',
-      f.name == null ? 'Page ${f.page}' : f.label,
-    ),
+    ShortcutEntry('$_prefix${f.page}', title(f)),
 ];
+
+String _plainTitle(Favourite f) => f.name == null ? 'Page ${f.page}' : f.label;
 
 /// The page a chosen shortcut stands for, or null for anything that is not one
 /// of ours or not a page (a stale shortcut from an older version, say).

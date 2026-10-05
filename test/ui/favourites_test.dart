@@ -1,4 +1,3 @@
-import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
@@ -8,6 +7,7 @@ import 'package:codedbykay_text_tv/ui/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../fakes/english.dart';
 import '../fakes/fake_text_tv_repository.dart';
 
 FakeTextTvRepository _repository() => FakeTextTvRepository(<int, TextTvPage>{
@@ -75,8 +75,8 @@ void main() {
           greaterThan(_chipX(tester, pages[i - 1])),
         );
       }
-      expect(find.text('100 NYHETER'), findsOneWidget);
-      expect(find.text('700 INNEHÅLL'), findsOneWidget);
+      expect(find.text('100 NEWS'), findsOneWidget);
+      expect(find.text('700 INDEX'), findsOneWidget);
     });
 
     testWidgets(
@@ -114,7 +114,7 @@ void main() {
       await _open(tester, saved: const SavedPages(favourites: <Favourite>[]));
 
       expect(find.byKey(textTvFavouritesHintKey), findsOneWidget);
-      expect(find.text(Messages.favouritesHint), findsOneWidget);
+      expect(find.text(en.favouritesHint), findsOneWidget);
       expect(find.byKey(textTvChipKey(100)), findsNothing);
     });
   });
@@ -180,11 +180,11 @@ void main() {
       WidgetTester tester,
     ) async {
       await _open(tester, start: 377);
-      expect(find.bySemanticsLabel(Messages.addFavourite), findsOneWidget);
+      expect(find.bySemanticsLabel(en.addFavourite), findsOneWidget);
 
       await tester.tap(find.byKey(textTvStarKey));
       await tester.pumpAndSettle();
-      expect(find.bySemanticsLabel(Messages.removeFavourite), findsOneWidget);
+      expect(find.bySemanticsLabel(en.removeFavourite), findsOneWidget);
     });
 
     testWidgets('does nothing more once the list is full', (
@@ -214,7 +214,7 @@ void main() {
       expect(find.byKey(textTvChipKey(800)), findsNothing);
     });
 
-    testWidgets('a page removed and added again is a bare number now', (
+    testWidgets('a page removed and added again still has its section name', (
       WidgetTester tester,
     ) async {
       await _open(tester, start: 300);
@@ -224,7 +224,7 @@ void main() {
       await tester.tap(find.byKey(textTvStarKey));
       await tester.pumpAndSettle();
 
-      expect(find.text('300 SPORT'), findsNothing);
+      expect(find.text('300 SPORT'), findsOneWidget);
       expect(find.byKey(textTvChipKey(300)), findsOneWidget);
     });
   });
@@ -243,7 +243,7 @@ void main() {
 
       expect(find.byKey(textTvSettingsGroupKey('favourites')), findsOneWidget);
       expect(
-        find.text(Messages.favouritesCount(6, SavedPages.maxFavourites)),
+        find.text(en.favouritesCount(6, SavedPages.maxFavourites)),
         findsOneWidget,
       );
     });
@@ -294,7 +294,7 @@ void main() {
       await openSettings(tester);
 
       expect(
-        find.text(Messages.favouritesCount(7, SavedPages.maxFavourites)),
+        find.text(en.favouritesCount(7, SavedPages.maxFavourites)),
         findsOneWidget,
       );
     });

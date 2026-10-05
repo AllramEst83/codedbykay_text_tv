@@ -1,4 +1,4 @@
-import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
@@ -6,6 +6,7 @@ import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
+import 'package:codedbykay_text_tv/ui/formats.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
@@ -95,13 +96,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   TvButton(
                     key: textTvSettingsBackKey,
                     label: '<',
-                    semanticLabel: Messages.back,
+                    semanticLabel: context.l10n.back,
                     onTap: () => Navigator.of(context).maybePop(),
                   ),
                   const SizedBox(width: TvMetrics.margin),
                   Expanded(
                     child: Text(
-                      Messages.settingsTitle,
+                      context.l10n.settingsTitle,
                       style: tvText(14, TvColors.white),
                     ),
                   ),
@@ -119,11 +120,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: <Widget>[
                   _SettingsGroup(
                     id: 'controls',
-                    title: Messages.sectionControls,
+                    title: context.l10n.sectionControls,
                     children: <Widget>[
                       TvSwitchRow(
                         switchKey: textTvQuickEntryKey,
-                        label: Messages.quickEntry,
+                        label: context.l10n.quickEntry,
                         value: _controls.quickEntry,
                         onChanged: (bool v) =>
                             _setControls(_controls.copyWith(quickEntry: v)),
@@ -133,10 +134,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: TvMetrics.margin * 2),
                   _SettingsGroup(
                     id: 'favourites',
-                    title: Messages.sectionFavourites,
+                    title: context.l10n.sectionFavourites,
                     children: <Widget>[
                       Text(
-                        Messages.favouritesCount(
+                        context.l10n.favouritesCount(
                           _saved.favourites.length,
                           SavedPages.maxFavourites,
                         ),
@@ -145,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(height: TvMetrics.margin),
                       TvButton(
                         key: textTvFavouritesResetKey,
-                        label: Messages.resetFavourites,
+                        label: context.l10n.resetFavourites,
                         onTap: _saved.hasDefaultFavourites
                             ? null
                             : () => _setSaved(_saved.resetFavourites()),
@@ -155,22 +156,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: TvMetrics.margin * 2),
                   _SettingsGroup(
                     id: 'refresh',
-                    title: Messages.sectionRefresh,
+                    title: context.l10n.sectionRefresh,
                     children: <Widget>[
                       TvSliderRow(
                         sliderKey: textTvAutoRefreshKey,
-                        label: Messages.autoRefresh,
+                        label: context.l10n.autoRefresh,
                         value: _refresh.auto.toDouble(),
                         max: (autoRefreshIntervals.length - 1).toDouble(),
                         divisions: autoRefreshIntervals.length - 1,
-                        text: Messages.autoRefreshValue(_refresh.interval),
+                        text: context.l10n.autoRefreshValue(_refresh.interval),
                         onChanged: (double v) =>
                             _setRefresh(_refresh.copyWith(auto: v.round())),
                       ),
                       const SizedBox(height: TvMetrics.margin),
                       TvSwitchRow(
                         switchKey: textTvPrefetchKey,
-                        label: Messages.prefetch,
+                        label: context.l10n.prefetch,
                         value: _refresh.prefetch,
                         onChanged: (bool v) =>
                             _setRefresh(_refresh.copyWith(prefetch: v)),
@@ -180,11 +181,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: TvMetrics.margin * 2),
                   _SettingsGroup(
                     id: 'crt',
-                    title: Messages.sectionCrt,
+                    title: context.l10n.sectionCrt,
                     children: <Widget>[
                       TvSwitchRow(
                         switchKey: textTvCrtSwitchKey,
-                        label: Messages.crtEffect,
+                        label: context.l10n.crtEffect,
                         value: on,
                         onChanged: (bool v) => _set(_crt.copyWith(enabled: v)),
                       ),
@@ -193,7 +194,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(height: TvMetrics.margin),
                       TvSliderRow(
                         sliderKey: textTvCrtCurveKey,
-                        label: Messages.crtCurve,
+                        label: context.l10n.crtCurve,
                         value: _crt.curve,
                         max: crtCurveMax,
                         text: _percent(_crt.curve, 0, crtCurveMax),
@@ -203,7 +204,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       TvSliderRow(
                         sliderKey: textTvCrtDepthKey,
-                        label: Messages.crtScanDepth,
+                        label: context.l10n.crtScanDepth,
                         value: _crt.scanDepth,
                         max: crtScanDepthMax,
                         text: _percent(_crt.scanDepth, 0, crtScanDepthMax),
@@ -213,11 +214,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       TvSliderRow(
                         sliderKey: textTvCrtPeriodKey,
-                        label: Messages.crtScanPeriod,
+                        label: context.l10n.crtScanPeriod,
                         value: _crt.scanPeriod,
                         min: crtScanPeriodMin,
                         max: crtScanPeriodMax,
-                        text: Messages.pixels(_crt.scanPeriod),
+                        text: Formats.pixels(_crt.scanPeriod),
                         onChanged: on
                             ? (double v) => _set(_crt.copyWith(scanPeriod: v))
                             : null,
@@ -227,7 +228,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         alignment: Alignment.centerLeft,
                         child: TvButton(
                           key: textTvCrtResetKey,
-                          label: Messages.reset,
+                          label: context.l10n.reset,
                           onTap: on ? () => _set(_crt.reset()) : null,
                         ),
                       ),
@@ -298,7 +299,7 @@ class _Preview extends StatelessWidget {
       ),
     );
     return Semantics(
-      label: Messages.crtPreview,
+      label: context.l10n.crtPreview,
       excludeSemantics: true,
       child: Container(
         key: textTvCrtPreviewKey,

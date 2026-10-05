@@ -1,4 +1,4 @@
-import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/reader_content.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
@@ -53,7 +53,7 @@ class ReaderView extends StatelessWidget {
     final Widget content;
     if (loading || shown == null) {
       content = _Message(
-        lines: const <String>[Messages.readerLoading],
+        lines: <String>[context.l10n.readerLoading],
         base: base,
       );
     } else {
@@ -66,11 +66,11 @@ class ReaderView extends StatelessWidget {
           onPull: onPull,
         ),
         TextTvNotBroadcast(:final int number) => _Message(
-          lines: <String>[Messages.readerNotBroadcast(number)],
+          lines: <String>[context.l10n.readerNotBroadcast(number)],
           base: base,
         ),
         TextTvFailed(:final NetworkFailure failure) => _Message(
-          lines: <String>[Messages.failure(failure)],
+          lines: <String>[context.l10n.failure(failure)],
           base: base,
           retry: _RetryButton(onTap: onRetry, palette: palette, base: base),
         ),
@@ -134,7 +134,7 @@ class _Page extends StatelessWidget {
 
     Widget tappable(int page, String label, Widget child) => Semantics(
       button: true,
-      label: '$label. ${Messages.pageLabel(page)}',
+      label: '$label. ${context.l10n.pageLabel(page)}',
       excludeSemantics: true,
       child: InkWell(
         onTap: () => onLink(page),
@@ -333,7 +333,7 @@ class _NavChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: '${link.label}. ${Messages.pageLabel(link.page)}',
+      label: '${link.label}. ${context.l10n.pageLabel(link.page)}',
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
@@ -405,7 +405,7 @@ class _RetryButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
-          Messages.readerTryAgain,
+          context.l10n.readerTryAgain,
           style: base.copyWith(color: palette.link),
         ),
       ),

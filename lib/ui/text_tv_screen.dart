@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/fastext.dart';
@@ -160,8 +160,28 @@ class _TextTvScreenState extends State<TextTvScreen>
     final ShortcutService? shortcuts = widget.shortcuts;
     if (shortcuts != null) {
       _shortcutSubscription = shortcuts.opened.listen(_open);
-      unawaited(shortcuts.update(_saved.favourites));
     }
+  }
+
+  // The language the icon shortcuts were last titled in.
+  Locale? _shortcutLocale;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // First time here, and whenever the phone's language changes: the titles
+    // of the icon shortcuts are in words.
+    final Locale locale = Localizations.localeOf(context);
+    if (locale != _shortcutLocale) {
+      _shortcutLocale = locale;
+      _updateShortcuts(_saved.favourites);
+    }
+  }
+
+  void _updateShortcuts(List<Favourite> favourites) {
+    unawaited(
+      widget.shortcuts?.update(favourites, title: context.l10n.shortcutTitle),
+    );
   }
 
   /// Sets up reading ahead for the page just read, when the settings say so.
@@ -255,7 +275,7 @@ class _TextTvScreenState extends State<TextTvScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            Messages.failure(result.failure).toUpperCase(),
+            context.l10n.failure(result.failure).toUpperCase(),
             style: tvText(10, TvColors.white),
           ),
           backgroundColor: TvColors.black,
@@ -530,7 +550,7 @@ class _TextTvScreenState extends State<TextTvScreen>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  Messages.copied,
+                  context.l10n.copied,
                   style: tvText(10, TvColors.white),
                 ),
                 backgroundColor: TvColors.black,
@@ -543,7 +563,7 @@ class _TextTvScreenState extends State<TextTvScreen>
             unawaited(
               widget.share?.shareText(
                 shareMessage(page, part),
-                subject: Messages.pageLabel(page.number),
+                subject: context.l10n.pageLabel(page.number),
               ),
             );
           case ShareAction.shareLink:
@@ -595,7 +615,7 @@ class _TextTvScreenState extends State<TextTvScreen>
     // Only the favourites are shortcuts: a page read is no reason to tell
     // the system again.
     if (favouritesChanged) {
-      unawaited(widget.shortcuts?.update(saved.favourites));
+      _updateShortcuts(saved.favourites);
     }
     widget.onSavedChanged?.call(saved);
   }
@@ -692,13 +712,13 @@ class _TextTvScreenState extends State<TextTvScreen>
                     ),
                     if (_savedAt case final DateTime savedAt)
                       TvOfflineNote(
-                        text: Messages.offlineSaved(
+                        text: context.l10n.offlineSaved(
                           formatSavedAt(savedAt, widget.clock()),
                         ),
                       )
                     else if (_updatedAt case final DateTime updatedAt)
                       TvUpdatedNote(
-                        text: Messages.updated(
+                        text: context.l10n.updated(
                           formatSavedAt(updatedAt, widget.clock()),
                         ),
                       ),
@@ -745,8 +765,8 @@ class _TextTvScreenState extends State<TextTvScreen>
                           ),
                           selected: _saved.isFavourite(_number),
                           semanticLabel: _saved.isFavourite(_number)
-                              ? Messages.removeFavourite
-                              : Messages.addFavourite,
+                              ? context.l10n.removeFavourite
+                              : context.l10n.addFavourite,
                           onTap: () =>
                               _setSaved(_saved.toggleFavourite(_number)),
                         ),
@@ -764,7 +784,7 @@ class _TextTvScreenState extends State<TextTvScreen>
                           key: textTvShareKey,
                           icon: (Color colour) =>
                               Icon(Icons.ios_share, color: colour, size: 26),
-                          semanticLabel: Messages.share,
+                          semanticLabel: context.l10n.share,
                           onTap: _result is TextTvShown ? _openShare : null,
                         ),
                         const SizedBox(width: TvMetrics.gutter),

@@ -1,6 +1,7 @@
-import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../fakes/english.dart';
 
 void main() {
   group('NetworkFailure', () {
@@ -14,8 +15,7 @@ void main() {
 
     test('every kind has its own wording', () {
       final Set<String> words = <String>{
-        for (final NetworkFailure f in NetworkFailure.values)
-          Messages.failure(f),
+        for (final NetworkFailure f in NetworkFailure.values) en.failure(f),
       };
 
       expect(words, hasLength(NetworkFailure.values.length));

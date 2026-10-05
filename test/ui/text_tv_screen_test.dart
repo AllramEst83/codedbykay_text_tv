@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:codedbykay_text_tv/messages.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
 import 'package:codedbykay_text_tv/model/page_search.dart';
@@ -16,6 +15,7 @@ import 'package:codedbykay_text_tv/ui/tv_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../fakes/english.dart';
 import '../fakes/fake_text_tv_repository.dart';
 
 TextTvPage _page(
@@ -93,7 +93,7 @@ void main() {
       expect(_number('100'), findsOneWidget);
       // The plain text on the grid: one row for each line of the page.
       expect(find.byType(TvRow), findsNWidgets(3));
-      expect(find.text(Messages.title), findsOneWidget);
+      expect(find.text(en.title), findsOneWidget);
     });
 
     testWidgets('can start on any page', (WidgetTester tester) async {
@@ -425,7 +425,7 @@ void main() {
       }
       await tester.pumpAndSettle();
 
-      expect(find.text(Messages.pageNotBroadcast(777)), findsOneWidget);
+      expect(find.text(en.pageNotBroadcast(777)), findsOneWidget);
     });
 
     testWidgets('puts the number pad away first', (WidgetTester tester) async {
@@ -639,7 +639,7 @@ void main() {
       }
       await tester.pumpAndSettle();
 
-      expect(find.text(Messages.pageNotBroadcast(777)), findsOneWidget);
+      expect(find.text(en.pageNotBroadcast(777)), findsOneWidget);
     });
   });
 
@@ -747,7 +747,7 @@ void main() {
       await _open(tester, withLinks());
 
       expect(
-        find.bySemanticsLabel('Inrikes. ${Messages.pageLabel(101)}'),
+        find.bySemanticsLabel('Inrikes. ${en.pageLabel(101)}'),
         findsOneWidget,
       );
     });
@@ -771,7 +771,7 @@ void main() {
     ) async {
       await _open(tester, withParts());
 
-      expect(find.text('${Messages.part} 1/2'), findsOneWidget);
+      expect(find.text('${en.part} 1/2'), findsOneWidget);
       expect(find.byType(TvRow), findsNWidgets(3));
     });
 
@@ -781,12 +781,12 @@ void main() {
       await tester.tap(find.byKey(textTvPartNextKey));
       await tester.pump();
 
-      expect(find.text('${Messages.part} 2/2'), findsOneWidget);
+      expect(find.text('${en.part} 2/2'), findsOneWidget);
       expect(find.byType(TvRow), findsNWidgets(4));
 
       await tester.tap(find.byKey(textTvPartPrevKey));
       await tester.pump();
-      expect(find.text('${Messages.part} 1/2'), findsOneWidget);
+      expect(find.text('${en.part} 1/2'), findsOneWidget);
     });
 
     testWidgets(
@@ -801,7 +801,7 @@ void main() {
           1000,
         );
         await tester.pumpAndSettle();
-        expect(find.text('${Messages.part} 2/2'), findsOneWidget);
+        expect(find.text('${en.part} 2/2'), findsOneWidget);
 
         await tester.fling(
           find.byType(TvRow).first,
@@ -923,7 +923,7 @@ void main() {
       final FakeTextTvRepository repository = _repository();
       await _open(tester, repository, start: 555);
 
-      expect(find.text(Messages.pageNotBroadcast(555)), findsOneWidget);
+      expect(find.text(en.pageNotBroadcast(555)), findsOneWidget);
 
       await tester.tap(find.byKey(textTvNextKey));
       await tester.pumpAndSettle();
@@ -955,7 +955,7 @@ void main() {
 
       expect(repository.requests, <(int, bool)>[(377, false)]);
       expect(_number('377'), findsOneWidget);
-      expect(find.text('${Messages.part} 2/2'), findsOneWidget);
+      expect(find.text('${en.part} 2/2'), findsOneWidget);
 
       // Back goes through the restored history.
       await tester.binding.handlePopRoute();
@@ -973,7 +973,7 @@ void main() {
         );
 
         expect(_number('101'), findsOneWidget);
-        expect(find.textContaining(Messages.part), findsNothing);
+        expect(find.textContaining(en.part), findsNothing);
       },
     );
 
@@ -1059,7 +1059,7 @@ void main() {
 
       // Nothing from the site yet, but the saved copy is already drawn.
       expect(find.byType(TvRow), findsOneWidget);
-      expect(find.text(Messages.loading), findsNothing);
+      expect(find.text(en.loading), findsNothing);
 
       repository.answer(
         TextTvShown(
@@ -1089,7 +1089,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text(Messages.loading), findsOneWidget);
+      expect(find.text(en.loading), findsOneWidget);
       expect(find.byType(TvRow), findsNothing);
     });
 
@@ -1139,7 +1139,7 @@ void main() {
 
       expect(
         tester.widget<Text>(find.byKey(textTvOfflineKey)).data,
-        Messages.offlineSaved('14:32'),
+        en.offlineSaved('14:32'),
       );
       expect(find.byType(TvRow), findsNWidgets(3));
     });
@@ -1155,7 +1155,7 @@ void main() {
 
       await _open(tester, repository, clock: () => DateTime(2026, 10, 5, 18));
 
-      expect(find.text(Messages.offlineSaved('3/10 09:05')), findsOneWidget);
+      expect(find.text(en.offlineSaved('3/10 09:05')), findsOneWidget);
     });
 
     testWidgets('a page just read carries no note', (

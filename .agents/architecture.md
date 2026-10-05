@@ -10,7 +10,7 @@ Keep the file list below in step with `lib/` as it changes.
 lib/
   main.dart                  # runApp + wiring: IoHttpFetcher -> TextTv -> LiveTextTvRepository, PrefsSessionStore -> saved session, FilePageDiskCache (app cache folder) -> TextTvApp
   app.dart                   # TextTvApp: MaterialApp, theme, edge-to-edge black system bars
-  messages.dart              # user-facing strings
+  l10n/                      # app_en.arb (template) + app_sv.arb -> generated app_localizations*.dart (checked in; `flutter gen-l10n` or any `flutter pub get`/build regenerates, config in l10n.yaml); l10n.dart: `context.l10n` (English when no delegates are above, so a bare widget test works) and AppWording (failure, themeName, autoRefreshValue, sectionName, chipLabel, shortcutTitle)
   model/                     # pure Dart (values and parsers): no platform, no I/O
     styled_text.dart         # TvColor, StyledRun (text + colours + underline + tall + mosaic + link), mergeRuns, plainText
     text_tv_page.dart        # textTvColumns, textTvFirstPage/LastPage, TextTvPage (parts, styledParts, previous/next), TextTvResult (TextTvShown / NotBroadcast / Failed)
@@ -30,6 +30,7 @@ lib/
     saved_time.dart          # formatSavedAt: `14:32` for today, `3/10 14:32` otherwise
     text_tv_session.dart     # TextTvSession (page, part, history <= 50): what a cold start returns to; tolerant encode/decode
     page_search.dart         # searchPages(pages, query) -> SearchHit(page, line, matches); foldForSearch (å/ä/ö); every word on one line, best 30
+    page_section.dart        # PageSection (the six built-in favourites' pages), sectionOf(page), legacyDefaultNames (the Swedish names older versions saved)
     page_share.dart          # pageText(page, part), pageLink(n), shareMessage: what copying and sharing send
     network_failure.dart     # NetworkFailure (offline/timeout/server/changed/other, .transient): why a request failed, for the wording and the retry
     text_tv_headlines.dart   # textTvHeadlines(page): the headline lines of a page (no title, bare numbers or navigation); not used by the UI yet
@@ -120,7 +121,7 @@ The tests pin most of this; change the spec and the tests together.
 - Fastext (quick mode only): when the last row of the part on screen is only `label number` pairs (two or more), up to four coloured keys (red, green, yellow, blue, in order) show above the digit pad, each the page's own label over its number, opening that page.
 - Swipe (|velocity| ≥ 200): left = next part, then next page; right = previous part, then previous page. Part bar only when a page has > 1 part.
 - Back: closes the pad first, then pops the history, then closes (`PopScope`).
-- The refresh icon and `TRY AGAIN` read with `fresh: true`. Failures print `Messages.failure(kind)` upper-cased.
+- The refresh icon and `TRY AGAIN` read with `fresh: true`. Failures print `context.l10n.failure(kind)` upper-cased.
 - Shortcuts (Swedish, hard-coded): 100 NYHETER, 101 INRIKES, 104 UTRIKES, 300 SPORT, 400 VÄDER, 700 INNEHÅLL.
 - Layout constants: 40 columns + 2 gutter cells; cell width capped at `8 × 1.75`; row height spreads the free height over the row units (double-height = 2), clamped to 1.6–3 cells; glyphs stretched upright up to 2× about the cell centre; `leadingDistribution: even` so text is not low in its row; 12 px air above and below; text centred by `tvGutters`, colour bars (≥ 90 % non-black background) centred by their edges with a 1-cell gutter; first row ignored for margin measurement; rows with < 12 characters of ink ignored.
 - A row is announced to TalkBack as its trimmed plain text.

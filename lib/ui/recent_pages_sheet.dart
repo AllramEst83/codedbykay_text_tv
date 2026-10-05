@@ -1,4 +1,4 @@
-import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
@@ -34,13 +34,13 @@ Future<void> showRecentPages(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(Messages.recentsTitle, style: tvText(12, TvColors.white)),
+            Text(context.l10n.recentsTitle, style: tvText(12, TvColors.white)),
             const SizedBox(height: TvMetrics.margin),
             if (recents.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: TvMetrics.margin),
                 child: Text(
-                  Messages.recentsEmpty,
+                  context.l10n.recentsEmpty,
                   key: textTvRecentsEmptyKey,
                   style: tvText(10, TvColors.dim),
                 ),
@@ -53,12 +53,12 @@ Future<void> showRecentPages(
                     for (final int page in recents)
                       _RecentRow(
                         page: page,
-                        label: favourites
-                            .firstWhere(
-                              (Favourite f) => f.page == page,
-                              orElse: () => Favourite(page),
-                            )
-                            .label,
+                        label: context.l10n.chipLabel(
+                          favourites.firstWhere(
+                            (Favourite f) => f.page == page,
+                            orElse: () => Favourite(page),
+                          ),
+                        ),
                         onTap: () {
                           Navigator.of(sheet).pop();
                           onOpen(page);
@@ -70,7 +70,7 @@ Future<void> showRecentPages(
             const SizedBox(height: TvMetrics.margin),
             TvButton(
               key: textTvRecentsClearKey,
-              label: Messages.clearRecents,
+              label: context.l10n.clearRecents,
               onTap: recents.isEmpty
                   ? null
                   : () {
@@ -100,7 +100,7 @@ class _RecentRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: Messages.pageLabel(page),
+      label: context.l10n.pageLabel(page),
       excludeSemantics: true,
       child: InkWell(
         key: textTvRecentKey(page),

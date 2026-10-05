@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/page_search.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
@@ -112,7 +112,7 @@ class _SearchSheetState extends State<_SearchSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(Messages.searchTitle, style: tvText(12, TvColors.white)),
+              Text(context.l10n.searchTitle, style: tvText(12, TvColors.white)),
               const SizedBox(height: TvMetrics.margin),
               TextField(
                 key: textTvSearchFieldKey,
@@ -130,7 +130,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                   }
                 },
                 decoration: InputDecoration(
-                  hintText: Messages.searchHint,
+                  hintText: context.l10n.searchHint,
                   hintStyle: tvText(10, TvColors.dim),
                   isDense: true,
                   contentPadding: const EdgeInsets.all(TvMetrics.gutter),
@@ -158,8 +158,8 @@ class _SearchSheetState extends State<_SearchSheet> {
                     if (goTo != null)
                       _Row(
                         key: textTvSearchGoKey,
-                        label: Messages.searchGo(goTo),
-                        semantics: Messages.pageLabel(goTo),
+                        label: context.l10n.searchGo(goTo),
+                        semantics: context.l10n.pageLabel(goTo),
                         onTap: () => widget.onOpen(goTo),
                       ),
                     for (final SearchHit hit in _hits)
@@ -167,7 +167,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                         key: textTvSearchHitKey(hit.page),
                         label: '${hit.page}  ${hit.line}',
                         semantics:
-                            '${Messages.pageLabel(hit.page)}. ${hit.line}',
+                            '${context.l10n.pageLabel(hit.page)}. ${hit.line}',
                         onTap: () => widget.onOpen(hit.page),
                       ),
                     if (searched && goTo == null && _hits.isEmpty)
@@ -176,7 +176,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                           vertical: TvMetrics.gutter,
                         ),
                         child: Text(
-                          Messages.searchNothing,
+                          context.l10n.searchNothing,
                           key: textTvSearchEmptyKey,
                           style: tvText(10, TvColors.dim),
                         ),
@@ -185,7 +185,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                 ),
               ),
               const SizedBox(height: TvMetrics.gutter),
-              Text(Messages.searchScope, style: tvText(8, TvColors.dim)),
+              Text(context.l10n.searchScope, style: tvText(8, TvColors.dim)),
             ],
           ),
         ),

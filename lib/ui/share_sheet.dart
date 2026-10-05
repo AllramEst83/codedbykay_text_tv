@@ -1,4 +1,4 @@
-import 'package:codedbykay_text_tv/messages.dart';
+import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_keys.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
@@ -36,29 +36,29 @@ Future<void> showShareSheet(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Text(Messages.shareTitle, style: tvText(12, TvColors.white)),
+              Text(context.l10n.shareTitle, style: tvText(12, TvColors.white)),
               const SizedBox(height: TvMetrics.margin),
               TvButton(
                 key: textTvCopyTextKey,
-                label: Messages.copyText,
+                label: context.l10n.copyText,
                 onTap: () => choose(ShareAction.copyText),
               ),
               const SizedBox(height: TvMetrics.gutter),
               TvButton(
                 key: textTvShareTextKey,
-                label: Messages.shareText,
+                label: context.l10n.shareText,
                 onTap: () => choose(ShareAction.shareText),
               ),
               const SizedBox(height: TvMetrics.gutter),
               TvButton(
                 key: textTvShareLinkKey,
-                label: Messages.shareLink,
+                label: context.l10n.shareLink,
                 onTap: () => choose(ShareAction.shareLink),
               ),
               const SizedBox(height: TvMetrics.gutter),
               TvButton(
                 key: textTvShareImageKey,
-                label: Messages.shareImage,
+                label: context.l10n.shareImage,
                 onTap: () => choose(ShareAction.shareImage),
               ),
             ],

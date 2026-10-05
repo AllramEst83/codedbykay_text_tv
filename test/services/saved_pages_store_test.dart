@@ -13,7 +13,7 @@ void main() {
 
     test('gives back what was saved, to a new store too', () async {
       const SavedPages saved = SavedPages(
-        favourites: <Favourite>[Favourite(377), Favourite(100, 'NYHETER')],
+        favourites: <Favourite>[Favourite(377), Favourite(100, 'MINA')],
       );
 
       await PrefsSavedPagesStore().save(saved);
