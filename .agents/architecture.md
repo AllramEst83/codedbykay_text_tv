@@ -31,6 +31,7 @@ lib/
     text_tv_session.dart     # TextTvSession (page, part, history <= 50): what a cold start returns to; tolerant encode/decode
     page_search.dart         # searchPages(pages, query) -> SearchHit(page, line, matches); foldForSearch (å/ä/ö); every word on one line, best 30
     language_settings.dart   # AppLanguage (system/swedish/english, .locale), LanguageSettings (tolerant decode), resolveLocale(device): sv -> sv, anything else -> en
+    page_font_settings.dart  # PageFont (pixel, bedstead), PageFontSettings (tolerant decode); the face's style, row height and whether glyphs stretch are `pageTextStyle`/`pageRowCells`/`pageStretchesGlyphs` in ui/theme.dart
     page_section.dart        # PageSection (the six built-in favourites' pages), sectionOf(page), legacyDefaultNames (the Swedish names older versions saved)
     page_semantics.dart      # PageSemantics: the page-level node (label, live region) around the rows
     page_share.dart          # pageText(page, part), pageLink(n), shareMessage: what copying and sharing send
@@ -56,7 +57,7 @@ lib/
   ui/
     theme.dart               # TvColors, TvMetrics, kPixelFontFamily, textTvTheme(): the chrome's colours and metrics, the only place they are defined
     text_tv_screen.dart      # TextTvScreen: state (page, part, history, typed digits and their timer, request counter) and the layout of the screen
-    settings_screen.dart     # SettingsScreen: the page the gear button opens, as framed panels each under a blue header bar: CONTROLS (the quick-pad switch), FAVOURITES (count, RESET), REFRESH (auto-refresh step slider, read-ahead switch), LANGUAGE (system / svenska / english, with a note), CRT SCREEN (switch, live preview, three capped sliders, RESET), ABOUT (credit and privacy text)
+    settings_screen.dart     # SettingsScreen: the page the gear button opens, as framed panels each under a blue header bar: CONTROLS (the quick-pad switch), FAVOURITES (count, RESET), REFRESH (auto-refresh step slider, read-ahead switch), LANGUAGE (system / svenska / english, with a note), TELETEXT FONT (pixel / Bedstead, preview, note), CRT SCREEN (switch, live preview, three capped sliders, RESET), ABOUT (credit and privacy text)
     crt_screen.dart          # CrtScreen: draws its child through shaders/crt.frag (flutter_shaders AnimatedSampler) and routes touches through CrtHitMap
     crt_hit_map.dart         # CrtHitMap: a render object that remaps a touch through the CRT glass so a tap reaches what is shown
     page_snapshot.dart       # capturePageImage(context, page, part): a PNG of the page as teletext, drawn off-screen in the overlay

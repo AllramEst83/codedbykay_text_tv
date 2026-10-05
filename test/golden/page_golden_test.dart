@@ -3,6 +3,7 @@ library;
 
 import 'dart:io';
 
+import 'package:codedbykay_text_tv/model/page_font_settings.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/services/text_tv.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_page_area.dart';
@@ -24,23 +25,30 @@ import '../fakes/fake_http_fetcher.dart';
 //   flutter test --tags golden                    # check
 //   flutter test --tags golden --update-goldens   # after a change you meant
 
-Future<void> _loadPixelFont() async {
-  final FontLoader loader = FontLoader(kPixelFontFamily)
+Future<void> _loadFont(String family, String file) async {
+  final FontLoader loader = FontLoader(family)
     ..addFont(
       Future<ByteData>.value(
-        ByteData.sublistView(
-          File('fonts/PressStart2P-Regular.ttf').readAsBytesSync(),
-        ),
+        ByteData.sublistView(File(file).readAsBytesSync()),
       ),
     );
   await loader.load();
+}
+
+Future<void> _loadFonts() async {
+  await _loadFont(kPixelFontFamily, 'fonts/PressStart2P-Regular.ttf');
+  await _loadFont(kBedsteadFontFamily, 'fonts/Bedstead-Regular.otf');
 }
 
 TextTvPage _page(int n) =>
     TextTv(fetcher: FakeHttpFetcher())
         .parse(n, File('test/fixtures/texttv_$n.json').readAsStringSync())!;
 
-Future<void> _draw(WidgetTester tester, TextTvPage page) async {
+Future<void> _draw(
+  WidgetTester tester,
+  TextTvPage page, {
+  PageFont font = PageFont.pixel,
+}) async {
   tester.view
     ..physicalSize = const Size(400, 640)
     ..devicePixelRatio = 1;
@@ -58,6 +66,7 @@ Future<void> _draw(WidgetTester tester, TextTvPage page) async {
           result: TextTvShown(page),
           onLink: (String _) {},
           onRetry: () {},
+          font: font,
         ),
       ),
     ),
@@ -66,7 +75,7 @@ Future<void> _draw(WidgetTester tester, TextTvPage page) async {
 }
 
 void main() {
-  setUpAll(_loadPixelFont);
+  setUpAll(_loadFonts);
 
   testWidgets('page 100, with the block-graphics header', (
     WidgetTester tester,
@@ -85,6 +94,24 @@ void main() {
     await expectLater(
       find.byType(MaterialApp),
       matchesGoldenFile('goldens/page_377.png'),
+    );
+  });
+
+  testWidgets('page 100 in Bedstead', (WidgetTester tester) async {
+    await _draw(tester, _page(100), font: PageFont.bedstead);
+
+    await expectLater(
+      find.byType(MaterialApp),
+      matchesGoldenFile('goldens/page_100_bedstead.png'),
+    );
+  });
+
+  testWidgets('page 377 in Bedstead', (WidgetTester tester) async {
+    await _draw(tester, _page(377), font: PageFont.bedstead);
+
+    await expectLater(
+      find.byType(MaterialApp),
+      matchesGoldenFile('goldens/page_377_bedstead.png'),
     );
   });
 }

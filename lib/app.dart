@@ -2,6 +2,7 @@ import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/language_settings.dart';
+import 'package:codedbykay_text_tv/model/page_font_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
@@ -37,6 +38,8 @@ class TextTvApp extends StatefulWidget {
     this.onCrtChanged,
     this.refresh = const RefreshSettings(),
     this.onRefreshChanged,
+    this.pageFont = PageFontSettings.defaults,
+    this.onPageFontChanged,
     this.language = LanguageSettings.defaults,
     this.onLanguageChanged,
     this.controls = ControlsSettings.defaults,
@@ -64,6 +67,10 @@ class TextTvApp extends StatefulWidget {
   /// Whether the page refreshes by itself, as of the last run.
   final RefreshSettings refresh;
   final ValueChanged<RefreshSettings>? onRefreshChanged;
+
+  /// The typeface of the teletext page, as of the last run.
+  final PageFontSettings pageFont;
+  final ValueChanged<PageFontSettings>? onPageFontChanged;
 
   /// The language of the app, as of the last run.
   final LanguageSettings language;
@@ -128,6 +135,8 @@ class _TextTvAppState extends State<TextTvApp> {
           onSavedChanged: widget.onSavedChanged,
           shortcuts: widget.shortcuts,
           share: widget.share,
+          pageFont: widget.pageFont,
+          onPageFontChanged: widget.onPageFontChanged,
           language: _language,
           onLanguageChanged: _setLanguage,
         ),

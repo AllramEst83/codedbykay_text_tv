@@ -1,5 +1,6 @@
 import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
+import 'package:codedbykay_text_tv/model/page_font_settings.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/tv_layout.dart';
@@ -22,7 +23,11 @@ class TvPageArea extends StatelessWidget {
     required this.onLink,
     required this.onRetry,
     this.onPull,
+    this.font = PageFont.pixel,
   });
+
+  /// The typeface of the page.
+  final PageFont font;
 
   /// Called when the page is pulled down past its top; the future ends when
   /// the page has been read again. Without it pulling does nothing.
@@ -58,6 +63,7 @@ class TvPageArea extends StatelessWidget {
                 onLink: onLink,
                 width: constraints.maxWidth,
                 height: constraints.maxHeight - 2 * _airAbove,
+                font: font,
               ),
             ),
             TextTvNotBroadcast(:final int number) => TvMessage(
@@ -141,7 +147,11 @@ class TvGrid extends StatelessWidget {
     required this.onLink,
     required this.width,
     required this.height,
+    this.font = PageFont.pixel,
   });
+
+  /// The typeface the page is drawn in.
+  final PageFont font;
 
   final TextTvPage page;
   final int part;
@@ -170,17 +180,8 @@ class TvGrid extends StatelessWidget {
       rows,
       columns: textTvColumns,
     );
-    // Press Start 2P is a monospaced pixel face: every cell one square em. The
-    // line height gives the rows their natural teletext proportions.
-    const TextStyle style = TextStyle(
-      fontFamily: kPixelFontFamily,
-      fontSize: 8,
-      height: 1.6,
-      // The extra line height goes half above and half below the letters.
-      // Left to the font's own split it all went above, so text sat low in its
-      // row and its descenders ran into the row below.
-      leadingDistribution: TextLeadingDistribution.even,
-    );
+    final TextStyle style = pageTextStyle(font);
+    final double naturalRow = pageRowCells(font);
 
     // Spread the rows over the height there is: a headline row counts for two.
     // A screen too short for the natural row height scrolls instead.
@@ -191,8 +192,8 @@ class TvGrid extends StatelessWidget {
           sum + (row.any((StyledRun r) => r.tall) ? 2 : 1),
     );
     final double rowHeight = units == 0
-        ? cell * 1.6
-        : (height / units).clamp(cell * 1.6, cell * _tallestRow);
+        ? cell * naturalRow
+        : (height / units).clamp(cell * naturalRow, cell * _tallestRow);
 
     // Its own layer: a page is painted once and then only moved (a page turn,
     // a pull to refresh), not drawn again.
@@ -211,6 +212,7 @@ class TvGrid extends StatelessWidget {
                   ? tvGutterCells ~/ 2
                   : gutters.left,
               rowHeight: rowHeight,
+              stretchGlyphs: pageStretchesGlyphs(font),
               onRun: onLink,
             ),
         ],

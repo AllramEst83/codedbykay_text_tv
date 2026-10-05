@@ -5,6 +5,7 @@ import 'package:codedbykay_text_tv/app.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/language_settings.dart';
+import 'package:codedbykay_text_tv/model/page_font_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
@@ -16,6 +17,7 @@ import 'package:codedbykay_text_tv/services/io_http_fetcher.dart';
 import 'package:codedbykay_text_tv/services/language_settings_store.dart';
 import 'package:codedbykay_text_tv/services/live_text_tv_repository.dart';
 import 'package:codedbykay_text_tv/services/page_disk_cache.dart';
+import 'package:codedbykay_text_tv/services/page_font_settings_store.dart';
 import 'package:codedbykay_text_tv/services/reader_settings_store.dart';
 import 'package:codedbykay_text_tv/services/refresh_settings_store.dart';
 import 'package:codedbykay_text_tv/services/saved_pages_store.dart';
@@ -40,6 +42,8 @@ Future<void> main() async {
   final CrtSettings crt = await crtStore.load();
   final RefreshSettingsStore refreshStore = PrefsRefreshSettingsStore();
   final RefreshSettings refresh = await refreshStore.load();
+  final PageFontSettingsStore pageFontStore = PrefsPageFontSettingsStore();
+  final PageFontSettings pageFont = await pageFontStore.load();
   final LanguageSettingsStore languageStore = PrefsLanguageSettingsStore();
   final LanguageSettings language = await languageStore.load();
   final ControlsSettingsStore controlsStore = PrefsControlsSettingsStore();
@@ -61,6 +65,9 @@ Future<void> main() async {
       onCrtChanged: (CrtSettings c) => unawaited(crtStore.save(c)),
       refresh: refresh,
       onRefreshChanged: (RefreshSettings r) => unawaited(refreshStore.save(r)),
+      pageFont: pageFont,
+      onPageFontChanged: (PageFontSettings p) =>
+          unawaited(pageFontStore.save(p)),
       language: language,
       onLanguageChanged: (LanguageSettings l) =>
           unawaited(languageStore.save(l)),

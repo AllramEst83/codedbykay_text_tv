@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:codedbykay_text_tv/model/page_font_settings.dart';
 import 'package:codedbykay_text_tv/model/page_share.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_controls.dart';
@@ -23,8 +24,9 @@ const double _scale = 3;
 Future<Uint8List?> capturePageImage(
   BuildContext context,
   TextTvPage page,
-  int part,
-) async {
+  int part, {
+  PageFont font = PageFont.pixel,
+}) async {
   final OverlayState? overlay = Overlay.maybeOf(context);
   if (overlay == null) return null;
   final GlobalKey boundary = GlobalKey();
@@ -47,6 +49,7 @@ Future<Uint8List?> capturePageImage(
                 onLink: (String _) {},
                 width: _snapshotWidth,
                 height: 0,
+                font: font,
               ),
               const SizedBox(height: TvMetrics.gutter),
               Text(

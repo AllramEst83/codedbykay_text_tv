@@ -62,6 +62,8 @@ void main() {
         'themeBeige',
         'fontSystem',
         'langSystem',
+        'pageFontPixel',
+        'pageFontBedstead',
         'langSwedish',
         'langEnglish',
         'fontAtkinson',

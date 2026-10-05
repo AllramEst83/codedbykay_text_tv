@@ -1,3 +1,4 @@
+import 'package:codedbykay_text_tv/model/page_font_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:flutter/material.dart';
 
@@ -19,6 +20,43 @@ abstract final class TvMetrics {
 
 /// Press Start 2P, bundled so the app works offline.
 const String kPixelFontFamily = 'PressStart2P';
+
+/// The text style of the teletext page in [font], at a nominal size: the row
+/// fits it to the width. Every cell is as wide as an `M`.
+TextStyle pageTextStyle(PageFont font) => switch (font) {
+  // Press Start 2P is a monospaced pixel face: every cell one square em. The
+  // line height gives the rows their natural teletext proportions. The extra
+  // line height goes half above and half below the letters; left to the
+  // font's own split it all went above, so text sat low in its row and its
+  // descenders ran into the row below.
+  PageFont.pixel => const TextStyle(
+    fontFamily: kPixelFontFamily,
+    fontSize: 8,
+    height: 1.6,
+    leadingDistribution: TextLeadingDistribution.even,
+  ),
+  // Bedstead cells are 0.6 em wide; a line of 1.2 em makes a row twice as tall
+  // as a cell, as on a television.
+  PageFont.bedstead => const TextStyle(
+    fontFamily: kBedsteadFontFamily,
+    fontSize: 8,
+    height: 1.2,
+    leadingDistribution: TextLeadingDistribution.even,
+  ),
+};
+
+/// How many cells tall a row of [font] is at least.
+double pageRowCells(PageFont font) => switch (font) {
+  PageFont.pixel => 1.6,
+  PageFont.bedstead => 2.0,
+};
+
+/// Whether the letters of [font] are stretched upright to fill a taller row:
+/// the pixel face is square and needs it, Bedstead is drawn tall already.
+bool pageStretchesGlyphs(PageFont font) => font == PageFont.pixel;
+
+/// Bedstead (CC0), bundled so the app works offline.
+const String kBedsteadFontFamily = 'Bedstead';
 
 /// Black and white with the pixel face; the page area sets its own colours.
 ThemeData textTvTheme() {

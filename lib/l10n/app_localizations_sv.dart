@@ -53,6 +53,22 @@ class AppLocalizationsSv extends AppLocalizations {
       'SYSTEM följer telefonens språk. Om telefonen använder ett språk som appen saknar blir det engelska.';
 
   @override
+  String get sectionPageFont => 'TEXT-TV-TYPSNITT';
+
+  @override
+  String get pageFontPixel => 'PRESS START 2P';
+
+  @override
+  String get pageFontBedstead => 'BEDSTEAD';
+
+  @override
+  String get pageFontNote =>
+      'Bedstead är ritad efter 80-talets text-tv. Den gäller text-tv-sidan, inte läsläget.';
+
+  @override
+  String get pageFontPreview => 'Förhandsvisning av text-TV-typsnittet';
+
+  @override
   String get sectionControls => 'KNAPPAR';
 
   @override

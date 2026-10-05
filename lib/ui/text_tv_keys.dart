@@ -1,4 +1,5 @@
 import 'package:codedbykay_text_tv/model/language_settings.dart';
+import 'package:codedbykay_text_tv/model/page_font_settings.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:flutter/widgets.dart';
 
@@ -71,3 +72,9 @@ const Key textTvAboutPrivacyKey = ValueKey<String>('text-tv-about-privacy');
 Key textTvLanguageKey(AppLanguage language) =>
     ValueKey<String>('text-tv-language-${language.name}');
 const Key textTvLanguageNoteKey = ValueKey<String>('text-tv-language-note');
+Key textTvPageFontKey(PageFont font) =>
+    ValueKey<String>('text-tv-page-font-${font.name}');
+const Key textTvPageFontNoteKey = ValueKey<String>('text-tv-page-font-note');
+const Key textTvPageFontPreviewKey = ValueKey<String>(
+  'text-tv-page-font-preview',
+);

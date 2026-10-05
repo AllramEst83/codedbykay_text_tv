@@ -2,6 +2,7 @@ import 'package:codedbykay_text_tv/l10n/l10n.dart';
 import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/language_settings.dart';
+import 'package:codedbykay_text_tv/model/page_font_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/styled_text.dart';
@@ -22,6 +23,8 @@ import 'package:flutter/material.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
     super.key,
+    required this.pageFont,
+    required this.onPageFontChanged,
     required this.language,
     required this.onLanguageChanged,
     required this.controls,
@@ -33,6 +36,10 @@ class SettingsScreen extends StatefulWidget {
     required this.saved,
     required this.onSavedChanged,
   });
+
+  /// The typeface of the teletext page, and the listener for it.
+  final PageFontSettings pageFont;
+  final ValueChanged<PageFontSettings> onPageFontChanged;
 
   /// The language of the app, and the listener for it.
   final LanguageSettings language;
@@ -58,6 +65,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  late PageFontSettings _pageFont = widget.pageFont;
   late LanguageSettings _language = widget.language;
   late CrtSettings _crt = widget.crt;
   late ControlsSettings _controls = widget.controls;
@@ -67,6 +75,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (saved == _saved) return;
     setState(() => _saved = saved);
     widget.onSavedChanged(saved);
+  }
+
+  void _setPageFont(PageFontSettings pageFont) {
+    if (pageFont == _pageFont) return;
+    setState(() => _pageFont = pageFont);
+    widget.onPageFontChanged(pageFont);
   }
 
   void _setLanguage(LanguageSettings language) {
@@ -229,6 +243,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: TvMetrics.margin * 2),
                   _SettingsGroup(
+                    id: 'pagefont',
+                    title: context.l10n.sectionPageFont,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          for (final PageFont font in PageFont.values)
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  right: font == PageFont.values.last
+                                      ? 0
+                                      : TvMetrics.gutter,
+                                ),
+                                child: TvChoice(
+                                  choiceKey: textTvPageFontKey(font),
+                                  label: context.l10n.pageFontName(font),
+                                  selected: _pageFont.font == font,
+                                  onTap: () => _setPageFont(
+                                    _pageFont.copyWith(font: font),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: TvMetrics.margin),
+                      _Preview(
+                        settings: CrtSettings.defaults,
+                        font: _pageFont.font,
+                        previewKey: textTvPageFontPreviewKey,
+                        label: context.l10n.pageFontPreview,
+                      ),
+                      const SizedBox(height: TvMetrics.margin),
+                      Text(
+                        context.l10n.pageFontNote,
+                        key: textTvPageFontNoteKey,
+                        style: readerTextStyle(13, TvColors.white),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: TvMetrics.margin * 2),
+                  _SettingsGroup(
                     id: 'crt',
                     title: context.l10n.sectionCrt,
                     children: <Widget>[
@@ -239,7 +295,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onChanged: (bool v) => _set(_crt.copyWith(enabled: v)),
                       ),
                       const SizedBox(height: TvMetrics.margin),
-                      _Preview(settings: _crt),
+                      _Preview(settings: _crt, font: _pageFont.font),
                       const SizedBox(height: TvMetrics.margin),
                       TvSliderRow(
                         sliderKey: textTvCrtCurveKey,
@@ -318,16 +374,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
 /// A few rows of teletext, drawn as the page will be, so a slider can be
 /// judged where it is moved.
 class _Preview extends StatelessWidget {
-  const _Preview({required this.settings});
+  const _Preview({
+    required this.settings,
+    required this.font,
+    this.previewKey = textTvCrtPreviewKey,
+    this.label,
+  });
 
   final CrtSettings settings;
 
-  static const TextStyle _style = TextStyle(
-    fontFamily: kPixelFontFamily,
-    fontSize: 8,
-    height: 1.6,
-    leadingDistribution: TextLeadingDistribution.even,
-  );
+  /// The typeface the rows are drawn in.
+  final PageFont font;
+  final Key previewKey;
+
+  /// What a screen reader says for it; the CRT preview by default.
+  final String? label;
 
   static List<StyledRun> _row(
     String text,
@@ -359,17 +420,18 @@ class _Preview extends StatelessWidget {
             TvRow(
               runs: row,
               columns: textTvColumns,
-              style: _style,
+              style: pageTextStyle(font),
               gutterLeft: tvGutterCells ~/ 2,
+              stretchGlyphs: pageStretchesGlyphs(font),
             ),
         ],
       ),
     );
     return Semantics(
-      label: context.l10n.crtPreview,
+      label: label ?? context.l10n.crtPreview,
       excludeSemantics: true,
       child: Container(
-        key: textTvCrtPreviewKey,
+        key: previewKey,
         decoration: BoxDecoration(
           border: Border.all(color: TvColors.border, width: TvMetrics.border),
         ),

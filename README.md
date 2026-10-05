@@ -58,5 +58,5 @@ Architecture notes, the behaviour spec and the decisions log are in [.agents/arc
 ## Credits and licence
 
 - Content: SVT Text, relayed by [texttv.nu](https://texttv.nu). The app sends its own `app` id (`texttv_android`) with every request, as the site's API asks.
-- Fonts, all SIL Open Font License 1.1 (the licences are in `fonts/`): [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) by CodeMan38 for the teletext page; [Atkinson Hyperlegible](https://brailleinstitute.org/freefont) by the Braille Institute and [OpenDyslexic](https://opendyslexic.org) by Abbie Gonzalez as the reader mode's choice of typeface.
+- Fonts, all SIL Open Font License 1.1 (the licences are in `fonts/`): [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) by CodeMan38 for the teletext page; [Atkinson Hyperlegible](https://brailleinstitute.org/freefont) by the Braille Institute and [OpenDyslexic](https://opendyslexic.org) by Abbie Gonzalez as the reader mode's choice of typeface; [Bedstead](https://bjh21.me.uk/bedstead/) by Ben Harris (public domain, CC0, `fonts/CC0-Bedstead.txt`) is the other typeface for the teletext page.
 - Code: [MIT](LICENSE) © 2026 Kay Wiberg. The bundled font keeps its own licence.

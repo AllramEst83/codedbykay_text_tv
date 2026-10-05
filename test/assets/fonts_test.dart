@@ -15,6 +15,7 @@ void main() {
         if (font == ReaderFont.system) continue;
         expect(pubspec, contains('family: ${readerFontFamily(font)}'));
       }
+      expect(pubspec, contains('family: $kBedsteadFontFamily'));
     });
 
     test('every file named in pubspec.yaml is there', () {
@@ -37,6 +38,10 @@ void main() {
         expect(licence.existsSync(), isTrue, reason: name);
         expect(licence.readAsStringSync(), contains('SIL OPEN FONT LICENSE'));
       }
+      // Bedstead is dedicated to the public domain.
+      final File cc0 = File('fonts/CC0-Bedstead.txt');
+      expect(cc0.existsSync(), isTrue);
+      expect(cc0.readAsStringSync(), contains('CC0 1.0 Universal'));
     });
 
     test('the family names are distinct from the phone\'s', () {

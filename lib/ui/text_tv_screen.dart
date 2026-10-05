@@ -5,6 +5,7 @@ import 'package:codedbykay_text_tv/model/controls_settings.dart';
 import 'package:codedbykay_text_tv/model/crt_settings.dart';
 import 'package:codedbykay_text_tv/model/fastext.dart';
 import 'package:codedbykay_text_tv/model/language_settings.dart';
+import 'package:codedbykay_text_tv/model/page_font_settings.dart';
 import 'package:codedbykay_text_tv/model/page_share.dart';
 import 'package:codedbykay_text_tv/model/prefetch.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
@@ -56,6 +57,8 @@ class TextTvScreen extends StatefulWidget {
     this.onCrtChanged,
     this.refresh = const RefreshSettings(),
     this.onRefreshChanged,
+    this.pageFont = PageFontSettings.defaults,
+    this.onPageFontChanged,
     this.language = LanguageSettings.defaults,
     this.onLanguageChanged,
     this.controls = ControlsSettings.defaults,
@@ -92,6 +95,10 @@ class TextTvScreen extends StatefulWidget {
   final ControlsSettings controls;
   final ValueChanged<ControlsSettings>? onControlsChanged;
 
+  /// The typeface of the teletext page.
+  final PageFontSettings pageFont;
+  final ValueChanged<PageFontSettings>? onPageFontChanged;
+
   /// The language of the app: the app holds it (it sets the locale of
   /// everything), the settings page changes it through [onLanguageChanged].
   final LanguageSettings language;
@@ -124,6 +131,7 @@ class _TextTvScreenState extends State<TextTvScreen>
   late CrtSettings _crtSettings = widget.crt;
   late RefreshSettings _refresh = widget.refresh;
   late ControlsSettings _controls = widget.controls;
+  late PageFontSettings _pageFont = widget.pageFont;
   late SavedPages _saved = widget.saved;
   TextTvResult? _result;
   bool _loading = true;
@@ -326,6 +334,12 @@ class _TextTvScreenState extends State<TextTvScreen>
       ? CrtScreen(settings: _crtSettings, child: page)
       : page;
 
+  void _setPageFont(PageFontSettings pageFont) {
+    if (pageFont == _pageFont) return;
+    setState(() => _pageFont = pageFont);
+    widget.onPageFontChanged?.call(pageFont);
+  }
+
   void _setCrt(CrtSettings crt) {
     setState(() => _crtSettings = crt);
     widget.onCrtChanged?.call(crt);
@@ -335,6 +349,8 @@ class _TextTvScreenState extends State<TextTvScreen>
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) => SettingsScreen(
+          pageFont: _pageFont,
+          onPageFontChanged: _setPageFont,
           language: widget.language,
           onLanguageChanged: (LanguageSettings l) =>
               widget.onLanguageChanged?.call(l),
@@ -589,7 +605,12 @@ class _TextTvScreenState extends State<TextTvScreen>
   Future<void> _shareImage(TextTvPage page, int part) async {
     final SharePlatform? share = widget.share;
     if (share == null) return;
-    final Uint8List? png = await capturePageImage(context, page, part);
+    final Uint8List? png = await capturePageImage(
+      context,
+      page,
+      part,
+      font: _pageFont.font,
+    );
     if (png == null) return;
     await share.shareImage(
       png,
@@ -716,6 +737,7 @@ class _TextTvScreenState extends State<TextTvScreen>
                                     },
                                     onRetry: () => _load(_number, fresh: true),
                                     onPull: _pullRefresh,
+                                    font: _pageFont.font,
                                   ),
                                 ),
                         ),

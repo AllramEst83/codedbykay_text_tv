@@ -53,6 +53,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'SYSTEM follows the phone\'s language. If the phone uses a language this app does not have, English is used.';
 
   @override
+  String get sectionPageFont => 'TELETEXT FONT';
+
+  @override
+  String get pageFontPixel => 'PRESS START 2P';
+
+  @override
+  String get pageFontBedstead => 'BEDSTEAD';
+
+  @override
+  String get pageFontNote =>
+      'Bedstead is drawn after the teletext of the 1980s. It applies to the teletext page, not to reader mode.';
+
+  @override
+  String get pageFontPreview => 'Preview of the teletext font';
+
+  @override
   String get sectionControls => 'CONTROLS';
 
   @override

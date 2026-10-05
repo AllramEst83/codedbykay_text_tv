@@ -2,6 +2,7 @@ import 'package:codedbykay_text_tv/l10n/app_localizations.dart';
 import 'package:codedbykay_text_tv/l10n/app_localizations_en.dart';
 import 'package:codedbykay_text_tv/model/language_settings.dart';
 import 'package:codedbykay_text_tv/model/network_failure.dart';
+import 'package:codedbykay_text_tv/model/page_font_settings.dart';
 import 'package:codedbykay_text_tv/model/page_section.dart';
 import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
@@ -41,6 +42,11 @@ extension AppWording on AppLocalizations {
   /// `Page 377, part 1 of 2` when it has parts ([part] counts from 0).
   String pageDescription(int page, int part, int parts) =>
       parts > 1 ? pageAndPart(page, part + 1, parts) : pageLabel(page);
+
+  String pageFontName(PageFont font) => switch (font) {
+    PageFont.pixel => pageFontPixel,
+    PageFont.bedstead => pageFontBedstead,
+  };
 
   String languageName(AppLanguage language) => switch (language) {
     AppLanguage.system => langSystem,

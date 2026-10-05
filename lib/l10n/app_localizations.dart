@@ -182,6 +182,36 @@ abstract class AppLocalizations {
   /// **'SYSTEM follows the phone\'s language. If the phone uses a language this app does not have, English is used.'**
   String get languageNote;
 
+  /// No description provided for @sectionPageFont.
+  ///
+  /// In en, this message translates to:
+  /// **'TELETEXT FONT'**
+  String get sectionPageFont;
+
+  /// No description provided for @pageFontPixel.
+  ///
+  /// In en, this message translates to:
+  /// **'PRESS START 2P'**
+  String get pageFontPixel;
+
+  /// No description provided for @pageFontBedstead.
+  ///
+  /// In en, this message translates to:
+  /// **'BEDSTEAD'**
+  String get pageFontBedstead;
+
+  /// No description provided for @pageFontNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Bedstead is drawn after the teletext of the 1980s. It applies to the teletext page, not to reader mode.'**
+  String get pageFontNote;
+
+  /// No description provided for @pageFontPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview of the teletext font'**
+  String get pageFontPreview;
+
   /// No description provided for @sectionControls.
   ///
   /// In en, this message translates to:
