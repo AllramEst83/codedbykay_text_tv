@@ -11,6 +11,7 @@ import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/saved_time.dart';
 import 'package:codedbykay_text_tv/model/text_tv_page.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
+import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
 import 'package:codedbykay_text_tv/ui/page_turn.dart';
@@ -52,6 +53,7 @@ class TextTvScreen extends StatefulWidget {
     this.onControlsChanged,
     this.saved = const SavedPages(),
     this.onSavedChanged,
+    this.shortcuts,
     this.clock = _systemNow,
   });
 
@@ -84,6 +86,10 @@ class TextTvScreen extends StatefulWidget {
   /// change (starring a page, or resetting them in the settings page).
   final SavedPages saved;
   final ValueChanged<SavedPages>? onSavedChanged;
+
+  /// The app icon's long-press shortcuts: kept in step with the first
+  /// favourites, and a page chosen from one is opened here.
+  final ShortcutService? shortcuts;
 
   /// Today's date, for saying when a saved copy is from.
   final DateTime Function() clock;
@@ -123,6 +129,7 @@ class _TextTvScreenState extends State<TextTvScreen>
   // Quiet refreshes: one at a time, on a timer if the settings ask for it.
   bool _refreshing = false;
   Timer? _autoTimer;
+  StreamSubscription<int>? _shortcutSubscription;
 
   // Pages read ahead of being asked for: a short queue, worked through one page
   // at a time with a pause between, and dropped the moment the reader moves.
@@ -140,6 +147,11 @@ class _TextTvScreenState extends State<TextTvScreen>
     WidgetsBinding.instance.addObserver(this);
     _load(_number, part: _part);
     _startAuto();
+    final ShortcutService? shortcuts = widget.shortcuts;
+    if (shortcuts != null) {
+      _shortcutSubscription = shortcuts.opened.listen(_open);
+      unawaited(shortcuts.update(_saved.favourites));
+    }
   }
 
   /// Sets up reading ahead for the page just read, when the settings say so.
@@ -488,6 +500,10 @@ class _TextTvScreenState extends State<TextTvScreen>
     });
   }
 
+  static bool _sameFavourites(List<Favourite> a, List<Favourite> b) =>
+      a.length == b.length &&
+      Iterable<int>.generate(a.length).every((int i) => a[i] == b[i]);
+
   void _openRecents() {
     showRecentPages(
       context,
@@ -504,7 +520,16 @@ class _TextTvScreenState extends State<TextTvScreen>
 
   void _setSaved(SavedPages saved) {
     if (saved == _saved) return;
+    final bool favouritesChanged = !_sameFavourites(
+      saved.favourites,
+      _saved.favourites,
+    );
     setState(() => _saved = saved);
+    // Only the favourites are shortcuts: a page read is no reason to tell
+    // the system again.
+    if (favouritesChanged) {
+      unawaited(widget.shortcuts?.update(saved.favourites));
+    }
     widget.onSavedChanged?.call(saved);
   }
 
@@ -527,6 +552,7 @@ class _TextTvScreenState extends State<TextTvScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    unawaited(_shortcutSubscription?.cancel());
     _autoTimer?.cancel();
     _readAheadTimer?.cancel();
     _typedTimer?.cancel();

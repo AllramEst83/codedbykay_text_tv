@@ -18,6 +18,7 @@ import 'package:codedbykay_text_tv/services/reader_settings_store.dart';
 import 'package:codedbykay_text_tv/services/refresh_settings_store.dart';
 import 'package:codedbykay_text_tv/services/saved_pages_store.dart';
 import 'package:codedbykay_text_tv/services/session_store.dart';
+import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,6 +41,8 @@ Future<void> main() async {
   final ControlsSettings controls = await controlsStore.load();
   final SavedPagesStore savedStore = PrefsSavedPagesStore();
   final SavedPages saved = await savedStore.load();
+  final ShortcutService shortcuts = ShortcutService(QuickActionsShortcuts());
+  await shortcuts.start();
   runApp(
     TextTvApp(
       repository: LiveTextTvRepository(
@@ -58,6 +61,7 @@ Future<void> main() async {
           unawaited(controlsStore.save(c)),
       saved: saved,
       onSavedChanged: (SavedPages p) => unawaited(savedStore.save(p)),
+      shortcuts: shortcuts,
       onReaderChanged: (ReaderSettings r) => unawaited(readerStore.save(r)),
     ),
   );

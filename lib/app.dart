@@ -5,6 +5,7 @@ import 'package:codedbykay_text_tv/model/reader_settings.dart';
 import 'package:codedbykay_text_tv/model/refresh_settings.dart';
 import 'package:codedbykay_text_tv/model/saved_pages.dart';
 import 'package:codedbykay_text_tv/model/text_tv_session.dart';
+import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 import 'package:codedbykay_text_tv/ui/text_tv_screen.dart';
 import 'package:codedbykay_text_tv/ui/theme.dart';
@@ -38,6 +39,7 @@ class TextTvApp extends StatelessWidget {
     this.onControlsChanged,
     this.saved = const SavedPages(),
     this.onSavedChanged,
+    this.shortcuts,
   });
 
   final TextTvRepository repository;
@@ -66,6 +68,9 @@ class TextTvApp extends StatelessWidget {
   final SavedPages saved;
   final ValueChanged<SavedPages>? onSavedChanged;
 
+  /// The app icon's long-press shortcuts.
+  final ShortcutService? shortcuts;
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -88,6 +93,7 @@ class TextTvApp extends StatelessWidget {
           onControlsChanged: onControlsChanged,
           saved: saved,
           onSavedChanged: onSavedChanged,
+          shortcuts: shortcuts,
         ),
       ),
     );

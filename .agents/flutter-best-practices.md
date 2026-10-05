@@ -36,7 +36,7 @@ Toolchain: Flutter 3.47 / Dart ^3.13 (see `pubspec.yaml`). Dot shorthands
 ## Dependencies
 - Add a package only when it earns its weight. Check pub.dev: maintained (recent release), not discontinued, supports current Android Gradle Plugin/Kotlin, Flutter-favorite or verified publisher preferred.
 - Use `flutter pub add <pkg>`; commit `pubspec.lock` (this is an app).
-- Wrap third-party/platform APIs behind our own interface so they can be swapped (see architecture). Today the runtime dependencies beyond Flutter are `shared_preferences` (the saved session) and `path_provider` (the page cache folder).
+- Wrap third-party/platform APIs behind our own interface so they can be swapped (see architecture). Today the runtime dependencies beyond Flutter are `shared_preferences` (the saved session and settings), `path_provider` (the page cache folder), `flutter_shaders` (the CRT look) and `quick_actions` (the icon's shortcuts).
 - Never fetch assets at runtime that the app needs to function offline. **Bundle fonts as assets**, don't rely on `google_fonts` runtime downloads.
 
 ## Style & lints
