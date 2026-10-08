@@ -125,7 +125,10 @@ class TvUpdatedNote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: TvMetrics.gutter),
+      padding: const EdgeInsets.only(
+        top: TvMetrics.gutter / 2,
+        bottom: TvMetrics.gutter,
+      ),
       child: Text(
         text,
         key: textTvUpdatedKey,
