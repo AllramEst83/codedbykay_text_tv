@@ -22,6 +22,7 @@ import 'package:codedbykay_text_tv/services/shortcut_service.dart';
 import 'package:codedbykay_text_tv/services/text_tv_repository.dart';
 import 'package:codedbykay_text_tv/ui/breadcrumbs.dart';
 import 'package:codedbykay_text_tv/ui/crt_screen.dart';
+import 'package:codedbykay_text_tv/ui/haptics.dart';
 import 'package:codedbykay_text_tv/ui/news_sheet.dart';
 import 'package:codedbykay_text_tv/ui/page_snapshot.dart';
 import 'package:codedbykay_text_tv/ui/page_turn.dart';
@@ -200,9 +201,13 @@ class _TextTvScreenState extends State<TextTvScreen>
     _startAuto();
     final ShortcutService? shortcuts = widget.shortcuts;
     if (shortcuts != null) {
-      _shortcutSubscription = shortcuts.opened.listen(_open);
+      _shortcutSubscription = shortcuts.opened.listen(
+        (int page) => _open(page, feel: false),
+      );
     }
-    _openPagesSubscription = widget.openPages?.requests.listen(_open);
+    _openPagesSubscription = widget.openPages?.requests.listen(
+      (int page) => _open(page, feel: false),
+    );
   }
 
   // The language the icon shortcuts were last titled in.
@@ -451,10 +456,13 @@ class _TextTvScreenState extends State<TextTvScreen>
     _show(result, readAhead: true);
   }
 
-  /// Goes to [number], remembering the page it leaves so back can return.
-  void _open(int number) {
+  /// Goes to [number], remembering the page it leaves so back can return. The
+  /// phone gives a tap of feedback unless [feel] is off (a page asked for from
+  /// outside, or one that has just had its own feedback).
+  void _open(int number, {bool feel = true}) {
     if (number < textTvFirstPage || number > textTvLastPage) return;
     if (number == _number && !_loading && _result is TextTvShown) return;
+    if (feel) tvPress();
     if (number != _number) {
       if (_history.length >= TextTvSession.maxHistory) _history.removeAt(0);
       _history.add(_number);
@@ -536,6 +544,7 @@ class _TextTvScreenState extends State<TextTvScreen>
 
   void _setPart(int part) {
     if (part < 0 || part >= _parts) return;
+    tvTick();
     setState(() => _part = part);
     _report();
   }
@@ -564,9 +573,11 @@ class _TextTvScreenState extends State<TextTvScreen>
     if (_typed.isEmpty && (digit < 1 || digit > 8)) return;
     final String typed = '$_typed$digit';
     if (typed.length == 3) {
-      _open(int.parse(typed));
+      tvConfirm();
+      _open(int.parse(typed), feel: false);
       return;
     }
+    tvTick();
     // The quick pad forgets a half-typed number; the classic one has a DEL key
     // and an X, and keeps it until they are used.
     if (_controls.quickEntry) {
@@ -578,6 +589,7 @@ class _TextTvScreenState extends State<TextTvScreen>
 
   void _deleteDigit() {
     if (_typed.isEmpty) return;
+    tvTick();
     setState(() => _typed = _typed.substring(0, _typed.length - 1));
   }
 
@@ -592,6 +604,7 @@ class _TextTvScreenState extends State<TextTvScreen>
   /// A tap on the number box: clears what was typed on the quick pad, and
   /// opens or puts away the classic one.
   void _numberTapped() {
+    tvTick();
     if (_controls.quickEntry) {
       _clearTyped();
       return;
@@ -852,8 +865,10 @@ class _TextTvScreenState extends State<TextTvScreen>
                           semanticLabel: _saved.isFavourite(_number)
                               ? context.l10n.removeFavourite
                               : context.l10n.addFavourite,
-                          onTap: () =>
-                              _setSaved(_saved.toggleFavourite(_number)),
+                          onTap: () {
+                            tvPress();
+                            _setSaved(_saved.toggleFavourite(_number));
+                          },
                         ),
                         const SizedBox(width: TvMetrics.gutter),
                         Expanded(
